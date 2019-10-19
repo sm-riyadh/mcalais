@@ -1,19 +1,25 @@
-import { TEMP } from '.'
+import { JOURNAL, COA } from '../'
 
-const temp = id => ({
-	type: TEMP.LOAD,
-	id,
+const sendCoa = payload => {
+	return {
+		type: COA.SEND,
+		data: payload,
+	}
+}
+const loadCoa = payload => ({
+	type: COA.LOAD,
+	data: payload,
 })
 
-const setTemp = (id, downloads) => ({
-	type: TEMP.LOAD_SUCCESS,
-	id,
-	downloads,
+const sendJournals = payload => {
+	return {
+		type: JOURNAL.SEND,
+		data: payload,
+	}
+}
+const loadJournals = payload => ({
+	type: JOURNAL.LOAD,
+	data: payload,
 })
 
-const setTempError = id => ({
-	type: TEMP.LOAD_FAIL,
-	id,
-})
-
-export { temp, setTemp, setTempError }
+export { sendJournals, loadJournals, sendCoa, loadCoa }

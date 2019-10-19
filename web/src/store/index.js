@@ -1,7 +1,11 @@
 const COA = {
-	LOAD: 'COA',
-	LOAD_SUCCESS: 'COA_SUCCESS',
-	LOAD_FAIL: 'COA_FAIL',
+	SEND: 'COA_SEND',
+	LOAD: 'COA_LOAD',
 }
 
-export { COA }
+const JOURNAL = {
+	SEND: 'JOURNAL_SEND',
+	LOAD: 'JOURNAL_LOAD',
+}
+
+export { COA, JOURNAL }

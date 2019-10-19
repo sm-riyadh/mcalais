@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react'
 import { connect } from 'react-redux'
-import chartOfAccounts from '../../store/reducers/chartOfAccounts'
+// import chartOfAccounts from '../../store/reducers/chartOfAccounts'
 // import { connect } from 'react-redux'
 // import { Route, Switch, withRouter } from 'react-router-dom'
 // import * as actions from '../store/actions'
@@ -9,11 +9,7 @@ import chartOfAccounts from '../../store/reducers/chartOfAccounts'
 
 class App extends Component {
 	state = {
-		code: '',
-		name: '',
-		catagory: '',
-		stackon_account: '',
-		stack_catagory: '',
+		account: 7,
 	}
 	OnChange = e => {
 		const state = { ...this.state }
@@ -28,81 +24,77 @@ class App extends Component {
 	}
 
 	render() {
-		const tablePrinter = (data, i) => (
-			<tr>
-				<td>{data.code}</td>
-				<td>{data.name}</td>
-				<td>{data.debit}</td>
-				<td>{data.credit}</td>
-				{data.stack && data.stack.map((data, i) => tablePrinter(data, i))}
-			</tr>
-		)
-
 		return (
 			<Fragment>
-				<main style={{ width: '100%', display: 'flex' }}>
+				<main>
 					<section style={{ margin: '10px' }}>
 						<h2>Chart of Accounts</h2>
 						<table border='1' style={{ width: '100%' }}>
+							<thead>
+								<tr>
+									<th> Code </th>
+									<th> Name </th>
+									<th> Debit </th>
+									<th> Credit </th>
+									<th> Balance </th>
+								</tr>
+							</thead>
 							<tbody>
-								{this.props.chart_of_accounts.map(
-									(data, i) => tablePrinter(data, i)
-									// <tr key={i}>
-									// 	<td>{data.code}</td>
-									// 	<td>{data.name}</td>
-									// 	<td>{data.debit}</td>
-									// 	<td>{data.credit}</td>
-									// 	{data.stack && data.stack.map((data, i) => <td key={i}> {data} </td>)}
-									// </tr>
-								)}
+								{this.props.chart_of_accounts.map((data, i) => (
+									<tr key={i}>
+										<td>{data.code}</td>
+										<td>{data.name}</td>
+										<td>{data.debit}</td>
+										<td>{data.credit}</td>
+										<td>{data.debit - data.credit}</td>
+									</tr>
+								))}
 							</tbody>
 						</table>
 					</section>
 					<hr />
 					<section>
+						<h2> Add account </h2>
 						<form style={{ width: '100%' }} onSubmit={this.HandlerAddAccount}>
 							<label>
 								Account:{' '}
 								<select name='catagory' onChange={this.OnChange} value={this.state.catagory}>
 									<option value='' disabled>
-										Choose
+										Choose a catagory
 									</option>
-									<option disabled> Assets </option>
-									<option disabled>----------</option>
-									<option value='11'>Current Assets</option>
-									<option value='12'>Fixed Assets</option>
-
-									<option disabled> Liabilities </option>
-									<option disabled>----------</option>
-									<option value='21'>Current Liabilities</option>
-									<option value='22'>Long-term Liabilities</option>
-
-									<option disabled> Equity </option>
-									<option disabled>----------</option>
-									<option value='31'>Capital Equity</option>
-									<option value='32'>Income Equity</option>
+									<option value='current_assets'>Current Assets</option>
+									<option value='fixed_assets'>Fixed Assets</option>
+									<option value='current_liabilities'>Current Liabilities</option>
+									<option value='longterm_liabilities'>Long-term Liabilities</option>
+									<option value='equity'>Capital Equity</option>
 								</select>
 							</label>
+							{this.state.catagory && (
+								<label>
+									Stack On:
+									<select name='stackCatagory' onChange={this.OnChange} value={this.state.stack_catagory}>
+										<option value='' disabled>
+											Choose
+										</option>
+										<option disabled> {this.state.stackon_account} </option>
+										<option disabled>----------</option>
+										{this.props.chart_of_accounts.filter(e => e.code.slice(0, 1) === '1').map((data, i) => (
+											<option key={i} value={data.code}>
+												{data.name}
+											</option>
+										))}
+									</select>
+								</label>
+							)}
 							<br />
 							<br />
-							<label>
-								Stack On:
-								<select name='stackCatagory' onChange={this.OnChange} value={this.state.stack_catagory}>
-									<option value='' disabled>
-										Choose
-									</option>
-									<option disabled> {this.state.stackon_account} </option>
-									<option disabled>----------</option>
-									{this.props.chart_of_accounts
-										.filter(e => e.code.slice(0, 1) === '1')
-										.map((data, i) => <option value={data.code}>{data.name}</option>)}
-								</select>
-							</label>
 							Code: <input type='number' name='name' onChange={this.OnChange} value={this.state.name} />
+							<br />
+							<br />
 							Name: <input type='text' name='code' onChange={this.OnChange} value={this.state.code} />
 							<br />
 							<br />
-							<input type='submit' value='Add' />
+							<input type='submit' value='Add Account' />
 						</form>
 					</section>
 				</main>

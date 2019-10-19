@@ -1,16 +1,11 @@
+import { JOURNAL } from '..'
+
 const initialState = []
 
 const journals = (state = initialState, action) => {
 	switch (action.type) {
-		// case :
-		// 	return {
-		// 		...state,
-		// 		[action.id]: {
-		// 			isLoading: true,
-		// 			downloads: null,
-		// 			error: false,
-		// 		},
-		// 	}
+		case JOURNAL.LOAD:
+			return [ action.data, ...state ]
 		default:
 			return state
 	}

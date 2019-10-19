@@ -1,160 +1,111 @@
-// import { COA } from '../index'
+import { COA } from '..'
 
 const initialState = [
 	{
-		code: '11100',
-		name: 'Cash',
+		code: '100001',
+		name: 'Cash-in-Hand',
 		checkable: true,
 		debit: 0,
 		credit: 0,
-
-		stack: [
-			{
-				code: '11101',
-				name: 'Cash-in-Hand',
-				checkable: true,
-				debit: 0,
-				credit: 0,
-			},
-		],
 	},
 	{
-		code: '11200',
+		code: '100002',
 		name: 'Bank',
 		checkable: true,
 		debit: 0,
 		credit: 0,
-
-		stack: [
-			{
-				code: '11101',
-				name: 'A Bank',
-				checkable: true,
-				debit: 0,
-				credit: 0,
-			},
-			{
-				code: '11101',
-				name: 'B Bank',
-				checkable: true,
-				debit: 0,
-				credit: 0,
-			},
-		],
 	},
 	{
-		code: '11300',
+		code: '100003',
 		name: 'Receivable',
 		debit: 0,
 		credit: 0,
-
-		stack: [],
 	},
 	{
-		code: '11400',
+		code: '100005',
 		name: 'Inventory',
 		debit: 0,
 		credit: 0,
-
-		stack: [],
 	},
 	{
-		code: '12100',
+		code: '150001',
 		name: 'Property',
 		debit: 0,
 		credit: 0,
-
-		stack: [],
 	},
 	{
-		code: '12200',
+		code: '150002',
 		name: 'Utility',
 		debit: 0,
 		credit: 0,
-
-		stack: [],
 	},
 	{
 		code: '21100',
 		name: 'Payable',
 		debit: 0,
 		credit: 0,
-
-		stack: [],
 	},
 	{
 		code: '21200',
 		name: 'Wages',
 		debit: 0,
 		credit: 0,
-
-		stack: [],
 	},
 	{
 		code: '22100',
 		name: 'Loan',
 		debit: 0,
 		credit: 0,
-
-		stack: [],
 	},
 	{
 		code: '22200',
 		name: 'Mortage',
 		debit: 0,
 		credit: 0,
-
-		stack: [],
 	},
 	{
 		code: '31100',
 		name: 'Capital',
 		debit: 0,
 		credit: 0,
-
-		stack: [],
 	},
 	{
 		code: '31200',
 		name: 'Wages',
 		debit: 0,
 		credit: 0,
-
-		stack: [],
 	},
 	{
 		code: '32100',
 		name: 'Earnings',
 		debit: 0,
 		credit: 0,
-
-		stack: [],
 	},
 	{
 		code: '32200',
 		name: 'Reserves',
 		debit: 0,
 		credit: 0,
-
-		stack: [],
 	},
 ]
 
 const chartOfAccounts = (state = initialState, action) => {
-	return state
-	// switch (action.type) {
-	// 	case COA.LOAD:
-	// 		return {
-	// 			...state,
-	// 			[action.id]: {
-	// 				isLoading: true,
-	// 				downloads: null,
-	// 				error: false,
-	// 			},
-	// 		}
-	// 	default:
-	// 		return state
-	// }
+	switch (action.type) {
+		case COA.LOAD:
+			let netAmount = 0
+			action.data.amount.map(amount => (netAmount += +amount))
+			console.log(netAmount)
+
+			state.filter(e => e.code === action.data.destination)[0].debit += netAmount
+
+			action.data.source.map((source, i) =>
+				state.filter(e => e.code === source).map(data => (data.credit += +action.data.amount[i]))
+			)
+
+		// return [ action.data, ...state ]
+		default:
+			return state
+	}
 }
 
 export default chartOfAccounts
