@@ -1,12 +1,13 @@
 import { put, call, takeEvery, select } from 'redux-saga/effects'
 
-import { JOURNAL } from '../index'
-import { loadJournals, loadCoa } from '../actions'
+import { LEDGERS } from './index'
+import { loadLedgers, loadJournals, loadCoa } from '../actions'
 // import { fetchImages } from 'api'
 
 export const getPage = state => state.nextPage
 
-export function* handleJournalSend(payload) {
+export function* handleLedgersSend(payload) {
+	yield put(loadLedgers(payload.data))
 	yield put(loadJournals(payload.data))
 	yield put(loadCoa(payload.data))
 
@@ -19,5 +20,5 @@ export function* handleJournalSend(payload) {
 }
 
 export default function* watchImagesLoad() {
-	yield takeEvery(JOURNAL.SEND, handleJournalSend)
+	yield takeEvery(LEDGERS.SEND, handleLedgersSend)
 }

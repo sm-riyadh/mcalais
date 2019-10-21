@@ -1,4 +1,4 @@
-import { JOURNAL, COA } from '../'
+import { LEDGERS, JOURNALS, COA } from '../'
 
 const sendCoa = payload => {
 	return {
@@ -11,15 +11,26 @@ const loadCoa = payload => ({
 	data: payload,
 })
 
+const sendLedgers = payload => {
+	return {
+		type: LEDGERS.SEND,
+		data: payload,
+	}
+}
+const loadLedgers = payload => ({
+	type: LEDGERS.LOAD,
+	data: payload,
+})
+
 const sendJournals = payload => {
 	return {
-		type: JOURNAL.SEND,
+		type: JOURNALS.SEND,
 		data: payload,
 	}
 }
 const loadJournals = payload => ({
-	type: JOURNAL.LOAD,
+	type: JOURNALS.LOAD,
 	data: payload,
 })
 
-export { sendJournals, loadJournals, sendCoa, loadCoa }
+export { sendJournals, loadJournals, sendLedgers, loadLedgers, sendCoa, loadCoa }

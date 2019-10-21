@@ -1,10 +1,10 @@
-import { JOURNAL } from '..'
+import { JOURNALS } from '..'
 
 const initialState = []
 
 const journals = (state = initialState, action) => {
 	switch (action.type) {
-		case JOURNAL.LOAD:
+		case JOURNALS.LOAD:
 			return [ action.data, ...state ]
 		default:
 			return state

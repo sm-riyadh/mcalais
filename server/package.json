@@ -1,0 +1,22 @@
+{
+	"name": "mcalais-server",
+	"version": "1.0.0",
+	"description": "server",
+	"author": "Cratobi",
+	"license": "MIT",
+	"scripts": {
+		"start": "webpack --watch --config webpack.dev.js",
+		"nodemon": "nodemon --no-deprecation dev_build",
+		"build": "webpack --config webpack.prod.js"
+	},
+	"devDependencies": {
+		"clean-webpack-plugin": "^3.0.0",
+		"webpack": "^4.25.1",
+		"webpack-cli": "^3.1.2",
+		"webpack-merge": "^4.1.4"
+	},
+	"dependencies": {
+		"body-parser": "^1.18.3",
+		"express": "^4.16.3"
+	}
+}

@@ -3,9 +3,14 @@ const COA = {
 	LOAD: 'COA_LOAD',
 }
 
-const JOURNAL = {
-	SEND: 'JOURNAL_SEND',
-	LOAD: 'JOURNAL_LOAD',
+const LEDGERS = {
+	SEND: 'LEDGERS_SEND',
+	LOAD: 'LEDGERS_LOAD',
 }
 
-export { COA, JOURNAL }
+const JOURNALS = {
+	SEND: 'JOURNALS_SEND',
+	LOAD: 'JOURNALS_LOAD',
+}
+
+export { COA, LEDGERS, JOURNALS }
