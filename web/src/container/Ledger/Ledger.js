@@ -1,58 +1,21 @@
 import React, { Component, Fragment } from 'react'
 import { connect } from 'react-redux'
-import { sendJournals } from '../../store/actions'
 
-class Ledgers extends Component {
-	state = {
-		date: new Date().getTime(),
-		destination: '',
-		source: [ '' ],
-		amount: [ '' ],
+import { fetchLedger } from '../../store/actions'
 
-		sourceCount: 0,
-	}
-	HandleChange = e => {
-		const state = { ...this.state }
-		state[e.target.name] = e.target.value
-		this.setState(state)
-	}
-	HandleChangeSource = e => {
-		const state = { ...this.state }
-		state[e.target.name][e.target.dataset.count] = e.target.value
-
-		this.setState(state)
-	}
-	HandleClear = e => {
-		const state = {
-			date: new Date().getTime(),
-			destination: '',
-			source: [ '' ],
-			amount: [ NaN ],
-		}
-
-		this.setState(state)
-	}
-
-	HandlerAddJournal = e => {
-		e.preventDefault()
-		this.props.sendJournals({
-			date: this.state.date,
-			destination: this.state.destination,
-			source: this.state.source,
-			amount: this.state.amount,
-		})
-
-		this.HandleClear()
+class Ledger extends Component {
+	componentDidMount() {
+		this.props.fetchLedger()
 	}
 
 	render() {
-		const [ ledgers, chart_of_accounts ] = [ this.props.ledgers, this.props.chart_of_accounts ]
+		const [ ledger, chart_of_account ] = [ this.props.ledger, this.props.chart_of_account ]
 		return (
 			<Fragment>
 				<main>
 					<section style={{ margin: '10px' }}>
-						{ledgers.map((ledger, i) => (
-							<Fragment>
+						{ledger.map((ledger, i) => (
+							<Fragment key={i}>
 								<table border='1' style={{ width: '100%' }}>
 									<caption>{ledger.name}</caption>
 									<thead>
@@ -78,7 +41,7 @@ class Ledgers extends Component {
 												</td>
 												<td>
 													{
-														chart_of_accounts.filter(e => e.code === entry.particular)[0] ? chart_of_accounts.filter(
+														chart_of_account.filter(e => e.code === entry.particular)[0] ? chart_of_account.filter(
 															e => e.code === entry.particular
 														)[0].name :
 														'ERROR: Account Not Found'}
@@ -105,11 +68,11 @@ class Ledgers extends Component {
 }
 
 const mapStateToProps = state => ({
-	ledgers: state.ledgers,
-	chart_of_accounts: state.chart_of_accounts,
+	ledger: state.ledger,
+	chart_of_account: state.chart_of_account,
 })
 const mapDispatchToProps = dispatch => ({
-	sendJournals: payload => dispatch(sendJournals(payload)),
+	fetchLedger: () => dispatch(fetchLedger()),
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(Ledgers)
+export default connect(mapStateToProps, mapDispatchToProps)(Ledger)

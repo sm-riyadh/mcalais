@@ -7,13 +7,14 @@ import bodyparser from 'body-parser'
 //   import logger from 'morgan'
 // }
 
-import authentication from './routes/chartOfAccounts'
+// import authentication from './routes/chartOfAccount'
+import journal from './routes/journal'
 const app = express()
 
 // Middlewares
 app.use(bodyparser.json())
 
-app.use(authentication, company, buyer, draft, order)
+app.use(journal)
 
 // Server Config
 const port = 8080

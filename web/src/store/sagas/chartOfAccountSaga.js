@@ -1,6 +1,9 @@
-import { COA } from '..'
+import { put, takeLatest } from 'redux-saga/effects'
 
-const initialState = [
+import { COA } from '../index'
+import { saveCoa, saveNewCoa } from '../actions'
+
+const sudoData = [
 	{
 		code: '100001',
 		name: 'Cash-in-Hand',
@@ -89,23 +92,26 @@ const initialState = [
 	},
 ]
 
-const chartOfAccounts = (state = initialState, action) => {
-	switch (action.type) {
-		case COA.LOAD:
-			let netAmount = 0
-			action.data.amount.map(amount => (netAmount += +amount))
-			console.log(netAmount)
-
-			state.filter(e => e.code === action.data.destination)[0].debit += netAmount
-
-			action.data.source.map((source, i) =>
-				state.filter(e => e.code === source).map(data => (data.credit += +action.data.amount[i]))
-			)
-
-		// return [ action.data, ...state ]
-		default:
-			return state
+function* handleCoaFetch() {
+	try {
+		// const user = yield call(Api.fetchUser, action.payload.userId);
+		yield put(saveCoa(sudoData))
+	} catch (e) {
+		yield put({ type: 'COA.SAVE', message: e.message })
 	}
 }
 
-export default chartOfAccounts
+function* handleCoaNew(payload) {
+	try {
+		yield put(saveNewCoa(payload))
+	} catch (e) {
+		yield put({ type: 'COA.NEW_SAVE', message: e.message })
+	}
+}
+
+function* watchCoa() {
+	yield takeLatest(COA.FETCH, handleCoaFetch)
+	yield takeLatest(COA.NEW, handleCoaNew)
+}
+
+export default watchCoa

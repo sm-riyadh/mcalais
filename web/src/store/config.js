@@ -4,8 +4,10 @@ import createSagaMiddleware from 'redux-saga'
 import rootSaga from './sagas'
 import rootReducer from './reducers'
 
+const monitor = window['__SAGA_MONITOR_EXTENSION__']
+
 const configureStore = () => {
-	const sagaMiddleware = createSagaMiddleware()
+	const sagaMiddleware = createSagaMiddleware({ sagaMonitor: monitor })
 	const store = createStore(
 		rootReducer,
 

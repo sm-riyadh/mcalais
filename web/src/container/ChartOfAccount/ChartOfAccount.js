@@ -1,13 +1,12 @@
 import React, { Component, Fragment } from 'react'
 import { connect } from 'react-redux'
-// import chartOfAccounts from '../../store/reducers/chartOfAccounts'
-// import { connect } from 'react-redux'
-// import { Route, Switch, withRouter } from 'react-router-dom'
-// import * as actions from '../store/actions'
 
-// import { loadCOA } from '../store/actions/index'
+import { fetchCoa } from '../../store/actions'
 
 class App extends Component {
+	componentDidMount() {
+		this.props.fetchCoa()
+	}
 	state = {
 		account: 7,
 	}
@@ -40,7 +39,7 @@ class App extends Component {
 								</tr>
 							</thead>
 							<tbody>
-								{this.props.chart_of_accounts.map((data, i) => (
+								{this.props.chart_of_account.map((data, i) => (
 									<tr key={i}>
 										<td>{data.code}</td>
 										<td>{data.name}</td>
@@ -78,7 +77,7 @@ class App extends Component {
 										</option>
 										<option disabled> {this.state.stackon_account} </option>
 										<option disabled>----------</option>
-										{this.props.chart_of_accounts.filter(e => e.code.slice(0, 1) === '1').map((data, i) => (
+										{this.props.chart_of_account.filter(e => e.code.slice(0, 1) === '1').map((data, i) => (
 											<option key={i} value={data.code}>
 												{data.name}
 											</option>
@@ -104,11 +103,11 @@ class App extends Component {
 }
 
 const mapStateToProps = state => ({
-	chart_of_accounts: state.chart_of_accounts,
-	journals: state.journals,
+	chart_of_account: state.chart_of_account,
+	journal: state.Journal,
 })
-// const mapDispatchToProps = dispatch => ({
-// 	loadCOA: () => dispatch(loadCOA()),
-// })
+const mapDispatchToProps = dispatch => ({
+	fetchCoa: () => dispatch(fetchCoa()),
+})
 
-export default connect(mapStateToProps, null)(App)
+export default connect(mapStateToProps, mapDispatchToProps)(App)
