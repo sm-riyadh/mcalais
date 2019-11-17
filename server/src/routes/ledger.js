@@ -1,16 +1,15 @@
 import Router from 'express'
 import validator from 'validator'
 // import { Types } from 'mongoose'
-import sudoData from '../sudoJournal'
+import sudoData from '../sudoLedger'
 
 // Express > Router
 const app = Router()
 // CHECK SERVER STATUS
 app.get('/', (req, res) => res.send('Server is working :}'))
 
-// Journal
+// LEDGER
 
-const daySub = day => 25 * 60 * 60 * 1000 * day
 const trimData = (data, start = 0, end = 50 ) => {
 	const trimmedData = []
 
@@ -19,7 +18,9 @@ const trimData = (data, start = 0, end = 50 ) => {
 
 	return trimmedData
 } 
-app.get('/journal', (req, res) => {
+
+
+app.get('/ledger', (req, res) => {
 	const {size} = req.query
 	try {
 		if (!(validator.isNumeric(size)))
@@ -31,7 +32,7 @@ app.get('/journal', (req, res) => {
 	return res.send(trimData(sudoData, undefined, req.query.size))
 })
 // date >= +e.data - daySub(1)
-app.post('/journal', (req, res) => {
+app.post('/ledger', (req, res) => {
 	const { time, debit, credit, amount } = req.body
 	
 	// Validation	
@@ -55,7 +56,7 @@ app.post('/journal', (req, res) => {
 	return res.send(trimData(data))
 })
 
-app.delete('/journal', (req, res) => {
+app.delete('/ledger', (req, res) => {
 	const {id} = req.query
 	try {
 		if (!(validator.isNumeric(id)))
