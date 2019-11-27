@@ -1,0 +1,12 @@
+@import '../../node_modules/normalize-scss/sass/normalize';
+@include normalize();
+
+@import './main.scss';
+@import './sideBar.scss';
+
+html {
+  font-size: 62.5%;
+}
+body {
+  font-size: 1.4rem;
+}

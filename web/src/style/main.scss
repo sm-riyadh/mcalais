@@ -1,0 +1,26 @@
+.main-container {
+  background-color: #dfdfdf;
+  max-height: 100vh;
+
+  overflow: hidden;
+}
+
+.container-scrollable {
+  background-color: #dfdfdf;
+  height: 100vh;
+  overflow: auto;
+}
+.grid {
+  width: 100%;
+  display: inline-grid;
+  grid-auto-rows: 20rem auto;
+  grid-template-columns: 20rem auto 20rem;
+  grid-template-rows: auto;
+  grid-column-gap: 0.5rem;
+}
+// .grid-item {
+//   display: inline-grid;
+// }
+.flex {
+  display: flex;
+}

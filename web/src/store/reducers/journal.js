@@ -5,7 +5,7 @@ const initialState = []
 const journal = (state = initialState, action) => {
 	switch (action.type) {
 		case JOURNAL.SAVE:
-			return state
+			return action.data
 		case JOURNAL.NEW_SAVE:
 			return [
 				{
