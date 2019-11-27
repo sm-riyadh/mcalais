@@ -43,7 +43,6 @@ app.post(`/${url}`, async (req, res) => {
 })
 
 // Delete
-// TODO: NEED TO FIX
 app.delete(`/${url}`, async (req, res) => {
 	const id = req.params.id
 	console.log('$: id', req.params)
