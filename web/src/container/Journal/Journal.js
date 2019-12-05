@@ -1,19 +1,17 @@
 import React, { Component, Fragment } from 'react'
 import { connect } from 'react-redux'
-import { fetchJournal, addNewJournal } from '../../store/actions'
+import { fetchJournal, fetchAccount, addNewJournal } from '../../store/actions'
 
 class Journal extends Component {
   componentDidMount() {
+    this.props.fetchAccount()
     this.props.fetchJournal()
   }
 
   state = {
-    date: new Date().getTime(),
-    destination: '',
-    source: '',
+    credit: '',
+    debit: '',
     amount: '',
-
-    sourceCount: 0,
   }
   HandleChange = e => {
     const state = { ...this.state }
@@ -23,8 +21,8 @@ class Journal extends Component {
   HandleClear = e => {
     const state = {
       date: new Date().getTime(),
-      destination: '',
-      source: '',
+      debit: '',
+      credit: '',
       amount: '',
     }
 
@@ -35,9 +33,8 @@ class Journal extends Component {
     e.preventDefault()
 
     this.props.addNewJournal({
-      date: this.state.date,
-      destination: this.state.destination,
-      source: this.state.source,
+      debit: this.state.debit,
+      credit: this.state.credit,
       amount: this.state.amount,
     })
 
@@ -45,84 +42,40 @@ class Journal extends Component {
   }
 
   render() {
-    const [journal, chart_of_account] = [
-      this.props.journal,
-      this.props.chart_of_account,
-    ]
+    const [journal, account] = [this.props.journal, this.props.account]
 
     return (
       <Fragment>
         <section>
-          <h2>Journal</h2>
-          <table border='1' style={{ width: '100%' }}>
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Destination (Sources)</th>
-                <th>Amount</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {journal.map((data, i) => (
-                <tr key={i}>
-                  <td>
-                    {new Date(+data.time).getDay() +
-                      '/' +
-                      new Date(+data.time).getMonth() +
-                      '/' +
-                      new Date(+data.time).getYear()}
-                  </td>
-                  <td>
-                    {
-                      chart_of_account.filter(e => +e.code === data.credit)[0]
-                        .name
-                    }
-                    <br />
-                    &nbsp;&nbsp;&nbsp;&nbsp;&#x2B11;&nbsp;&nbsp;(
-                    {
-                      chart_of_account.filter(e => +e.code === data.debit)[0]
-                        .name
-                    }
-                    )
-                  </td>
-                  <td>${data.amount}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </section>
-        <section>
           <h2> Custom Transaction </h2>
           <form style={{ width: '100%' }} onSubmit={this.HandlerAddJournal}>
             <label>
-              Source:{' '}
+              From:{' '}
               <select
-                name='source'
+                name='credit'
                 onChange={this.HandleChange}
-                value={this.state.source}
+                value={this.state.credit}
               >
                 <option value=''>Choose a catagory</option>
-                {chart_of_account.map((data, i) => (
-                  <option key={i} value={data.code}>
-                    {data.name}
+                {account.map(({ name, code }, i) => (
+                  <option key={i} value={code}>
+                    {name}
                   </option>
                 ))}
               </select>
             </label>
-            <br />
-            <br />
+            {'   '}
             <label>
-              Destination:{' '}
+              To:{' '}
               <select
-                name='destination'
+                name='debit'
                 onChange={this.HandleChange}
-                value={this.state.destination}
+                value={this.state.debit}
               >
                 <option value=''>Choose a catagory</option>
-                {chart_of_account.map((data, i) => (
-                  <option key={i} value={data.code}>
-                    {data.name}
+                {account.map(({ code, name }, i) => (
+                  <option key={i} value={code}>
+                    {name}
                   </option>
                 ))}
               </select>
@@ -141,6 +94,36 @@ class Journal extends Component {
             <input type='submit' value=' ADD ' />
           </form>
         </section>
+
+        <section>
+          <h2>Journal</h2>
+          <table border='1' style={{ width: '100%' }}>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Destination (Sources)</th>
+                <th>Amount</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {account.length !== 0 && journal.length !== 0
+                ? journal.map(({ _id, amount, credit, debit }, i) => (
+                    <tr key={i}>
+                      <td>{_id}</td>
+                      <td>
+                        {account.filter(e => +e.code === debit)[0].name}
+                        <br />
+                        &nbsp;&nbsp;&nbsp;&nbsp;&#x2B11;&nbsp;&nbsp;(
+                        {account.filter(e => e.code === credit)[0].name})
+                      </td>
+                      <td>${amount}</td>
+                    </tr>
+                  ))
+                : null}
+            </tbody>
+          </table>
+        </section>
       </Fragment>
     )
   }
@@ -148,9 +131,10 @@ class Journal extends Component {
 
 const mapStateToProps = state => ({
   journal: state.journal,
-  chart_of_account: state.chart_of_account,
+  account: state.account,
 })
 const mapDispatchToProps = dispatch => ({
+  fetchAccount: () => dispatch(fetchAccount()),
   fetchJournal: payload => dispatch(fetchJournal(payload)),
   addNewJournal: payload => dispatch(addNewJournal(payload)),
 })

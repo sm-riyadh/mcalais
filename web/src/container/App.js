@@ -1,8 +1,8 @@
 import React, { Component, Fragment } from 'react'
-import { Switch, Route, NavLink } from 'react-router-dom'
+import { Route } from 'react-router-dom'
 import { connect } from 'react-redux'
 
-import LayoutSideBar from '../component/sideBar/sideBar'
+// import LayoutSideBar from '../component/sideBar/sideBar'
 
 import Home from './Home/Home'
 

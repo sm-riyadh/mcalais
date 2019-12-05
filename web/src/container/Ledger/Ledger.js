@@ -9,22 +9,19 @@ class Ledger extends Component {
   }
 
   render() {
-    const [ledger, chart_of_account] = [
-      this.props.ledger,
-      this.props.chart_of_account,
-    ]
+    const [ledger, account] = [this.props.ledger, this.props.account]
     return (
       <Fragment>
         <main>
           <section style={{ margin: '10px' }}>
-            {ledger.map((ledger, i) => (
+            {ledger.map(({ name, transaction }, i) => (
               <Fragment key={i}>
+                <h1>{name}</h1>
                 <table border='1' style={{ width: '100%' }}>
-                  <caption>{ledger.name}</caption>
                   <thead>
                     <tr>
                       <th rowSpan='2'>Date</th>
-                      <th rowSpan='2'>Description</th>
+                      <th rowSpan='2'>account</th>
                       <th colSpan='2'>Amount</th>
                     </tr>
                     <tr>
@@ -33,26 +30,17 @@ class Ledger extends Component {
                     </tr>
                   </thead>
                   <tbody>
-                    {ledger.transactions.map((entry, i) => (
+                    {transaction.map(({ _id, account, credit, debit }, i) => (
                       <tr key={i}>
-                        <td>
-                          {new Date(+entry.time).getDay() +
-                            '/' +
-                            new Date(+entry.time).getMonth() +
-                            '/' +
-                            new Date(+entry.time).getYear()}
-                        </td>
-                        <td>
-                          {chart_of_account.filter(
-                            e => +e.code === entry.credit
-                          )[0]
-                            ? chart_of_account.filter(
-                                e => +e.code === entry.credit
-                              )[0].name
-                            : 'ERROR: Account Not Found'}
-                        </td>
-                        <td>{entry.debit}</td>
-                        <td>{entry.credit}</td>
+                        <td>{_id}</td>
+                        {/* <td>
+                            {account.filter(e => +e.code === credit)[0]
+                              ? account.filter(e => +e.code === credit)[0].name
+                              : 'ERROR: Account Not Found'}
+                          </td> */}
+                        <td>{account}</td>
+                        <td>{debit}</td>
+                        <td>{credit}</td>
                       </tr>
                     ))}
                     <tr>
@@ -74,7 +62,7 @@ class Ledger extends Component {
 
 const mapStateToProps = state => ({
   ledger: state.ledger,
-  chart_of_account: state.chart_of_account,
+  account: state.account,
 })
 const mapDispatchToProps = dispatch => ({
   fetchLedger: () => dispatch(fetchLedger()),

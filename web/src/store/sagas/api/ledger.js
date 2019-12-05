@@ -1,9 +1,9 @@
 const URL = `http://localhost:8080/ledger/`
 
 const fetchLedger = async () => {
-  const response = await fetch(`${URL}?size=50`)
-  const data = await response.json()
-  if (response.status >= 400) {
+  const res = await fetch(`${URL}`)
+  const data = await res.json()
+  if (res.status >= 400) {
     throw new Error(data.errors)
   }
   return data

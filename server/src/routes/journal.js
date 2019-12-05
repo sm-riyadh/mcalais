@@ -1,87 +1,70 @@
 import Router from 'express'
 import validator from 'validator'
+import Journal from '../models/journal'
+import Account from '../models/account'
 // import { Types } from 'mongoose'
-import sudoData from '../sudoJournal'
-import Ledger from '../models/ledger'
 
 // Express > Router
 const app = Router()
-// CHECK SERVER STATUS
-app.get('/', (req, res) => res.send('Server is working :}'))
 
-// Journal
+// Route
+const url = 'journal'
 
 // FETCHES
-
-app.get('/journal', async (req, res) => {
+app.get(`/${url}`, async (req, res) => {
   const { size } = req.query
 
   try {
     if (!validator.isNumeric(size)) throw err
 
-    const ledger = await Ledger.findJournal()
-    let journal = []
+    const journal = await Journal.fetch(size)
 
-    console.log(
-      '$: ledger',
-      ledger.map(ledger =>
-        ledger._doc.transactions.map(
-          transaction =>
-            (journal = [
-              ...journal,
-              {
-                debit: ledger.code,
-                credit: transaction.credit,
-                amount: transaction.amount,
-              },
-            ])
-        )
-      )
-    )
-
-    return res.send(trimData(journal, undefined, req.query.size))
+    return res.send(journal)
   } catch (err) {
     return res.send('Error: ' + err)
   }
 })
-// date >= +e.data - daySub(1)
-app.post('/journal', (req, res) => {
-  const { time, debit, credit, amount } = req.body
 
-  // Validation
+app.post(`/${url}`, async (req, res) => {
+  const { credit, debit, amount } = req.body
+
   try {
+    // Validation
     if (
-      !(
-        validator.isNumeric(time) &&
-        validator.isNumeric(debit) &&
-        validator.isNumeric(credit) &&
-        validator.isNumeric(amount)
-      )
+      !validator.isNumeric(credit) ||
+      !validator.isNumeric(debit) ||
+      !validator.isNumeric(amount) ||
+      !(amount > 0)
     )
-      throw e
-  } catch (e) {
-    return res.send('LOL')
+      throw 'Invalid type'
+
+    if (!(await Account.isExist(credit)) || !(await Account.isExist(debit)))
+      throw 'Invilid account code'
+
+    const newJournal = await Journal.create({
+      credit,
+      debit,
+      amount,
+    })
+
+    return res.send(newJournal)
+  } catch (err) {
+    return res.send('Error: ' + err)
   }
-
-  let data = { id: 999, time, debit: +debit, credit: +credit, amount: +amount }
-  data = [data, ...sudoData]
-
-  return res.send(trimData(data))
 })
 
-app.delete('/journal', (req, res) => {
+// Delete
+app.delete(`/${url}`, async (req, res) => {
   const { id } = req.query
+
   try {
-    if (!validator.isNumeric(id)) throw e
-  } catch (e) {
-    return res.send('LOL')
+    if (!validator.isMongoId(id)) throw 'Invalid type'
+
+    await Journal.remove(id)
+    return res.send()
+  } catch (err) {
+    return res.send('Error: ' + err)
   }
-
-  let data = [...sudoData]
-  data = trimData(data, 0, 10)
-  data = data.filter(item => item.id !== +id)
-
-  return res.send(trimData(data, 0, 10))
 })
 
 export default app

@@ -4,16 +4,18 @@ import bodyparser from 'body-parser'
 
 // dev-env import
 // if (process.env.NODE_ENV !== 'production') {
-//   import logger from 'morgan'
+// import logger from 'morgan'
 // }
 
-import accounts from './routes/accounts'
-// import journal from './routes/journal'
-// import ledger from './routes/ledger'
+import account from './routes/account'
+import journal from './routes/journal'
+import ledger from './routes/ledger'
+
 const app = express()
 
 // Middlewares
 app.use(bodyparser.json())
+// app.use(logger)
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', 'http://localhost:3000') // update to match the domain you will make the request from
   res.header(
@@ -23,7 +25,9 @@ app.use((req, res, next) => {
   next()
 })
 
-app.use(accounts)
+app.use(account)
+app.use(journal)
+app.use(ledger)
 
 // Server Config
 const port = 8080

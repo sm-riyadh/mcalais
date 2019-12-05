@@ -4,7 +4,6 @@ const authenticate = async (req, res, next) => {
   const token = req.header('x-auth')
 
   try {
-    console.log(req.header('x-auth'))
     const user = await User.findByToken(token)
     if (!user) throw 'You need to signin'
 
@@ -13,7 +12,7 @@ const authenticate = async (req, res, next) => {
       username: user.username,
       name: user.name,
       company: user.company,
-      power: user.power
+      power: user.power,
     }
     return next()
   } catch (err) {

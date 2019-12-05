@@ -4,16 +4,16 @@ import { connect } from 'react-redux'
 
 import LayoutSideBar from '../../component/sideBar/sideBar'
 
-import ChartOfAccount from '../ChartOfAccount/ChartOfAccount'
+import Account from '../Account/Account'
 import Ledger from '../Ledger/Ledger'
 import Journal from '../Journal/Journal'
-import { fetchJournal, fetchCoa, fetchLedger } from '../../store/actions'
+import { fetchJournal, fetchAccount, fetchLedger } from '../../store/actions'
 
 class App extends Component {
   componentDidMount() {
     this.props.fetchLedger()
     this.props.fetchJournal()
-    this.props.fetchCoa()
+    this.props.fetchAccount()
   }
   render() {
     return (
@@ -34,18 +34,18 @@ class App extends Component {
                 <NavLink to='/general-ledger'>General Ledgers</NavLink>
               </li>
               <li>
-                <NavLink to='/coa'>Chart of Accounts</NavLink>
+                <NavLink to='/account'>Chart of Accounts</NavLink>
               </li>
             </ul>
           </LayoutSideBar>
           <section className='container-scrollable'>
             <Switch>
               <Route path='/transaction' component={Journal} />
-              <Route path='/coa' component={ChartOfAccount} />
+              <Route path='/account' component={Account} />
               <Route path='/general-ledger' component={Ledger} />
               <Route exact path='/'>
                 <Fragment>
-                  <ChartOfAccount />
+                  <Account />
                   <hr />
                   <Journal />
                   <hr />
@@ -62,7 +62,7 @@ class App extends Component {
 
 const mapDispatchToProps = dispatch => ({
   fetchJournal: () => dispatch(fetchJournal()),
-  fetchCoa: () => dispatch(fetchCoa()),
+  fetchAccount: () => dispatch(fetchAccount()),
   fetchLedger: () => dispatch(fetchLedger()),
 })
 

@@ -1,14 +1,14 @@
-const URL = `http://localhost:8080/journal/`
+const URL = `http://localhost:8080/account/`
 
-const fetchJournal = async () => {
-  const res = await fetch(`${URL}?size=50`)
-  const data = await res.json()
-  if (res.status >= 400) {
+const fetchAccount = async () => {
+  const response = await fetch(`${URL}`)
+  const data = await response.json()
+  if (response.status >= 400) {
     throw new Error(data.errors)
   }
   return data
 }
-const createJournal = async payload => {
+const addAccount = async payload => {
   const res = await fetch(`${URL}`, {
     method: 'POST',
     headers: {
@@ -23,4 +23,4 @@ const createJournal = async payload => {
   return data
 }
 
-export default { fetchJournal, createJournal }
+export default { fetchAccount, addAccount }
