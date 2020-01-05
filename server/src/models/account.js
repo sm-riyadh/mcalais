@@ -1,7 +1,12 @@
 import mongoose from 'mongoose'
 import Journal from './journal'
 
-const accountSchema = new mongoose.Schema({
+const ObjectIdDate = date =>
+  mongoose.Types.ObjectId(
+    Math.floor(date / 1000).toString(16) + '0000000000000000'
+  )
+
+const AccountSchema = new mongoose.Schema({
   name: {
     type: String,
     trim: true,
@@ -30,9 +35,16 @@ const accountSchema = new mongoose.Schema({
   ],
 })
 
-accountSchema.statics.fetchAll = async () => await Account.find()
+AccountSchema.statics.fetchAll = async () =>
+  await Account.find().sort({ code: 1 })
 
-accountSchema.statics.fetchLedger = async () => {
+AccountSchema.statics.fetchLedger = async (
+  startDate = new Date() - 24 * 60 * 60 * 1000 * 7,
+  endDate = new Date()
+) => {
+  if (startDate) startDate = new Date(startDate)
+  if (endDate) endDate = new Date(endDate)
+
   const account = JSON.parse(JSON.stringify(await Account.find()))
 
   const ledger = await Promise.all(
@@ -41,18 +53,42 @@ accountSchema.statics.fetchLedger = async () => {
       if (transaction.length == 0)
         return { _id, name, code, balance, transaction }
 
-      const journalID = transaction.map(journalID => journalID.journal_id)
+      let journalID = transaction.map(journalID => {
+        const id = journalID.journal_id
+
+        if (startDate && id >= ObjectIdDate(startDate)) return id
+        if (
+          startDate &&
+          endDate &&
+          id >= ObjectIdDate(startDate) &&
+          id <= ObjectIdDate(endDate)
+        )
+          return id
+      })
+      journalID = journalID.filter(id => id != null)
 
       const journal = await Promise.all(
         journalID.map(async journalID => {
-          const { _id, credit, debit, amount } = await Journal.fetchSpecific(
-            journalID
-          )
+          console.log('TCL: journalID', journalID)
+          console.log(await Journal.fetchSpecific(journalID))
+          const {
+            _id,
+            credit,
+            debit,
+            particular,
+            amount,
+          } = await Journal.fetchSpecific(journalID)
 
           if (code === debit) {
-            return { _id, account: credit, debit: amount, credit: 0 }
+            return {
+              _id,
+              particular,
+              account: credit,
+              debit: amount,
+              credit: 0,
+            }
           } else if (code === credit) {
-            return { _id, account: debit, debit: 0, credit: amount }
+            return { _id, particular, account: debit, debit: 0, credit: amount }
           }
         })
       )
@@ -62,8 +98,8 @@ accountSchema.statics.fetchLedger = async () => {
   )
   return ledger
 }
-accountSchema.statics.create = async payload => await Account(payload).save()
-accountSchema.statics.addJournal = async (journalID, credit, debit, amount) => {
+AccountSchema.statics.create = async payload => await Account(payload).save()
+AccountSchema.statics.addJournal = async (journalID, credit, debit, amount) => {
   await Account.findOneAndUpdate(
     { code: credit },
     {
@@ -120,12 +156,12 @@ accountSchema.statics.addJournal = async (journalID, credit, debit, amount) => {
     )
   }
 }
-accountSchema.statics.isExist = async code => await Account.exists({ code })
+AccountSchema.statics.isExist = async code => await Account.exists({ code })
 
-accountSchema.statics.remove = async id => {
+AccountSchema.statics.remove = async id => {
   return await Account.findByIdAndRemove(id)
 }
 
-const Account = mongoose.model('Account', accountSchema)
+const Account = mongoose.model('Account', AccountSchema)
 
 export default Account

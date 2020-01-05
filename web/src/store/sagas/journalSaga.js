@@ -2,7 +2,7 @@ import { call, put, takeLatest } from 'redux-saga/effects'
 
 import { JOURNAL } from '../index'
 import Api from './api/journal'
-import { saveJournal, fetchJournal } from '../actions'
+import { saveJournal, fetchJournal, saveNewJournal } from '../actions'
 
 function* handleJournalFetch() {
   try {
@@ -14,10 +14,8 @@ function* handleJournalFetch() {
 }
 function* handleJournalAdd(payload) {
   try {
-    yield call(Api.createJournal, [payload.data])
-
-    // yield put(saveNewJournal(journal))
-    yield put(fetchJournal())
+    const journal = yield call(Api.createJournal, [payload.data])
+    yield put(saveNewJournal(journal))
   } catch (e) {
     yield put({ type: 'Journal.SAVE', message: e.message })
   }

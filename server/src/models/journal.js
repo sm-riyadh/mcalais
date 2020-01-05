@@ -1,7 +1,12 @@
 import mongoose from 'mongoose'
 import Account from './account'
 
-const journalSchema = new mongoose.Schema({
+const ObjectIdDate = date =>
+  mongoose.Types.ObjectId(
+    Math.floor(date / 1000).toString(16) + '0000000000000000'
+  )
+
+const JournalSchema = new mongoose.Schema({
   debit: {
     type: Number,
     min: 100001,
@@ -19,18 +24,47 @@ const journalSchema = new mongoose.Schema({
     min: 1,
     required: true,
   },
+  particular: {
+    type: String,
+    required: true,
+  },
+  comment: {
+    type: String,
+  },
 })
+JournalSchema.methods.toJSON = function() {
+  const { _id, credit, debit, particular, amount, comment } = this.toObject()
+  const date = _id.getTimestamp()
+  return { id: _id, date, credit, debit, particular, amount, comment }
+}
 
-// journalSchema.statics.fetchAll = async () => await Journal.find()
-journalSchema.statics.fetch = async size => await Journal.find().limit(+size)
-journalSchema.statics.fetchSpecific = async id => await Journal.findById(id)
-journalSchema.statics.create = async payload => {
-  const { _id, credit, debit, amount } = await Journal(payload).save()
+JournalSchema.statics.fetch = async (
+  size = 20,
+  startDate = new Date() - 24 * 60 * 60 * 1000 * 2,
+  endDate = new Date()
+) => {
+  if (startDate) startDate = new Date(startDate)
+  if (endDate) endDate = new Date(endDate)
+
+  return await Journal.find({
+    _id: {
+      $gte: ObjectIdDate(startDate),
+      $lt: ObjectIdDate(endDate),
+    },
+  })
+    .limit(+size)
+    .sort({ _id: -1 })
+}
+JournalSchema.statics.fetchSpecific = async id => await Journal.findById(id)
+JournalSchema.statics.create = async payload => {
+  const { _id, credit, debit, particular, amount, comment } = await Journal(
+    payload
+  ).save()
 
   await Account.addJournal(_id, credit, debit, amount)
-  return { _id, credit, debit, amount }
+  return { _id, credit, debit, particular, amount, comment }
 }
-journalSchema.statics.remove = async id => {
+JournalSchema.statics.remove = async id => {
   const journal = await Journal.findById(id)
 
   await Account.update(
@@ -54,5 +88,5 @@ journalSchema.statics.remove = async id => {
   return null
 }
 
-const Journal = mongoose.model('Journal', journalSchema)
+const Journal = mongoose.model('Journal', JournalSchema)
 export default Journal

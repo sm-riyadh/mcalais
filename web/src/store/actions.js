@@ -41,8 +41,9 @@ const saveNewJournal = payload => ({
 /*
  * Ledger
  */
-const fetchLedger = () => ({
+const fetchLedger = payload => ({
   type: LEDGER.FETCH,
+  data: payload,
 })
 const saveLedger = payload => ({
   type: LEDGER.SAVE,

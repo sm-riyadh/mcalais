@@ -3,14 +3,28 @@
 
   &__nav {
     font-size: 1.6rem;
-    padding: 2rem;
     list-style: none;
 
     li {
       text-decoration: none;
-
-      padding: 0.5rem 0;
       border-radius: 50%;
+
+      a {
+        color: #000000;
+        padding: 1.5rem 2rem;
+
+        &:hover {
+          background-color: #ececec;
+        }
+      }
+      .active {
+        color: #ffffff;
+        background-color: #5a5a5a;
+
+        &:hover {
+          background-color: #5a5a5a;
+        }
+      }
     }
   }
 }

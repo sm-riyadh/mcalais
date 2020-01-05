@@ -12,12 +12,14 @@ const url = 'journal'
 
 // FETCHES
 app.get(`/${url}`, async (req, res) => {
-  const { size } = req.query
+  const { size, startDate, endDate } = req.query
 
   try {
     if (!validator.isNumeric(size)) throw err
+    // if (!validator.isISO8601(startDate)) throw err
+    // if (!validator.isISO8601(endDate)) throw err
 
-    const journal = await Journal.fetch(size)
+    const journal = await Journal.fetch(size, startDate, endDate)
 
     return res.send(journal)
   } catch (err) {
@@ -26,7 +28,7 @@ app.get(`/${url}`, async (req, res) => {
 })
 
 app.post(`/${url}`, async (req, res) => {
-  const { credit, debit, amount } = req.body
+  const { credit, debit, particular, amount, comment } = req.body
 
   try {
     // Validation
@@ -41,10 +43,12 @@ app.post(`/${url}`, async (req, res) => {
     if (!(await Account.isExist(credit)) || !(await Account.isExist(debit)))
       throw 'Invilid account code'
 
-    const newJournal = await Journal.create({
+    const { newJournal } = await Journal.create({
       credit,
       debit,
+      particular,
       amount,
+      comment,
     })
 
     return res.send(newJournal)

@@ -1,5 +1,7 @@
 import React, { Component, Fragment } from 'react'
 import { connect } from 'react-redux'
+import dateFormat from 'dateformat'
+
 import { fetchJournal, fetchAccount, addNewJournal } from '../../store/actions'
 
 class Journal extends Component {
@@ -11,7 +13,9 @@ class Journal extends Component {
   state = {
     credit: '',
     debit: '',
+    particular: '',
     amount: '',
+    comment: '',
   }
   HandleChange = e => {
     const state = { ...this.state }
@@ -23,7 +27,9 @@ class Journal extends Component {
       date: new Date().getTime(),
       debit: '',
       credit: '',
+      particular: '',
       amount: '',
+      comment: '',
     }
 
     this.setState(state)
@@ -35,10 +41,13 @@ class Journal extends Component {
     this.props.addNewJournal({
       debit: this.state.debit,
       credit: this.state.credit,
+      particular: this.state.particular,
       amount: this.state.amount,
+      comment: this.state.comment,
     })
 
     this.HandleClear()
+    this.accountSelect.focus()
   }
 
   render() {
@@ -46,83 +55,140 @@ class Journal extends Component {
 
     return (
       <Fragment>
-        <section>
-          <h2> Custom Transaction </h2>
-          <form style={{ width: '100%' }} onSubmit={this.HandlerAddJournal}>
-            <label>
-              From:{' '}
-              <select
-                name='credit'
-                onChange={this.HandleChange}
-                value={this.state.credit}
-              >
-                <option value=''>Choose a catagory</option>
-                {account.map(({ name, code }, i) => (
-                  <option key={i} value={code}>
-                    {name}
-                  </option>
-                ))}
-              </select>
-            </label>
-            {'   '}
-            <label>
-              To:{' '}
-              <select
-                name='debit'
-                onChange={this.HandleChange}
-                value={this.state.debit}
-              >
-                <option value=''>Choose a catagory</option>
-                {account.map(({ code, name }, i) => (
-                  <option key={i} value={code}>
-                    {name}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <br />
-            <br />
-            Amount:{' '}
-            <input
-              type='number'
-              name='amount'
-              onChange={this.HandleChange}
-              value={this.state.amount}
-            />
-            <br />
-            <br />
-            <input type='submit' value=' ADD ' />
-          </form>
+        <section className='container-scrollable'>
+          <div className='container-card'>
+            <h2>Journal</h2>
+            <table
+              className='uk-table uk-table-divider uk-table-striped uk-table-hover uk-table-small uk-table-justify  uk-table-middle'
+              style={{ width: '100%' }}
+            >
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Particular</th>
+                  <th>Destination (Sources)</th>
+                  <th>Amount</th>
+                  <th>Comments</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {account.length !== 0 && journal.length !== 0
+                  ? journal.map(
+                      (
+                        { date, particular, amount, credit, debit, comment },
+                        i
+                      ) => (
+                        <tr key={i}>
+                          <td>
+                            <span
+                              title={dateFormat(
+                                date,
+                                'ddd, dS mmm, yyyy, h:MM:ss TT'
+                              )}
+                            >
+                              {dateFormat(date, 'ddd, dS mmm, yyyy')}
+                            </span>
+                          </td>
+                          <td>{particular}</td>
+                          <td>
+                            {account.filter(e => +e.code === debit)[0].name}
+                            <br />
+                            &nbsp;&nbsp;&nbsp;&nbsp;&#x2B11;&nbsp;&nbsp;(
+                            {account.filter(e => e.code === credit)[0].name})
+                          </td>
+                          <td>${amount}</td>
+                          <td>{comment}</td>
+                        </tr>
+                      )
+                    )
+                  : null}
+              </tbody>
+            </table>
+          </div>
         </section>
-
-        <section>
-          <h2>Journal</h2>
-          <table border='1' style={{ width: '100%' }}>
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Destination (Sources)</th>
-                <th>Amount</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {account.length !== 0 && journal.length !== 0
-                ? journal.map(({ _id, amount, credit, debit }, i) => (
-                    <tr key={i}>
-                      <td>{_id}</td>
-                      <td>
-                        {account.filter(e => +e.code === debit)[0].name}
-                        <br />
-                        &nbsp;&nbsp;&nbsp;&nbsp;&#x2B11;&nbsp;&nbsp;(
-                        {account.filter(e => e.code === credit)[0].name})
-                      </td>
-                      <td>${amount}</td>
-                    </tr>
-                  ))
-                : null}
-            </tbody>
-          </table>
+        <section
+          className='uk-container sidebar'
+          style={{ paddingTop: '3rem' }}
+        >
+          <h2> Transaction </h2>
+          <hr />
+          <div>
+            <form style={{ width: '100%' }} onSubmit={this.HandlerAddJournal}>
+              <section>
+                From
+                <select
+                  name='credit'
+                  ref={select => {
+                    this.accountSelect = select
+                  }}
+                  className='uk-select'
+                  onChange={this.HandleChange}
+                  value={this.state.credit}
+                >
+                  <option value=''>Choose a catagory</option>
+                  {account.map(({ name, code }, i) => (
+                    <option key={i} value={code}>
+                      {name}
+                    </option>
+                  ))}
+                </select>
+              </section>
+              <label>
+                To
+                <select
+                  name='debit'
+                  className='uk-select'
+                  onChange={this.HandleChange}
+                  value={this.state.debit}
+                >
+                  <option value=''>Choose a catagory</option>
+                  {account.map(({ code, name }, i) => (
+                    <option key={i} value={code}>
+                      {name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <br />
+              <br />
+              Particular:{' '}
+              <input
+                type='text'
+                name='particular'
+                className='uk-input'
+                onChange={this.HandleChange}
+                value={this.state.particular}
+              />
+              <br />
+              <br />
+              Amount:{' '}
+              <input
+                type='number'
+                name='amount'
+                className='uk-input'
+                onChange={this.HandleChange}
+                value={this.state.amount}
+              />
+              <br />
+              <br />
+              Remarks:{' '}
+              <textarea
+                type='text'
+                name='comment'
+                className='uk-input'
+                onChange={this.HandleChange}
+                value={this.state.comment}
+              />
+              <br />
+              <br />
+              <input
+                className='uk-button uk-button-primary'
+                type='submit'
+                input='ADD'
+              />
+            </form>
+          </div>
         </section>
       </Fragment>
     )

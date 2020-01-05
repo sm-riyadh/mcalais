@@ -5,19 +5,43 @@ import { fetchLedger } from '../../store/actions'
 
 class Ledger extends Component {
   componentDidMount() {
-    this.props.fetchLedger()
+    this.props.fetchLedger({
+      start_date: new Date(new Date() - 24 * 60 * 60 * 1000 * 7)
+        .toISOString()
+        .substr(0, 10),
+      end_date: new Date().toISOString().substr(0, 10),
+    })
+  }
+
+  state = {
+    start_date: new Date(new Date() - 24 * 60 * 60 * 1000 * 7)
+      .toISOString()
+      .substr(0, 10),
+    end_date: new Date().toISOString().substr(0, 10),
+  }
+  HandleDateChange = e => {
+    const state = { ...this.state }
+    state[e.target.name] = e.target.value
+    this.setState(state)
+    this.props.fetchLedger({
+      start_date: this.state.start_date,
+      end_date: this.state.end_date,
+    })
   }
 
   render() {
-    const [ledger, account] = [this.props.ledger, this.props.account]
+    const [ledger] = [this.props.ledger]
     return (
       <Fragment>
-        <main>
-          <section style={{ margin: '10px' }}>
+        <section className='container-scrollable'>
+          <div className='container-card'>
             {ledger.map(({ name, transaction }, i) => (
               <Fragment key={i}>
                 <h1>{name}</h1>
-                <table border='1' style={{ width: '100%' }}>
+                <table
+                  className='uk-table uk-table-divider uk-table-striped uk-table-hover uk-table-small uk-table-justify  uk-table-middle'
+                  style={{ width: '100%' }}
+                >
                   <thead>
                     <tr>
                       <th rowSpan='2'>Date</th>
@@ -53,8 +77,37 @@ class Ledger extends Component {
                 <br />
               </Fragment>
             ))}
-          </section>
-        </main>
+          </div>
+        </section>
+        <section
+          className='uk-container sidebar'
+          style={{ paddingTop: '3rem' }}
+        >
+          <h2>Filter</h2>
+          <hr />
+          <label>
+            From
+            <input
+              type='date'
+              name='start_date'
+              className='uk-input'
+              onChange={this.HandleDateChange}
+              value={this.state.start_date}
+            />
+          </label>
+          <br />
+          <br />
+          <label>
+            To
+            <input
+              type='date'
+              name='end_date'
+              className='uk-input'
+              onChange={this.HandleDateChange}
+              value={this.state.end_date}
+            />
+          </label>
+        </section>
       </Fragment>
     )
   }
@@ -65,7 +118,7 @@ const mapStateToProps = state => ({
   account: state.account,
 })
 const mapDispatchToProps = dispatch => ({
-  fetchLedger: () => dispatch(fetchLedger()),
+  fetchLedger: payload => dispatch(fetchLedger(payload)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Ledger)
