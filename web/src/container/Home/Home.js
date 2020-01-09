@@ -13,13 +13,7 @@ import { fetchJournal, fetchAccount, fetchLedger } from '../../store/actions'
 class App extends Component {
   componentDidMount() {
     if (this.props.match.path === '/') {
-      this.props.fetchLedger({
-        start_date: new Date(new Date() - 24 * 60 * 60 * 1000 * 7)
-          .toISOString()
-          .substr(0, 10),
-        end_date: new Date().toISOString().substr(0, 10),
-      })
-      this.props.fetchJournal()
+      // this.props.fetchJournal()
       this.props.fetchAccount()
     }
   }

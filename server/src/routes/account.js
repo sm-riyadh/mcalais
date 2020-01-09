@@ -21,21 +21,56 @@ app.get(`/${url}`, async (req, res) => {
 })
 
 // Push new
+// app.post(`/${url}`, async (req, res) => {
+//   const { name, type, code } = req.body
+
+//   try {
+//     if (type !== 'asset' && type !== 'liability' && type !== 'equity')
+//       throw 'Wrong Type'
+
+//     // Generating Code
+//     // if (type === 'asset') 100000 <= code && code < 200000
+//     // else if (type === 'liability') 200000 <= code && code < 300000
+//     // else if (type === 'equity') 300000 <= code && code < 400000
+
+//     const account = await Account.create({ name, type, code })
+
+//     return res.send(account)
+//   } catch (err) {
+//     return res.send('Error: ' + err)
+//   }
+// })
+
+// Patch new
 app.post(`/${url}`, async (req, res) => {
-  const { name, type, code } = req.body
+  const change_tree = req.body
 
   try {
-    if (type !== 'asset' && type !== 'liability' && type !== 'equity')
-      throw 'Wrong Type'
-
+    // if (type !== 'asset' && type !== 'liability' && type !== 'equity')
+    // throw 'Wrong Type'
     // Generating Code
     // if (type === 'asset') 100000 <= code && code < 200000
     // else if (type === 'liability') 200000 <= code && code < 300000
     // else if (type === 'equity') 300000 <= code && code < 400000
+    change_tree.map(async (change, index) => {
+      if (change.action === 'ADD') {
+        await Account.create({
+          id: change.data.id,
+          name: change.data.name,
+          type: change.data.catagory_id,
+          under: change.type,
+          code: 100009,
+        })
 
-    const account = await Account.create({ name, type, code })
+        if (change.type === 'preset')
+          await Account.insertPreset({
+            account_id: change.data.account_id,
+            preset_id: change.data.id,
+          })
+      }
+    })
 
-    return res.send(account)
+    return res.send()
   } catch (err) {
     return res.send('Error: ' + err)
   }

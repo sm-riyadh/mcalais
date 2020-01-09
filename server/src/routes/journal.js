@@ -16,8 +16,8 @@ app.get(`/${url}`, async (req, res) => {
 
   try {
     if (!validator.isNumeric(size)) throw err
-    // if (!validator.isISO8601(startDate)) throw err
-    // if (!validator.isISO8601(endDate)) throw err
+    if (startDate && !validator.isISO8601(startDate)) throw err
+    if (endDate && !validator.isISO8601(endDate)) throw err
 
     const journal = await Journal.fetch(size, startDate, endDate)
 
@@ -43,13 +43,14 @@ app.post(`/${url}`, async (req, res) => {
     if (!(await Account.isExist(credit)) || !(await Account.isExist(debit)))
       throw 'Invilid account code'
 
-    const { newJournal } = await Journal.create({
+    const newJournal = await Journal.create({
       credit,
       debit,
       particular,
       amount,
       comment,
     })
+    console.log('TCL: newJournal', newJournal)
 
     return res.send(newJournal)
   } catch (err) {

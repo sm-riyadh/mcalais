@@ -13,6 +13,10 @@ const AccountSchema = new mongoose.Schema({
     minlength: 2,
     required: true,
   },
+  id: {
+    type: String,
+    required: true,
+  },
   type: {
     type: String,
     required: true,
@@ -28,12 +32,45 @@ const AccountSchema = new mongoose.Schema({
     default: 0,
     required: true,
   },
+  under: {
+    type: String,
+    required: true,
+  },
+  preset: [{ type: Object }],
   transaction: [
     {
       journal_id: mongoose.Schema.ObjectId,
     },
   ],
 })
+
+/* {
+  name: {
+    type: String,
+    trim: true,
+    minlength: 2,
+    required: true,
+  },
+  type: {
+    type: String,
+    required: true,
+  },
+  code: {
+    type: Number,
+    min: 100000,
+    max: 999999,
+    required: true,
+  },
+  balance: {
+    type: Number,
+    default: 0,
+    required: true,
+  },
+  under: {
+    type: String,
+    default: 'preset',
+  },
+}, */
 
 AccountSchema.statics.fetchAll = async () =>
   await Account.find().sort({ code: 1 })
@@ -69,8 +106,6 @@ AccountSchema.statics.fetchLedger = async (
 
       const journal = await Promise.all(
         journalID.map(async journalID => {
-          console.log('TCL: journalID', journalID)
-          console.log(await Journal.fetchSpecific(journalID))
           const {
             _id,
             credit,
@@ -78,17 +113,26 @@ AccountSchema.statics.fetchLedger = async (
             particular,
             amount,
           } = await Journal.fetchSpecific(journalID)
+          const date = _id.getTimestamp()
 
           if (code === debit) {
             return {
               _id,
+              date,
               particular,
               account: credit,
               debit: amount,
               credit: 0,
             }
           } else if (code === credit) {
-            return { _id, particular, account: debit, debit: 0, credit: amount }
+            return {
+              _id,
+              date,
+              particular,
+              account: debit,
+              debit: 0,
+              credit: amount,
+            }
           }
         })
       )
@@ -98,7 +142,20 @@ AccountSchema.statics.fetchLedger = async (
   )
   return ledger
 }
-AccountSchema.statics.create = async payload => await Account(payload).save()
+AccountSchema.statics.create = async payload => {
+  return await Account(payload).save()
+}
+AccountSchema.statics.insertPreset = async payload => {
+  console.log(payload)
+  return await Account.findOneAndUpdate(
+    { id: payload.account_id },
+    {
+      $push: {
+        preset: { preset_id: payload.preset_id },
+      },
+    }
+  )
+}
 AccountSchema.statics.addJournal = async (journalID, credit, debit, amount) => {
   await Account.findOneAndUpdate(
     { code: credit },

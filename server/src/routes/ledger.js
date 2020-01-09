@@ -10,7 +10,6 @@ app.get('/ledger', async (req, res) => {
 
   try {
     const ledger = await Account.fetchLedger(startDate, endDate)
-    console.log('TCL: ledger', ledger)
 
     return res.send(ledger)
   } catch (err) {

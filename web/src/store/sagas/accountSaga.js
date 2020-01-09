@@ -14,9 +14,16 @@ function* handleAccountFetch() {
 }
 
 function* handleAddAccount(payload) {
-  console.log('TCL: function*handleAddAccount -> payload', payload.data)
   try {
     yield call(Api.addAccount, [payload.data])
+    yield put(fetchAccount())
+  } catch (e) {
+    yield put({ type: 'ACCOUNT.NEW_SAVE', message: e.message })
+  }
+}
+function* handleChangeAccount(payload) {
+  try {
+    yield call(Api.changeAccount, [payload.data])
     yield put(fetchAccount())
   } catch (e) {
     yield put({ type: 'ACCOUNT.NEW_SAVE', message: e.message })
@@ -25,6 +32,7 @@ function* handleAddAccount(payload) {
 
 function* watchAccount() {
   yield takeLatest(ACCOUNT.FETCH, handleAccountFetch)
+  yield takeLatest(ACCOUNT.CHANGE, handleChangeAccount)
   yield takeLatest(ACCOUNT.ADD, handleAddAccount)
 }
 

@@ -6,24 +6,24 @@ import { LEDGER, JOURNAL, ACCOUNT } from './index'
 const fetchAccount = () => ({
   type: ACCOUNT.FETCH,
 })
-const saveAccount = payload => {
-  return {
-    type: ACCOUNT.SAVE,
-    data: payload,
-  }
-}
-const addAccount = payload => {
-  return {
-    type: ACCOUNT.ADD,
-    data: payload,
-  }
-}
-
+const saveAccount = payload => ({
+  type: ACCOUNT.SAVE,
+  data: payload,
+})
+const addAccount = payload => ({
+  type: ACCOUNT.ADD,
+  data: payload,
+})
+const sumbitChange = payload => ({
+  type: ACCOUNT.CHANGE,
+  data: payload,
+})
 /*
  * Journal
  */
-const fetchJournal = () => ({
+const fetchJournal = payload => ({
   type: JOURNAL.FETCH,
+  data: payload,
 })
 const saveJournal = payload => ({
   type: JOURNAL.SAVE,
@@ -63,4 +63,5 @@ export {
   fetchAccount,
   saveAccount,
   addAccount,
+  sumbitChange,
 }

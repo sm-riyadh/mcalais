@@ -1,5 +1,6 @@
 import React, { Component, Fragment } from 'react'
 import { connect } from 'react-redux'
+import fmt from 'indian-number-format'
 
 import { fetchAccount, addAccount } from '../../store/actions'
 
@@ -17,7 +18,7 @@ class App extends Component {
     state[e.target.name] = e.target.value
     this.setState(state)
   }
-  HandleClear = e => {
+  HandleClear = () => {
     const state = {
       name: '',
       code: '',
@@ -60,7 +61,10 @@ class App extends Component {
                   <tr key={i}>
                     <td>{code}</td>
                     <td>{name}</td>
-                    <td>{balance}</td>
+                    <td>
+                      <span style={{ fontSize: '2rem' }}>৳</span>{' '}
+                      {fmt.format(balance, 2)}
+                    </td>
                   </tr>
                 ))}
               </tbody>

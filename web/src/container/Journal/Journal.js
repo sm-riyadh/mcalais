@@ -1,6 +1,7 @@
 import React, { Component, Fragment } from 'react'
 import { connect } from 'react-redux'
 import dateFormat from 'dateformat'
+import fmt from 'indian-number-format'
 
 import { fetchJournal, fetchAccount, addNewJournal } from '../../store/actions'
 
@@ -11,18 +12,75 @@ class Journal extends Component {
   }
 
   state = {
+    sort: {
+      start_date: new Date(new Date() - 24 * 60 * 60 * 1000 * 7)
+        .toISOString()
+        .substr(0, 10),
+      end_date: new Date().toISOString().substr(0, 10),
+      search: '',
+      day: 'today',
+    },
     credit: '',
     debit: '',
     particular: '',
     amount: '',
     comment: '',
   }
-  HandleChange = e => {
+  HandleChange = (e, option) => {
     const state = { ...this.state }
-    state[e.target.name] = e.target.value
-    this.setState(state)
+    const name = e.target.name
+    const value = e.target.value
+
+    if (!option) state[name] = value
+    else {
+      state[option][name] = value
+    }
+
+    if (name === 'start_date' || name === 'end_date')
+      this.setState(state, this.onDateChange)
+    else if (name === 'day' && value !== 'n') {
+      console.log('TCL: Journal -> HandleChange -> end_date', value)
+      switch (value) {
+        case '1': {
+          state.sort.start_date = new Date(new Date() - 24 * 60 * 60 * 1000 * 1)
+            .toISOString()
+            .substr(0, 10)
+          state.sort.end_date = new Date().toISOString().substr(0, 10)
+
+          this.setState(state, this.onDateChange)
+          break
+        }
+        case '2': {
+          state.sort.start_date = new Date(new Date() - 24 * 60 * 60 * 1000 * 2)
+            .toISOString()
+            .substr(0, 10)
+          state.sort.end_date = new Date().toISOString().substr(0, 10)
+
+          this.setState(state, this.onDateChange)
+          break
+        }
+        case '3':
+          state.sort.start_date = new Date(new Date() - 24 * 60 * 60 * 1000 * 2)
+            .toISOString()
+            .substr(0, 10)
+          state.sort.end_date = new Date().toISOString().substr(0, 10)
+
+          this.setState(state, this.onDateChange)
+          break
+        case '7':
+          state.sort.start_date = new Date(new Date() - 24 * 60 * 60 * 1000 * 7)
+            .toISOString()
+            .substr(0, 10)
+          state.sort.end_date = new Date().toISOString().substr(0, 10)
+
+          this.setState(state, this.onDateChange)
+          break
+        default:
+          break
+      }
+    } else this.setState(state)
   }
-  HandleClear = e => {
+  HandleClear = () => {
     const state = {
       date: new Date().getTime(),
       debit: '',
@@ -49,6 +107,12 @@ class Journal extends Component {
     this.HandleClear()
     this.accountSelect.focus()
   }
+  onDateChange = () => {
+    this.props.fetchJournal({
+      start_date: this.state.sort.start_date,
+      end_date: this.state.sort.end_date,
+    })
+  }
 
   render() {
     const [journal, account] = [this.props.journal, this.props.account]
@@ -57,54 +121,101 @@ class Journal extends Component {
       <Fragment>
         <section className='container-scrollable'>
           <div className='container-card'>
-            <h2>Journal</h2>
-            <table
-              className='uk-table uk-table-divider uk-table-striped uk-table-hover uk-table-small uk-table-justify  uk-table-middle'
-              style={{ width: '100%' }}
-            >
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Particular</th>
-                  <th>Destination (Sources)</th>
-                  <th>Amount</th>
-                  <th>Comments</th>
-                </tr>
-              </thead>
+            <h3>Journal</h3>
+            <span style={{ float: 'right' }} className='uk-form-group sort'>
+              {/* <input type='text' className='uk-input' placeholder='Search' /> */}
+              <select
+                name='day'
+                className='uk-select'
+                onChange={e => this.HandleChange(e, 'sort')}
+                value={this.state.sort.day}
+              >
+                <option value='1'>Today</option>
+                <option value='2'>Yesterday</option>
+                <option value='3'>Past 3 days</option>
+                <option value='7'>Weekly</option>
+                <option value='n'>Custom</option>
+              </select>
+              {this.state.sort.day === 'n' && (
+                <Fragment>
+                  <input
+                    type='date'
+                    name='start_date'
+                    className='uk-input'
+                    onChange={e => this.HandleChange(e, 'sort')}
+                    value={this.state.sort.start_date}
+                  />
+                  <input
+                    type='date'
+                    name='end_date'
+                    className='uk-input'
+                    onChange={e => this.HandleChange(e, 'sort')}
+                    value={this.state.sort.end_date}
+                  />
+                </Fragment>
+              )}
+            </span>
+            <br />
+            <br />
+            {account.length !== 0 && journal.length !== 0 ? (
+              <table
+                className='uk-table uk-table-divider uk-table-striped uk-table-hover uk-table-small uk-table-justify  uk-table-middle'
+                style={{ width: '100%' }}
+              >
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Particular</th>
+                    <th>Destination (Sources)</th>
+                    <th style={{ textAlign: 'right' }}>Amount</th>
+                    <th>Comments</th>
+                  </tr>
+                </thead>
 
-              <tbody>
-                {account.length !== 0 && journal.length !== 0
-                  ? journal.map(
-                      (
-                        { date, particular, amount, credit, debit, comment },
-                        i
-                      ) => (
-                        <tr key={i}>
-                          <td>
-                            <span
-                              title={dateFormat(
-                                date,
-                                'ddd, dS mmm, yyyy, h:MM:ss TT'
-                              )}
-                            >
-                              {dateFormat(date, 'ddd, dS mmm, yyyy')}
-                            </span>
-                          </td>
-                          <td>{particular}</td>
-                          <td>
-                            {account.filter(e => +e.code === debit)[0].name}
-                            <br />
-                            &nbsp;&nbsp;&nbsp;&nbsp;&#x2B11;&nbsp;&nbsp;(
-                            {account.filter(e => e.code === credit)[0].name})
-                          </td>
-                          <td>${amount}</td>
-                          <td>{comment}</td>
-                        </tr>
-                      )
+                <tbody>
+                  {journal.map(
+                    (
+                      { date, particular, amount, credit, debit, comment },
+                      i
+                    ) => (
+                      <tr key={i}>
+                        <td>
+                          <span
+                            title={dateFormat(
+                              date,
+                              'ddd, dS mmm, yyyy, h:MM:ss TT'
+                            )}
+                          >
+                            {dateFormat(date, 'ddd, dS mmm, yyyy')}
+                          </span>
+                        </td>
+                        <td>{particular}</td>
+                        <td>
+                          {account.filter(e => +e.code === debit)[0].name}
+                          <br />
+                          &nbsp;&nbsp;&nbsp;&nbsp;&#x2B11;&nbsp;&nbsp;(
+                          {account.filter(e => e.code === credit)[0].name})
+                        </td>
+                        <td style={{ textAlign: 'right' }}>
+                          <span style={{ fontSize: '2rem' }}>৳</span>{' '}
+                          {fmt.format(amount, 2)}
+                        </td>
+                        <td>{comment}</td>
+                      </tr>
                     )
-                  : null}
-              </tbody>
-            </table>
+                  )}
+                </tbody>
+              </table>
+            ) : (
+              <div
+                style={{
+                  width: '100%',
+                  padding: '5rem',
+                }}
+              >
+                <h1 style={{ textAlign: 'center ' }}>Loading...</h1>
+              </div>
+            )}
           </div>
         </section>
         <section

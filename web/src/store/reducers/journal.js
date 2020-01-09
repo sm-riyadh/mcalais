@@ -6,15 +6,29 @@ const journal = (state = initialState, action) => {
   switch (action.type) {
     case JOURNAL.SAVE:
       return action.data
-    case JOURNAL.NEW_SAVE:
+    case JOURNAL.NEW_SAVE: {
+      const {
+        id,
+        date,
+        credit,
+        debit,
+        particular,
+        amount,
+        comment,
+      } = action.data
       return [
         {
-          to: action.data.debit,
-          from: action.data.credit,
-          amount: +action.data.amount,
+          id,
+          date,
+          credit,
+          debit,
+          particular,
+          amount,
+          comment,
         },
         ...state,
       ]
+    }
     default:
       return state
   }

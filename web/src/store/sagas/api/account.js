@@ -22,5 +22,19 @@ const addAccount = async payload => {
   }
   return data
 }
+const changeAccount = async payload => {
+  const res = await fetch(`${URL}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload[0]),
+  })
+  const data = await res.json()
+  if (res.status >= 400) {
+    throw new Error(data.errors)
+  }
+  return data
+}
 
-export default { fetchAccount, addAccount }
+export default { fetchAccount, addAccount, changeAccount }

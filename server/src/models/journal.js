@@ -40,7 +40,7 @@ JournalSchema.methods.toJSON = function() {
 
 JournalSchema.statics.fetch = async (
   size = 20,
-  startDate = new Date() - 24 * 60 * 60 * 1000 * 2,
+  startDate = new Date() - 24 * 60 * 60 * 1000 * 1,
   endDate = new Date()
 ) => {
   if (startDate) startDate = new Date(startDate)
