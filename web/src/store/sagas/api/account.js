@@ -1,8 +1,19 @@
 const URL = `http://localhost:8080/account/`
 
+const fetchCatagory = async () => {
+  const response = await fetch('http://localhost:8080/catagory/')
+  const data = await response.json()
+
+  if (response.status >= 400) {
+    throw new Error(data.errors)
+  }
+  return data
+}
+
 const fetchAccount = async () => {
   const response = await fetch(`${URL}`)
   const data = await response.json()
+
   if (response.status >= 400) {
     throw new Error(data.errors)
   }
@@ -37,4 +48,4 @@ const changeAccount = async payload => {
   return data
 }
 
-export default { fetchAccount, addAccount, changeAccount }
+export default { fetchCatagory, fetchAccount, addAccount, changeAccount }

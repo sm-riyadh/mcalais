@@ -26,7 +26,6 @@ const JournalSchema = new mongoose.Schema({
   },
   particular: {
     type: String,
-    required: true,
   },
   comment: {
     type: String,

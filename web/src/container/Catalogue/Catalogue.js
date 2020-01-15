@@ -2,12 +2,14 @@ import React, { Component, Fragment } from 'react'
 import { connect } from 'react-redux'
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
 
-import { sumbitChange } from '../../store/actions'
-
+import { fetchCatagory, sumbitChange } from '../../store/actions'
 class Catalogue extends Component {
-  // componentDidMount() {
-  //   this.props.fetchAccount()
-  // }
+  componentDidMount() {
+    this.updateTree()
+  }
+  componentDidUpdate() {
+    this.typeInput && this.typeInput.focus()
+  }
   state = {
     new_catagory: {
       is_visible: false,
@@ -16,7 +18,7 @@ class Catalogue extends Component {
       index: '',
       title: '',
     },
-    catagory_list: [
+    catagory_tree: [
       {
         id: 'assets',
         title: 'Assets',
@@ -60,6 +62,11 @@ class Catalogue extends Component {
     ],
     change_tree: [],
   }
+  updateTree = async () => {
+    const response = await fetch('http://localhost:8080/catagory/')
+    const data = await response.json()
+    data[0] && this.setState({ catagory_tree: data[0].catagory })
+  }
   onDragEnd = (result, index) => {
     const { destination, source, draggableId } = result
 
@@ -71,7 +78,7 @@ class Catalogue extends Component {
       return
 
     if (source.droppableId === destination.droppableId) {
-      const { preset_order: newPresetID } = this.state.catagory_list[
+      const { preset_order: newPresetID } = this.state.catagory_tree[
         index
       ].account[source.droppableId]
 
@@ -79,13 +86,13 @@ class Catalogue extends Component {
       newPresetID.splice(destination.index, 0, draggableId)
 
       const newCatagory = {
-        ...this.state.catagory_list[index],
+        ...this.state.catagory_tree[index],
         account: {
-          ...this.state.catagory_list[index].account,
+          ...this.state.catagory_tree[index].account,
           preset_order: newPresetID,
         },
       }
-      const newCatagoryList = [...this.state.catagory_list]
+      const newCatagoryList = [...this.state.catagory_tree]
       newCatagoryList.splice(index, 1, newCatagory)
 
       this.setState({
@@ -93,10 +100,10 @@ class Catalogue extends Component {
         newCatagoryList,
       })
     } else {
-      const { preset_order: newSourcePresetID } = this.state.catagory_list[
+      const { preset_order: newSourcePresetID } = this.state.catagory_tree[
         index
       ].account[source.droppableId]
-      const { preset_order: newDestinationPresetID } = this.state.catagory_list[
+      const { preset_order: newDestinationPresetID } = this.state.catagory_tree[
         index
       ].account[destination.droppableId]
 
@@ -104,24 +111,24 @@ class Catalogue extends Component {
       newDestinationPresetID.splice(destination.index, 0, draggableId)
 
       const newSourcePreset = {
-        ...this.state.catagory_list[index].account,
+        ...this.state.catagory_tree[index].account,
         preset_order: newSourcePresetID,
       }
       const newDestinationPreset = {
-        ...this.state.catagory_list[index].account,
+        ...this.state.catagory_tree[index].account,
         preset_order: newDestinationPresetID,
       }
 
       const newAccount = {
-        ...this.state.catagory_list[index].account,
+        ...this.state.catagory_tree[index].account,
         [newSourcePreset.id]: newSourcePreset,
         [newDestinationPreset.id]: newDestinationPreset,
       }
       const newCatagory = {
-        ...this.state.catagory_list[index],
+        ...this.state.catagory_tree[index],
         account: newAccount,
       }
-      const newCatagoryList = [...this.state.catagory_list]
+      const newCatagoryList = [...this.state.catagory_tree]
       newCatagoryList.splice(index, 1, newCatagory)
 
       this.setState({
@@ -149,32 +156,37 @@ class Catalogue extends Component {
     ]
 
     if (action === 'account') {
-      const catagory = this.state.catagory_list[index]
+      const catagory = this.state.catagory_tree[index]
 
       const newCatagory = {
         ...catagory,
-
         account: {
           ...catagory.account,
 
-          [`ac_${Object.keys(catagory.account).length + 1}`]: {
-            id: `ac_${Object.keys(catagory.account).length + 1}`,
+          [`ac_${
+            catagory.account ? Object.keys(catagory.account).length + 1 : '1'
+          }`]: {
+            id: `ac_${
+              catagory.account ? Object.keys(catagory.account).length + 1 : '1'
+            }`,
             title: this.state.new_catagory.title,
             preset_order: [],
           },
         },
         account_order: [
           ...catagory.account_order,
-          `ac_${Object.keys(catagory.account).length + 1}`,
+          `ac_${
+            catagory.account ? Object.keys(catagory.account).length + 1 : '1'
+          }`,
         ],
       }
 
-      const catagoryList = this.state.catagory_list
+      const catagoryList = this.state.catagory_tree
       catagoryList.splice(index, 1, newCatagory)
 
       this.setState({
         ...this.state,
-        catagory_list: catagoryList,
+        catagory_tree: catagoryList,
         change_tree: [
           ...this.state.change_tree,
           {
@@ -182,7 +194,11 @@ class Catalogue extends Component {
             type: 'account',
             data: {
               ...this.state.change_tree,
-              id: `ac_${Object.keys(catagory.account).length + 1}`,
+              id: `ac_${
+                catagory.account
+                  ? Object.keys(catagory.account).length + 1
+                  : '1'
+              }`,
               name: this.state.new_catagory.title,
               catagory_id: catagory.id,
               preset: [],
@@ -191,7 +207,7 @@ class Catalogue extends Component {
         ],
       })
     } else {
-      const catagory = this.state.catagory_list[index]
+      const catagory = this.state.catagory_tree[index]
 
       const newAccount = {
         ...catagory.account,
@@ -199,7 +215,9 @@ class Catalogue extends Component {
         [id]: {
           ...catagory.account[id],
           preset_order: [
-            `ps_${Object.keys(catagory.preset).length + 1}`,
+            `ps_${
+              catagory.preset ? Object.keys(catagory.preset).length + 1 : 1
+            }`,
             ...catagory.account[id].preset_order,
           ],
         },
@@ -207,8 +225,12 @@ class Catalogue extends Component {
       const newPreset = {
         ...catagory.preset,
 
-        [`ps_${Object.keys(catagory.preset).length + 1}`]: {
-          id: `ps_${Object.keys(catagory.preset).length + 1}`,
+        [`ps_${
+          catagory.preset ? Object.keys(catagory.preset).length + 1 : 1
+        }`]: {
+          id: `ps_${
+            catagory.preset ? Object.keys(catagory.preset).length + 1 : 1
+          }`,
           title: this.state.new_catagory.title,
         },
       }
@@ -218,19 +240,21 @@ class Catalogue extends Component {
         preset: newPreset,
       }
 
-      const catagoryList = this.state.catagory_list
+      const catagoryList = this.state.catagory_tree
       catagoryList.splice(index, 1, newCatagory)
 
       this.setState({
         ...this.state,
-        catagoryList,
+        catagory_tree: catagoryList,
         change_tree: [
           ...this.state.change_tree,
           {
             action: 'ADD',
             type: 'preset',
             data: {
-              id: `ps_${Object.keys(catagory.preset).length + 1}1`,
+              id: `ps_${
+                catagory.preset ? Object.keys(catagory.preset).length + 1 : 1
+              }1`,
               name: this.state.new_catagory.title,
               catagory_id: catagory.id,
               account_id: id,
@@ -260,7 +284,6 @@ class Catalogue extends Component {
 
     this.setState(state)
   }
-  HandleSubmition = (type, { title }) => {}
   Capitalize = str => str.charAt(0).toUpperCase() + str.slice(1)
 
   render() {
@@ -268,84 +291,92 @@ class Catalogue extends Component {
       <Fragment>
         <section className='container-scrollable'>
           <div className='container-card'>
-            {this.state.catagory_list.map((catagory, index) => (
-              <div key={index} className='draggable container'>
-                <span className='section-title-big'>{catagory.title}</span>
-                <button
-                  style={{ float: 'right' }}
-                  onClick={() => this.toggleInput('account', index)}
-                >
-                  ADD
-                </button>
-                <DragDropContext
-                  onDragEnd={result => this.onDragEnd(result, index)}
-                >
-                  {catagory.account_order.map((account_id, index) => {
-                    const account = catagory.account[account_id]
+            {this.state.catagory_tree.length != 0 &&
+              this.state.catagory_tree.map((catagory, catagory_index) => (
+                <div key={catagory_index} className='draggable container'>
+                  <span className='section-title-big'>{catagory.title}</span>
+                  <button
+                    style={{ float: 'right' }}
+                    onClick={() => this.toggleInput('account', catagory_index)}
+                  >
+                    ADD
+                  </button>
+                  <DragDropContext
+                    onDragEnd={result => this.onDragEnd(result, catagory_index)}
+                  >
+                    {catagory.account_order.map((account_id, index) => {
+                      const account = catagory.account[account_id]
 
-                    return (
-                      <Droppable
-                        key={account.id}
-                        droppableId={account.id}
-                        index={index}
-                      >
-                        {provided => (
-                          <span>
-                            <div className='section-title'>
-                              {account.title} &nbsp;&nbsp;&nbsp;
-                              <button
-                                style={{ float: 'right' }}
-                                onClick={() =>
-                                  this.toggleInput('preset', index, account_id)
-                                }
-                              >
-                                ADD
-                              </button>
-                            </div>
-                            <div>
-                              <div
-                                className='drag-container'
-                                ref={provided.innerRef}
-                                {...provided.droppableProps}
-                              >
-                                {account.preset_order.map(
-                                  (preset_order, index) => {
-                                    const preset = catagory.preset[preset_order]
-
-                                    return (
-                                      <Draggable
-                                        key={preset.id}
-                                        draggableId={preset.id}
-                                        index={index}
-                                      >
-                                        {provided => (
-                                          <div
-                                            className='drag-item'
-                                            ref={provided.innerRef}
-                                            {...provided.draggableProps}
-                                            {...provided.dragHandleProps}
-                                          >
-                                            {preset.title}
-                                            <b style={{ float: 'right' }}>≡</b>
-                                            {provided.placeholder}
-                                          </div>
-                                        )}
-                                      </Draggable>
+                      return (
+                        <Droppable
+                          key={account.id}
+                          droppableId={account.id}
+                          index={index}
+                        >
+                          {provided => (
+                            <span>
+                              <div className='section-title'>
+                                {account.title} &nbsp;&nbsp;&nbsp;
+                                <button
+                                  style={{ float: 'right' }}
+                                  onClick={() =>
+                                    this.toggleInput(
+                                      'preset',
+                                      catagory_index,
+                                      account_id
                                     )
                                   }
-                                )}
+                                >
+                                  ADD
+                                </button>
                               </div>
-                            </div>
+                              <div>
+                                <div
+                                  className='drag-container'
+                                  ref={provided.innerRef}
+                                  {...provided.droppableProps}
+                                >
+                                  {account.preset_order.map(
+                                    (preset_order, index) => {
+                                      const preset =
+                                        catagory.preset[preset_order]
 
-                            {provided.placeholder}
-                          </span>
-                        )}
-                      </Droppable>
-                    )
-                  })}
-                </DragDropContext>
-              </div>
-            ))}
+                                      return (
+                                        <Draggable
+                                          key={preset.id}
+                                          draggableId={preset.id}
+                                          index={index}
+                                        >
+                                          {provided => (
+                                            <div
+                                              className='drag-item'
+                                              ref={provided.innerRef}
+                                              {...provided.draggableProps}
+                                              {...provided.dragHandleProps}
+                                            >
+                                              {preset.title}
+                                              <b style={{ float: 'right' }}>
+                                                ≡
+                                              </b>
+                                              {provided.placeholder}
+                                            </div>
+                                          )}
+                                        </Draggable>
+                                      )
+                                    }
+                                  )}
+                                </div>
+                              </div>
+
+                              {provided.placeholder}
+                            </span>
+                          )}
+                        </Droppable>
+                      )
+                    })}
+                  </DragDropContext>
+                </div>
+              ))}
           </div>
         </section>
         <section
@@ -358,6 +389,9 @@ class Catalogue extends Component {
             <div>
               <h4>Add {this.Capitalize(this.state.new_catagory.action)}</h4>
               <input
+                ref={input => {
+                  this.typeInput = input
+                }}
                 type='text'
                 name='title'
                 onChange={this.HandleInputChange}
@@ -374,7 +408,14 @@ class Catalogue extends Component {
           <br />
           <button
             className='uk-button uk-button-primary'
-            onClick={() => this.props.sumbitChange(this.state.change_tree)}
+            onClick={() => {
+              this.props.sumbitChange({
+                catagory_tree: this.state.catagory_tree,
+                change_tree: this.state.change_tree,
+              })
+
+              // this.props.history.push('/account')
+            }}
           >
             &nbsp;&nbsp;SEND UPDATED CHANGE&nbsp;&nbsp;
           </button>
@@ -384,8 +425,12 @@ class Catalogue extends Component {
   }
 }
 
+const mapStateToProps = state => ({
+  catagory: state.catagory,
+})
 const mapDispatchToProps = dispatch => ({
   sumbitChange: payload => dispatch(sumbitChange(payload)),
+  fetchCatagory: payload => dispatch(fetchCatagory(payload)),
 })
 
-export default connect(null, mapDispatchToProps)(Catalogue)
+export default connect(mapStateToProps, mapDispatchToProps)(Catalogue)

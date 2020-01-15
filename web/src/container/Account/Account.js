@@ -44,31 +44,79 @@ class App extends Component {
       <Fragment>
         <section className='container-scrollable'>
           <div className='container-card'>
-            <h2>Accounts</h2>
-            <table
-              className='uk-table uk-table-divider uk-table-striped uk-table-hover uk-table-small uk-table-justify  uk-table-middle'
-              style={{ width: '100%' }}
-            >
-              <thead>
-                <tr>
-                  <th> Code </th>
-                  <th> Name </th>
-                  <th> Balance </th>
-                </tr>
-              </thead>
-              <tbody>
-                {this.props.account.map(({ name, code, balance }, i) => (
-                  <tr key={i}>
-                    <td>{code}</td>
-                    <td>{name}</td>
-                    <td>
-                      <span style={{ fontSize: '2rem' }}>৳</span>{' '}
-                      {fmt.format(balance, 2)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            {this.props.catagory.map((catagory, index) => (
+              <Fragment>
+                <h1>{catagory.title}</h1>
+                <table
+                  className='uk-table uk-table-divider uk-table-striped uk-table-hover uk-table-small uk-table-justify  uk-table-middle'
+                  style={{ width: '100%' }}
+                >
+                  <thead>
+                    <tr>
+                      <th> Code </th>
+                      <th> Name </th>
+                      <th> Balance </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {catagory.account_order.map(account_id =>
+                      this.props.account
+                        .filter(
+                          e => e.type === catagory.id && e.id === account_id
+                        )
+                        .map(({ name, code, balance, preset }) => (
+                          <Fragment>
+                            <tr>
+                              <td>{code}</td>
+                              <td>{name}</td>
+                              <td>{balance}</td>
+                            </tr>
+                            {preset.map(({ preset_id }) =>
+                              this.props.account.filter(e => console.log(e))
+                            )}
+                            {preset.map(({ preset_id }) =>
+                              this.props.account
+                                .filter(
+                                  e =>
+                                    e.type === catagory.id && e.id === preset_id
+                                )
+                                .map(({ name, code, balance }) => (
+                                  <tr style={{ border: '0.2rem solid red' }}>
+                                    <td>{code}</td>
+                                    <td>{name}</td>
+                                    <td>{balance}</td>
+                                  </tr>
+                                ))
+                            )}
+                          </Fragment>
+                        ))
+                    )
+
+                    // .map(({ name, code, balance }, i) => (
+                    //   <tr key={i}>
+                    //     <td>{code}</td>
+                    //     <td>{name}</td>
+                    //     <td>
+                    //       <span style={{ fontSize: '2rem' }}>৳</span>{' '}
+                    //       {fmt.format(balance, 2)}
+                    //     </td>
+                    //   </tr>
+                    // ))}
+                    /* {this.props.account.filter.map(({ name, code, balance }, i) => (
+                      <tr key={i}>
+                        <td>{code}</td>
+                        <td>{name}</td>
+                        <td>
+                          <span style={{ fontSize: '2rem' }}>৳</span>{' '}
+                          {fmt.format(balance, 2)}
+                        </td>
+                      </tr>
+                    ))} */
+                    }
+                  </tbody>
+                </table>
+              </Fragment>
+            ))}
           </div>
         </section>
         <section
@@ -77,7 +125,7 @@ class App extends Component {
         >
           <h2> Add account </h2>
           <hr />
-          <form style={{ width: '100%' }} onSubmit={this.HandlerAddAccount}>
+          {/* <form style={{ width: '100%' }} onSubmit={this.HandlerAddAccount}>
             <label>
               Account
               <select
@@ -122,7 +170,7 @@ class App extends Component {
               type='submit'
               value='Add Account'
             />
-          </form>
+          </form> */}
         </section>
       </Fragment>
     )
@@ -130,8 +178,9 @@ class App extends Component {
 }
 
 const mapStateToProps = state => ({
+  catagory: state.catagory,
   account: state.account,
-  journal: state.Journal,
+  journal: state.journal,
 })
 const mapDispatchToProps = dispatch => ({
   fetchAccount: () => dispatch(fetchAccount()),

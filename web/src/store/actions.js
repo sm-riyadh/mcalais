@@ -1,8 +1,15 @@
-import { LEDGER, JOURNAL, ACCOUNT } from './index'
+import { LEDGER, JOURNAL, ACCOUNT, CATAGORY } from './index'
 
 /*
  * Chart of Accounts
  */
+const fetchCatagory = () => ({
+  type: CATAGORY.FETCH,
+})
+const saveCatagory = payload => ({
+  type: CATAGORY.SAVE,
+  data: payload,
+})
 const fetchAccount = () => ({
   type: ACCOUNT.FETCH,
 })
@@ -60,6 +67,8 @@ export {
   fetchLedger,
   saveLedger,
   // Chart of accounts
+  fetchCatagory,
+  saveCatagory,
   fetchAccount,
   saveAccount,
   addAccount,

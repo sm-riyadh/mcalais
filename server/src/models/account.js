@@ -10,7 +10,6 @@ const AccountSchema = new mongoose.Schema({
   name: {
     type: String,
     trim: true,
-    minlength: 2,
     required: true,
   },
   id: {
@@ -43,34 +42,6 @@ const AccountSchema = new mongoose.Schema({
     },
   ],
 })
-
-/* {
-  name: {
-    type: String,
-    trim: true,
-    minlength: 2,
-    required: true,
-  },
-  type: {
-    type: String,
-    required: true,
-  },
-  code: {
-    type: Number,
-    min: 100000,
-    max: 999999,
-    required: true,
-  },
-  balance: {
-    type: Number,
-    default: 0,
-    required: true,
-  },
-  under: {
-    type: String,
-    default: 'preset',
-  },
-}, */
 
 AccountSchema.statics.fetchAll = async () =>
   await Account.find().sort({ code: 1 })
@@ -145,9 +116,8 @@ AccountSchema.statics.fetchLedger = async (
 AccountSchema.statics.create = async payload => {
   return await Account(payload).save()
 }
-AccountSchema.statics.insertPreset = async payload => {
-  console.log(payload)
-  return await Account.findOneAndUpdate(
+AccountSchema.statics.insertPreset = async payload =>
+  await Account.findOneAndUpdate(
     { id: payload.account_id },
     {
       $push: {
@@ -155,7 +125,7 @@ AccountSchema.statics.insertPreset = async payload => {
       },
     }
   )
-}
+
 AccountSchema.statics.addJournal = async (journalID, credit, debit, amount) => {
   await Account.findOneAndUpdate(
     { code: credit },
@@ -177,8 +147,12 @@ AccountSchema.statics.addJournal = async (journalID, credit, debit, amount) => {
   if (
     100000 <= debit &&
     debit < 200000 &&
+    400000 <= debit &&
+    debit < 500000 &&
     100000 <= credit &&
-    credit < 200000
+    credit < 200000 &&
+    400000 <= credit &&
+    credit < 500000
   ) {
     await Account.findOneAndUpdate(
       { code: credit },
@@ -191,8 +165,12 @@ AccountSchema.statics.addJournal = async (journalID, credit, debit, amount) => {
   } else if (
     200000 <= debit &&
     debit < 400000 &&
+    500000 <= debit &&
+    debit < 600000 &&
     200000 <= credit &&
-    credit < 400000
+    credit < 400000 &&
+    500000 <= credit &&
+    credit < 600000
   ) {
     await Account.findOneAndUpdate(
       { code: credit },

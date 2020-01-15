@@ -191,10 +191,10 @@ class Journal extends Component {
                         </td>
                         <td>{particular}</td>
                         <td>
-                          {account.filter(e => +e.code === debit)[0].name}
+                          {account.find(e => +e.code === debit).name}
                           <br />
                           &nbsp;&nbsp;&nbsp;&nbsp;&#x2B11;&nbsp;&nbsp;(
-                          {account.filter(e => e.code === credit)[0].name})
+                          {account.find(e => e.code === credit).name})
                         </td>
                         <td style={{ textAlign: 'right' }}>
                           <span style={{ fontSize: '2rem' }}>৳</span>{' '}
@@ -238,9 +238,9 @@ class Journal extends Component {
                   value={this.state.credit}
                 >
                   <option value=''>Choose a catagory</option>
-                  {account.map(({ name, code }, i) => (
+                  {account.map(({ name, code, type }, i) => (
                     <option key={i} value={code}>
-                      {name}
+                      {name} [{type}]
                     </option>
                   ))}
                 </select>
@@ -254,9 +254,9 @@ class Journal extends Component {
                   value={this.state.debit}
                 >
                   <option value=''>Choose a catagory</option>
-                  {account.map(({ code, name }, i) => (
+                  {account.map(({ code, name, type }, i) => (
                     <option key={i} value={code}>
-                      {name}
+                      {name} [{type}]
                     </option>
                   ))}
                 </select>

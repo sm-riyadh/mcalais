@@ -1,13 +1,16 @@
 import { put, call, takeLatest } from 'redux-saga/effects'
 
 import { ACCOUNT } from '../index'
-import { saveAccount, fetchAccount } from '../actions'
+import { saveAccount, fetchAccount, saveCatagory } from '../actions'
 import Api from './api/account'
 
 function* handleAccountFetch() {
   try {
-    const journalData = yield call(Api.fetchAccount)
-    yield put(saveAccount(journalData))
+    const accountData = yield call(Api.fetchAccount)
+    const catagoryData = yield call(Api.fetchCatagory)
+
+    yield put(saveAccount(accountData))
+    yield put(saveCatagory(catagoryData[0].catagory))
   } catch (e) {
     yield put({ type: 'ACCOUNT.SAVE', message: e.message })
   }

@@ -11,14 +11,14 @@
   },
   "devDependencies": {
     "clean-webpack-plugin": "^3.0.0",
-    "webpack": "^4.25.1",
+    "webpack": "^4.41.5",
     "webpack-cli": "^3.3.10",
     "webpack-merge": "^4.1.4"
   },
   "dependencies": {
     "body-parser": "^1.18.3",
     "express": "^4.16.3",
-    "mongoose": "^5.7.12",
+    "mongoose": "^5.8.7",
     "morgan": "^1.9.1",
     "validator": "^12.1.0"
   }

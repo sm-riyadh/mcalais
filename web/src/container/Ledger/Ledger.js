@@ -80,9 +80,9 @@ class Ledger extends Component {
                             <td>{particular}</td>
                             <td>
                               {
-                                this.props.account.filter(
+                                this.props.account.find(
                                   e => +e.code === account
-                                )[0].name
+                                ).name
                               }
                             </td>
                             <td style={{ textAlign: 'right' }}>
