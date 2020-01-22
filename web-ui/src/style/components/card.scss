@@ -1,0 +1,12 @@
+.card {
+  background-color: #fff;
+  box-shadow: 0 0.1rem 0.4rem #00000034;
+  display: flex;
+  padding: 2rem;
+
+  border-radius: 0.8rem;
+
+  &-expand {
+    width: 100%;
+  }
+}

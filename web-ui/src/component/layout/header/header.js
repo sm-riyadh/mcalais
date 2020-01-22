@@ -1,20 +1,52 @@
 import React from 'react'
+import UIfx from 'uifx'
 
-import Container from '../../common/container/container'
+import PikachuAvator from '../../../res/image/pikachu-avatar.jpg'
+import Click from '../../../res/audio/click.mp3'
+
+import { Container, Text } from '../../common/'
 
 function header() {
+  const click = new UIfx(Click, {
+    volume: 0.8,
+    throttleMs: 10,
+  })
+
   return (
-    <div>
-      <Container position='left' noClip>
-        <button className='btn btn-header-black'>icon</button>
-        <h3>LOGO</h3>
+    <div className='header'>
+      <audio id='audioID'>
+        <source src={Click} type='audio/ogg'></source>
+      </audio>
+      <Container vPos='middle' noPad>
+        {/* <button className='btn btn-header-nav-black'>icon</button> */}
+        <Text className='m-left-3'>Marina Construction</Text>
       </Container>
-      <Container position='right'>
-        <h4>B0K@Ch0D4</h4>
-        <button className='btn-header-nav-black'>Profile</button>
-        <button className='btn-header-nav-black'>Admin Panel</button>
-        <button className='btn-header-nav-black'>Notification</button>
-        <button className='btn-header-nav-black'>Settings</button>
+      <Container vPos='middle'>
+        <Text className='m-right'>Pikachu</Text>
+        <button
+          className='btn btn-header-nav btn-header-nav-img'
+          onMouseEnter={() => click.play()}
+        >
+          <img src={PikachuAvator} />
+        </button>
+        <button
+          className='btn btn-header-nav black'
+          onMouseEnter={() => click.play()}
+        >
+          O
+        </button>
+        <button
+          className='btn btn-header-nav black'
+          onMouseEnter={() => click.play()}
+        >
+          O
+        </button>
+        <button
+          className='btn btn-header-nav black'
+          onMouseEnter={() => click.play()}
+        >
+          O
+        </button>
       </Container>
     </div>
   )

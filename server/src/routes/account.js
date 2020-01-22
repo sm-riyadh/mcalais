@@ -8,7 +8,7 @@ import Catagory from '../models/catagory'
 const app = Router()
 
 // Route
-const url = 'account'
+const url = 'api/account'
 
 // Fetch
 app.get(`/${url}`, async (req, res) => {
@@ -21,7 +21,7 @@ app.get(`/${url}`, async (req, res) => {
     return res.send('Error: ' + err)
   }
 })
-app.get(`/catagory`, async (req, res) => {
+app.get(`/api/catagory`, async (req, res) => {
   try {
     // Fetch all
     const catagory = await Catagory.fetchAll()

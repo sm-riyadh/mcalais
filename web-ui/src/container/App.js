@@ -7,11 +7,9 @@ import Home from './Home/Home'
 class App extends Component {
   render() {
     return (
-      <Fragment>
-        <main className='main-container'>
-          <Route path='/' component={Home} />
-        </main>
-      </Fragment>
+      <div className='web-app'>
+        <Route path='/' component={Home} />
+      </div>
     )
   }
 }

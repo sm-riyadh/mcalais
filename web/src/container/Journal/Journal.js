@@ -39,7 +39,6 @@ class Journal extends Component {
     if (name === 'start_date' || name === 'end_date')
       this.setState(state, this.onDateChange)
     else if (name === 'day' && value !== 'n') {
-      console.log('TCL: Journal -> HandleChange -> end_date', value)
       switch (value) {
         case '1': {
           state.sort.start_date = new Date(new Date() - 24 * 60 * 60 * 1000 * 1)

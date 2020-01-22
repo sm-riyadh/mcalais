@@ -1,18 +1,18 @@
-const CATAGORY = {
-  FETCH: 'CATAGORY_FETCH',
-  SAVE: 'CATAGORY_SAVE',
-}
-const ACCOUNT = {
-  FETCH: 'ACCOUNT_FETCH',
-  SAVE: 'ACCOUNT_SAVE',
-  ADD: 'ACCOUNT_ADD',
-  CHANGE: 'ACCOUNT_CHANGE',
-}
+// const CATAGORY = {
+//   FETCH: 'CATAGORY_FETCH',
+//   SAVE: 'CATAGORY_SAVE',
+// }
+// const ACCOUNT = {
+//   FETCH: 'ACCOUNT_FETCH',
+//   SAVE: 'ACCOUNT_SAVE',
+//   ADD: 'ACCOUNT_ADD',
+//   CHANGE: 'ACCOUNT_CHANGE',
+// }
 
-const LEDGER = {
-  FETCH: 'LEDGER_FETCH',
-  SAVE: 'LEDGER_SAVE',
-}
+// const LEDGER = {
+//   FETCH: 'LEDGER_FETCH',
+//   SAVE: 'LEDGER_SAVE',
+// }
 
 const JOURNAL = {
   FETCH: 'JOURNAL_FETCH',
@@ -21,4 +21,4 @@ const JOURNAL = {
   NEW_SAVE: 'JOURNAL_NEW_SAVE',
 }
 
-export { CATAGORY, ACCOUNT, LEDGER, JOURNAL }
+export { JOURNAL }

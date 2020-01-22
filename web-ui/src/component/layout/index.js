@@ -1,4 +1,5 @@
 import Header from './header/header'
-import SideBar from './sideBar/sideBar'
+import NavBar from './navBar/navBar'
+import ActivityBar from './activityBar/activityBar'
 
-export { Header, SideBar }
+export { Header, NavBar, ActivityBar }

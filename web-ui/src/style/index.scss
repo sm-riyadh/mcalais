@@ -2,12 +2,20 @@
 // @include normalize();
 
 @import './main.scss';
-@import './components/index.scss';
-@import './header.scss';
+@import './components';
 
+@import './header.scss';
+@import './sideBar.scss';
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 html {
   font-size: 62.5%;
 }
 body {
   font-size: 1.4rem;
+  // overflow: hidden;
 }

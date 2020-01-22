@@ -1,11 +1,47 @@
 .btn {
   background-color: #fff;
-  border: 0.1rem solid #000;
-}
-.btn-header-nav-black {
-  background-color: #ff0000;
-  border: 0.1rem solid #000;
-  width: 4rem;
-  height: 4rem;
-  border-radius: 0.4rem;
+  padding: 0.6rem 1rem;
+  border: 0 solid #e7d8d8;
+
+  box-shadow: 0 0.1rem 0.3rem #00000015;
+  transition: box-shadow 80ms;
+
+  &:hover {
+    box-shadow: 0 0 0 0.3rem #1613df6c;
+  }
+  &:active {
+    box-shadow: 0 0 0.1rem #1613df6c;
+  }
+
+  &-chip {
+    border-radius: 100rem;
+    padding: 0.8rem 1.8rem;
+  }
+
+  &.btn-header-nav {
+    border-width: 0;
+    width: 3.4rem;
+    height: 3.4rem;
+    margin: 0 0.3rem;
+    border-radius: 0.4rem;
+
+    // box-shadow: 0 0.1rem 0.3rem #0000004b;
+
+    &-img {
+      padding: 0;
+      background-color: #ffffff;
+
+      img {
+        border-radius: 0.4rem;
+      }
+    }
+  }
+  &.primary {
+    background-color: #773bd6;
+    color: #ffffff;
+  }
+  &.black {
+    background-color: #444444;
+    color: #ffffff;
+  }
 }

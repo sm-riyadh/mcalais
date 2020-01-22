@@ -8,7 +8,7 @@ import Account from '../models/account'
 const app = Router()
 
 // Route
-const url = 'journal'
+const url = 'api/journal'
 
 // FETCHES
 app.get(`/${url}`, async (req, res) => {
@@ -50,7 +50,6 @@ app.post(`/${url}`, async (req, res) => {
       amount,
       comment,
     })
-    console.log('TCL: newJournal', newJournal)
 
     return res.send(newJournal)
   } catch (err) {

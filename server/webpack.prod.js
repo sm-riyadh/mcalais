@@ -1,13 +1,13 @@
-import { CleanWebpackPlugin } from 'clean-webpack-plugin'
-import merge from 'webpack-merge'
-import common from './webpack.common.js'
-import { resolve } from 'path'
+const { CleanWebpackPlugin } = require('clean-webpack-plugin')
+const merge = require('webpack-merge')
+const common = require('./webpack.common.js')
+const { resolve } = require('path')
 
-export default merge(common, {
-	mode: 'production',
-	plugins: [ new CleanWebpackPlugin() ],
-	output: {
-		path: resolve(__dirname, 'build'),
-		filename: 'index.js',
-	},
+module.exports = merge(common, {
+  mode: 'production',
+  plugins: [new CleanWebpackPlugin()],
+  output: {
+    path: resolve(__dirname, 'build'),
+    filename: 'index.js',
+  },
 })

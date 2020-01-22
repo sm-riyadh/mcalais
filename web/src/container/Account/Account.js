@@ -72,9 +72,6 @@ class App extends Component {
                               <td>{balance}</td>
                             </tr>
                             {preset.map(({ preset_id }) =>
-                              this.props.account.filter(e => console.log(e))
-                            )}
-                            {preset.map(({ preset_id }) =>
                               this.props.account
                                 .filter(
                                   e =>

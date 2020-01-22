@@ -5,11 +5,12 @@ import Account from '../models/account'
 const app = Router()
 
 // FETCHES LEDGER
-app.get('/ledger', async (req, res) => {
+app.get('/api/ledger', async (req, res) => {
   const { startDate, endDate } = req.query
 
   try {
     const ledger = await Account.fetchLedger(startDate, endDate)
+    console.log('TCL: ledger', ledger)
 
     return res.send(ledger)
   } catch (err) {

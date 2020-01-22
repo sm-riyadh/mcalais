@@ -1,4 +1,4 @@
-const URL = `http://localhost:8080/journal`
+const URL = `http://192.168.0.100/api/journal`
 
 const fetchJournal = async payload => {
   payload = payload[0]

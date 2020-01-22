@@ -63,7 +63,7 @@ class Catalogue extends Component {
     change_tree: [],
   }
   updateTree = async () => {
-    const response = await fetch('http://localhost:8080/catagory/')
+    const response = await fetch('http://192.168.0.100/api/catagory/')
     const data = await response.json()
     data[0] && this.setState({ catagory_tree: data[0].catagory })
   }
