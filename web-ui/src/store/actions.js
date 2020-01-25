@@ -1,69 +1,42 @@
 // import { LEDGER, JOURNAL, ACCOUNT, CATAGORY } from './index'
 import { JOURNAL } from './index'
-
-// /*
-//  * Chart of Accounts
-//  */
-// const fetchCatagory = () => ({
-//   type: CATAGORY.FETCH,
-// })
-// const saveCatagory = payload => ({
-//   type: CATAGORY.SAVE,
-//   data: payload,
-// })
-// const fetchAccount = () => ({
-//   type: ACCOUNT.FETCH,
-// })
-// const saveAccount = payload => ({
-//   type: ACCOUNT.SAVE,
-//   data: payload,
-// })
-// const addAccount = payload => ({
-//   type: ACCOUNT.ADD,
-//   data: payload,
-// })
-// const sumbitChange = payload => ({
-//   type: ACCOUNT.CHANGE,
-//   data: payload,
-// })
 /*
  * Journal
  */
-const fetchJournal = payload => ({
-  type: JOURNAL.FETCH,
-  data: payload,
+const fetchJournalInit = payload => ({
+  type: JOURNAL.FETCH.INIT,
+  payload,
 })
-const saveJournal = payload => ({
-  type: JOURNAL.SAVE,
-  data: payload,
+const fetchJournalMore = payload => ({
+  type: JOURNAL.FETCH.MORE,
+  payload,
 })
-const addNewJournal = payload => ({
-  type: JOURNAL.NEW,
-  data: payload,
+const fetchJournalOfAccount = payload => ({
+  type: JOURNAL.FETCH.ACCOUNT,
+  payload,
 })
-const saveNewJournal = payload => ({
-  type: JOURNAL.NEW_SAVE,
-  data: payload,
+const saveJournalInit = payload => ({
+  type: JOURNAL.SAVE.INIT,
+  payload,
 })
-
-// /*
-//  * Ledger
-//  */
-// const fetchLedger = payload => ({
-//   type: LEDGER.FETCH,
-//   data: payload,
-// })
-// const saveLedger = payload => ({
-//   type: LEDGER.SAVE,
-//   data: payload,
-// })
+const saveJournalMore = payload => ({
+  type: JOURNAL.SAVE.MORE,
+  payload,
+})
+const saveJournalOfAccount = payload => ({
+  type: JOURNAL.SAVE.ACCOUNT,
+  payload,
+})
 
 export {
   // Journal
-  fetchJournal,
-  saveJournal,
-  addNewJournal,
-  saveNewJournal,
+  fetchJournalInit,
+  fetchJournalMore,
+  fetchJournalOfAccount,
+  saveJournalInit,
+  saveJournalMore,
+  saveJournalOfAccount,
+
   // Ledger
   // fetchLedger,
   // saveLedger,

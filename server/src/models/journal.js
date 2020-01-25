@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
 import Account from './account'
+import { subDays, endOfDay } from 'date-fns'
 
 const ObjectIdDate = date =>
   mongoose.Types.ObjectId(
@@ -8,60 +9,110 @@ const ObjectIdDate = date =>
 
 const JournalSchema = new mongoose.Schema({
   debit: {
-    type: Number,
-    min: 100001,
-    max: 999999,
-    required: true,
+    code: {
+      type: Number,
+      min: 100001,
+      max: 999999,
+      required: true,
+    },
+    name: {
+      type: String,
+      trim: true,
+      required: true,
+    },
+    // hierarchies: [
+    //   {
+    //     type: String,
+    //     trim: true,
+    //     required: true,
+    //   },
+    // ],
   },
   credit: {
-    type: Number,
-    min: 100001,
-    max: 999999,
-    required: true,
+    code: {
+      type: Number,
+      min: 100001,
+      max: 999999,
+      required: true,
+    },
+    name: {
+      type: String,
+      trim: true,
+      required: true,
+    },
+    // hierarchies: [
+    //   {
+    //     type: String,
+    //     trim: true,
+    //     required: true,
+    //   },
+    // ],
   },
   amount: {
     type: Number,
     min: 1,
     required: true,
   },
-  particular: {
+  description: {
     type: String,
+    trim: true,
   },
   comment: {
     type: String,
+    trim: true,
   },
 })
 JournalSchema.methods.toJSON = function() {
-  const { _id, credit, debit, particular, amount, comment } = this.toObject()
+  const { _id, credit, debit, description, amount, comment } = this.toObject()
   const date = _id.getTimestamp()
-  return { id: _id, date, credit, debit, particular, amount, comment }
+  return { id: _id, date, credit, debit, description, amount, comment }
 }
 
 JournalSchema.statics.fetch = async (
-  size = 20,
-  startDate = new Date() - 24 * 60 * 60 * 1000 * 100,
-  endDate = new Date()
+  size = 50,
+  page = 0,
+  account,
+  startDate = subDays(new Date(), 5),
+  endDate = endOfDay(new Date())
 ) => {
+  size = 5
   if (startDate) startDate = new Date(startDate)
   if (endDate) endDate = new Date(endDate)
 
-  return await Journal.find({
-    _id: {
-      $gte: ObjectIdDate(startDate),
-      $lt: ObjectIdDate(endDate),
-    },
-  })
-    .limit(+size)
-    .sort({ _id: -1 })
+  if (!account)
+    return await Journal.find({
+      _id: {
+        $gte: ObjectIdDate(startDate),
+        $lt: ObjectIdDate(endDate),
+      },
+    })
+      .skip(+size * +page)
+      .limit(+size)
+      .sort({ _id: -1 })
+  else
+    return await Journal.find({
+      _id: {
+        $gte: ObjectIdDate(startDate),
+        $lt: ObjectIdDate(endDate),
+      },
+      $or: [
+        { 'debit.code': { $eq: account } },
+        { 'credit.code': { $eq: account } },
+      ],
+    })
+      .skip(+size * +page)
+      .limit(+size)
+      .sort({ _id: -1 })
 }
 JournalSchema.statics.fetchSpecific = async id => await Journal.findById(id)
 JournalSchema.statics.create = async payload => {
-  const { _id, credit, debit, particular, amount, comment } = await Journal(
+  console.log('TCL: payload', payload)
+  const { _id, credit, debit, description, amount, comment } = await Journal(
     payload
   ).save()
 
-  await Account.addJournal(_id, credit, debit, amount)
-  return { _id, credit, debit, particular, amount, comment }
+  await Account.addJournal(_id, credit.code, debit.code, amount)
+  return { _id, credit, debit, description, amount, comment }
 }
 JournalSchema.statics.remove = async id => {
   const journal = await Journal.findById(id)

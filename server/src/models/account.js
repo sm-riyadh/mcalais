@@ -43,8 +43,11 @@ const AccountSchema = new mongoose.Schema({
   ],
 })
 
-AccountSchema.statics.fetchAll = async () =>
-  await Account.find().sort({ code: 1 })
+AccountSchema.statics.fetch = async code =>
+  await Account.find({ code: code }).sort({ code: 1 })
+
+AccountSchema.statics.fetchList = async () =>
+  await Account.find({ transaction: { $exists: true, $ne: [] } })
 
 AccountSchema.statics.fetchLedger = async (
   startDate = new Date() - 24 * 60 * 60 * 1000 * 7,
@@ -81,7 +84,7 @@ AccountSchema.statics.fetchLedger = async (
             _id,
             credit,
             debit,
-            particular,
+            description,
             amount,
           } = await Journal.fetchSpecific(journalID)
           const date = _id.getTimestamp()
@@ -90,7 +93,7 @@ AccountSchema.statics.fetchLedger = async (
             return {
               _id,
               date,
-              particular,
+              description,
               account: credit,
               debit: amount,
               credit: 0,
@@ -99,7 +102,7 @@ AccountSchema.statics.fetchLedger = async (
             return {
               _id,
               date,
-              particular,
+              description,
               account: debit,
               debit: 0,
               credit: amount,

@@ -7,8 +7,8 @@ const navBar = props => {
   return (
     <SideBar>
       <ul className='navbar'>
-        {props.children.map(({ title, path, icon }) => (
-          <NavLink to={path} activeClassName='active'>
+        {props.children.map(({ title, path, icon }, index) => (
+          <NavLink key={index} to={path} activeClassName='active'>
             <li>
               <b>{icon} </b>&nbsp; {title}
             </li>

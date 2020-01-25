@@ -12,23 +12,61 @@ const url = 'api/journal'
 
 // FETCHES
 app.get(`/${url}`, async (req, res) => {
-  const { size, startDate, endDate } = req.query
+  const { size, page, account, startDate, endDate } = req.query
 
   try {
-    if (!validator.isNumeric(size)) throw err
-    if (startDate && !validator.isISO8601(startDate)) throw err
-    if (endDate && !validator.isISO8601(endDate)) throw err
+    const journal = await Journal.fetch(size, page, account, startDate, endDate)
 
-    const journal = await Journal.fetch(size, startDate, endDate)
+    if (!page || page <= 0) {
+      const accountList = await Account.fetchList()
+      return res.send({ journal, account_list: accountList })
+    }
 
     return res.send(journal)
   } catch (err) {
     return res.send('Error: ' + err)
   }
 })
+app.get(`/${url}/more`, async (req, res) => {
+  const { size, page, startDate, endDate } = req.query
+
+  try {
+    if (!page || page <= 0) {
+      const journal = await Journal.fetch(
+        size,
+        account,
+        startDate,
+        endDate,
+        page
+      )
+      return res.send(journal)
+    }
+
+    return res.send()
+  } catch (err) {
+    return res.send('Error: ' + err)
+  }
+})
+
+app.get(`/${url}/:account`, async (req, res) => {
+  // const { size, page, account, startDate, endDate } = req.query
+  // try {
+  //   if (size && !validator.isNumeric(size)) throw err
+  //   if (startDate && !validator.isISO8601(startDate)) throw err
+  //   if (endDate && !validator.isISO8601(endDate)) throw err
+  //   const journal = await Journal.fetch(size, page, account, startDate, endDate)
+  //   if (!page || page <= 0) {
+  //     const accountList = await Account.fetchList()
+  //     return res.send({ journal, account_list: accountList })
+  //   }
+  //   return res.send(journal)
+  // } catch (err) {
+  //   return res.send('Error: ' + err)
+  // }
+})
 
 app.post(`/${url}`, async (req, res) => {
-  const { credit, debit, particular, amount, comment } = req.body
+  const { credit, debit, description, amount, comment } = req.body
 
   try {
     // Validation
@@ -43,10 +81,19 @@ app.post(`/${url}`, async (req, res) => {
     if (!(await Account.isExist(credit)) || !(await Account.isExist(debit)))
       throw 'Invilid account code'
 
+    const debitAccount = await Account.fetch(debit)
+    const creditAccount = await Account.fetch(credit)
+
     const newJournal = await Journal.create({
-      credit,
-      debit,
-      particular,
+      credit: {
+        code: creditAccount[0].code,
+        name: creditAccount[0].name,
+      },
+      debit: {
+        code: debitAccount[0].code,
+        name: debitAccount[0].name,
+      },
+      description,
       amount,
       comment,
     })

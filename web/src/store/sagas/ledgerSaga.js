@@ -8,8 +8,8 @@ function* handleLedgerFetch(payload) {
   try {
     const ledger = yield call(Api.fetchLedger, [payload.data])
     yield put(saveLedger(ledger))
-  } catch (e) {
-    yield put({ type: 'LEDGER.SAVE', message: e.message })
+  } catch (err) {
+    yield put({ type: 'LEDGER.SAVE', message: err.message })
   }
 }
 

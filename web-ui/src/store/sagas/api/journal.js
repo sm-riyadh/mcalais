@@ -1,34 +1,76 @@
-const URL = `http://localhost:8080/api/journal`
-// const URL = `http://192.168.0.100/api/journal`
+import Axios from './axios-instance'
 
-const fetchJournal = async payload => {
-  payload = payload[0]
+const fetchJournalInit = async payload => {
+  try {
+    if (payload[0]) payload = payload[0]
 
-  const res = await fetch(
-    `${URL}?size=100${
-      payload && payload.start_date ? `&startDate=${payload.start_date}` : ''
-    }${payload && payload.end_date ? `&endDate=${payload.end_date}` : ''}`
-  )
+    const { size, start_date, end_date } = payload
+    const res = await Axios({
+      method: 'get',
+      url: '/journal',
+      params: {
+        size,
+        start_date,
+        end_date,
+      },
+    })
 
-  const data = await res.json()
-  if (res.status >= 400) {
-    throw new Error(data.errors)
+    const data = await res.data
+    if (res.status >= 400) {
+      throw new Error(data.errors)
+    }
+    return data
+  } catch (err) {
+    return { ERROR: err }
   }
-  return data
 }
-const createJournal = async payload => {
-  const res = await fetch(`${URL}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(payload[0]),
-  })
-  const data = await res.json()
-  if (res.status >= 400) {
-    throw new Error(data.errors)
+const fetchJournalMore = async payload => {
+  try {
+    if (payload[0]) payload = payload[0]
+
+    const { size, page } = payload
+    const res = await Axios({
+      method: 'get',
+      url: '/journal/more',
+      params: {
+        size,
+        page,
+      },
+    })
+
+    const data = await res.data
+    if (res.status >= 400) {
+      throw new Error(data.errors)
+    }
+    return data
+  } catch (err) {
+    return { ERROR: err }
   }
-  return data
+}
+const fetchJournalOfAccount = async payload => {
+  try {
+    if (payload[0]) payload = payload[0]
+
+    const { account, size, start_date, end_date } = payload
+    const res = await Axios({
+      method: 'get',
+      url: '/journal/account',
+      params: {
+        account,
+        size,
+        start_date,
+        end_date,
+      },
+    })
+
+    const data = await res.data
+    if (res.status >= 400) {
+      throw new Error(data.errors)
+    }
+    return data
+  } catch (err) {
+    return { ERROR: err }
+  }
 }
 
-export default { fetchJournal, createJournal }
+export default { fetchJournalInit, fetchJournalMore, fetchJournalOfAccount }

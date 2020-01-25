@@ -51,7 +51,7 @@ class Ledger extends Component {
                     <thead>
                       <tr>
                         <th rowSpan='2'>Date</th>
-                        <th rowSpan='2'>Particular</th>
+                        <th rowSpan='2'>Description</th>
                         <th rowSpan='2'>Account</th>
                         <th colSpan='2'>Amount</th>
                       </tr>
@@ -63,7 +63,7 @@ class Ledger extends Component {
                     <tbody>
                       {transaction.map(
                         (
-                          { _id, date, particular, account, credit, debit },
+                          { _id, date, description, account, credit, debit },
                           i
                         ) => (
                           <tr key={i}>
@@ -77,7 +77,7 @@ class Ledger extends Component {
                                 {dateFormat(date, 'ddd, dS mmm, yyyy')}
                               </span>
                             </td>
-                            <td>{particular}</td>
+                            <td>{description}</td>
                             <td>
                               {
                                 this.props.account.find(

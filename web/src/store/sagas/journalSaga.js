@@ -8,16 +8,16 @@ function* handleJournalFetch(payload) {
   try {
     const journal = yield call(Api.fetchJournal, [payload.data])
     yield put(saveJournal(journal))
-  } catch (e) {
-    yield put({ type: 'JOURNAL.SAVE', message: e.message })
+  } catch (err) {
+    yield put({ type: 'JOURNAL.SAVE', message: err.message })
   }
 }
 function* handleJournalAdd(payload) {
   try {
     const journal = yield call(Api.createJournal, [payload.data])
     yield put(saveNewJournal(journal))
-  } catch (e) {
-    yield put({ type: 'JOURNAL.SAVE', message: e.message })
+  } catch (err) {
+    yield put({ type: 'JOURNAL.SAVE', message: err.message })
   }
 }
 

@@ -3,6 +3,7 @@ import UIfx from 'uifx'
 
 import PikachuAvator from '../../../res/image/pikachu-avatar.jpg'
 import Click from '../../../res/audio/click.mp3'
+import ml from '../../../res/image/ml.png'
 
 import { Container, Text } from '../../common/'
 
@@ -19,6 +20,7 @@ function header() {
       </audio>
       <Container vPos='middle' noPad>
         {/* <button className='btn btn-header-nav-black'>icon</button> */}
+        <img src={ml} style={{ height: '2.5rem', paddingLeft: '1rem' }}></img>
         <Text className='m-left-3'>Marina Construction</Text>
       </Container>
       <Container vPos='middle'>

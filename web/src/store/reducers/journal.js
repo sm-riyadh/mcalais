@@ -12,7 +12,7 @@ const journal = (state = initialState, action) => {
         date,
         credit,
         debit,
-        particular,
+        description,
         amount,
         comment,
       } = action.data
@@ -22,7 +22,7 @@ const journal = (state = initialState, action) => {
           date,
           credit,
           debit,
-          particular,
+          description,
           amount,
           comment,
         },

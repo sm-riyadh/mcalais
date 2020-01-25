@@ -11,8 +11,8 @@ function* handleAccountFetch() {
 
     yield put(saveAccount(accountData))
     yield put(saveCatagory(catagoryData[0].catagory))
-  } catch (e) {
-    yield put({ type: 'ACCOUNT.SAVE', message: e.message })
+  } catch (err) {
+    yield put({ type: 'ACCOUNT.SAVE', message: err.message })
   }
 }
 
@@ -20,16 +20,16 @@ function* handleAddAccount(payload) {
   try {
     yield call(Api.addAccount, [payload.data])
     yield put(fetchAccount())
-  } catch (e) {
-    yield put({ type: 'ACCOUNT.NEW_SAVE', message: e.message })
+  } catch (err) {
+    yield put({ type: 'ACCOUNT.NEW_SAVE', message: err.message })
   }
 }
 function* handleChangeAccount(payload) {
   try {
     yield call(Api.changeAccount, [payload.data])
     yield put(fetchAccount())
-  } catch (e) {
-    yield put({ type: 'ACCOUNT.NEW_SAVE', message: e.message })
+  } catch (err) {
+    yield put({ type: 'ACCOUNT.NEW_SAVE', message: err.message })
   }
 }
 

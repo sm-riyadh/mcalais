@@ -22,7 +22,7 @@ class Journal extends Component {
     },
     credit: '',
     debit: '',
-    particular: '',
+    description: '',
     amount: '',
     comment: '',
   }
@@ -84,7 +84,7 @@ class Journal extends Component {
       date: new Date().getTime(),
       debit: '',
       credit: '',
-      particular: '',
+      description: '',
       amount: '',
       comment: '',
     }
@@ -98,7 +98,7 @@ class Journal extends Component {
     this.props.addNewJournal({
       debit: this.state.debit,
       credit: this.state.credit,
-      particular: this.state.particular,
+      description: this.state.description,
       amount: this.state.amount,
       comment: this.state.comment,
     })
@@ -164,7 +164,7 @@ class Journal extends Component {
                 <thead>
                   <tr>
                     <th>Date</th>
-                    <th>Particular</th>
+                    <th>Description</th>
                     <th>Destination (Sources)</th>
                     <th style={{ textAlign: 'right' }}>Amount</th>
                     <th>Comments</th>
@@ -174,7 +174,7 @@ class Journal extends Component {
                 <tbody>
                   {journal.map(
                     (
-                      { date, particular, amount, credit, debit, comment },
+                      { date, description, amount, credit, debit, comment },
                       i
                     ) => (
                       <tr key={i}>
@@ -188,7 +188,7 @@ class Journal extends Component {
                             {dateFormat(date, 'ddd, dS mmm, yyyy')}
                           </span>
                         </td>
-                        <td>{particular}</td>
+                        <td>{description}</td>
                         <td>
                           {account.find(e => +e.code === debit).name}
                           <br />
@@ -262,13 +262,13 @@ class Journal extends Component {
               </label>
               <br />
               <br />
-              Particular:{' '}
+              Description:{' '}
               <input
                 type='text'
-                name='particular'
+                name='description'
                 className='uk-input'
                 onChange={this.HandleChange}
-                value={this.state.particular}
+                value={this.state.description}
               />
               <br />
               <br />

@@ -1,12 +1,56 @@
-import React, { Component } from 'react'
+import React, { Component, Fragment } from 'react'
 import { connect } from 'react-redux'
+import dateFormat from 'dateformat'
+import fmt from 'indian-number-format'
 
-import { Container, Card, Text, Placeholder } from '../../component/common'
-import { fetchJournal } from '../../store/actions'
+import {
+  Modal,
+  Container,
+  Card,
+  Text,
+  Placeholder,
+} from '../../component/common'
+import {
+  fetchJournalInit,
+  fetchJournalMore,
+  fetchJournalOfAccount,
+} from '../../store/actions'
+
+import JournalTableRows from './components/JournalTableRows'
 
 export class Journal extends Component {
   componentDidMount() {
-    this.props.fetchJournal()
+    this.props.fetchJournalInit()
+  }
+  state = {
+    journal_index: '',
+    journal_modal: false,
+    page: 0,
+    account_filter: '',
+  }
+  toggleModal = action => this.setState({ journal_modal: action })
+  setJournalIndex = index => this.setState({ journal_index: index })
+  changeHandler = e => {
+    const { name, value } = value
+    this.setState({ [name]: value })
+  }
+  accountFilterChangeHandler = e => {
+    const { value } = e.target.value
+    this.setState({ account_filter: value })
+
+    this.props.fetchJournalOfAccount({ account: value })
+  }
+  addPage = () => {
+    this.setState(
+      state => ({
+        page: state.page + 1,
+      }),
+      () =>
+        this.props.fetchJournalMore({
+          page: this.state.page,
+          account: this.state.account,
+        })
+    )
   }
 
   render() {
@@ -16,8 +60,6 @@ export class Journal extends Component {
           <div>
             <select className='btn btn-chip m-right-2'>
               <option>Journal</option>
-              {/* <option>Expenses</option>
-              <option>Incomes</option> */}
             </select>
             <input
               type='text'
@@ -34,15 +76,22 @@ export class Journal extends Component {
               {/* <select className='btn btn-chip'>
               <option>Sort by...</option>
             </select> */}
+              <select
+                name='account_filter'
+                className='btn btn-chip'
+                onChange={this.accountFilterChangeHandler}
+              >
+                <option value=''>All</option>
+                {this.props.account_list.map(account => (
+                  <option value={account.code}>{account.name}</option>
+                ))}
+              </select>
               <select className='btn btn-chip'>
                 <option>Today</option>
                 <option>Tomorrow</option>
                 <option>3 Days</option>
                 <option>Month</option>
-                {/* <option>Custom</option> */}
               </select>
-              {/* <input type='date' className='btn' /> */}
-              {/* <input type='date' className='btn' /> */}
             </div>
           </Container>
           <table className='table-card'>
@@ -53,151 +102,57 @@ export class Journal extends Component {
                 <th>Destination (Source)</th>
                 <th>Description</th>
                 <th className='txtRight'>Amount</th>
+                <th>Comment</th>
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td className='txtRight'>1</td>
-                <td>Mon, 6th Jan</td>
-                <td>NRBC (Bank) [NRBC (Loan)]</td>
-                <td>Marina Construction</td>
-                <td className='txtRight'>10,00,000</td>
-              </tr>
-              <tr>
-                <td className='txtRight'>2</td>
-                <td>Mon, 6th Jan</td>
-                <td>NRBC (Bank) [NRBC (Loan)]</td>
-                <td>Marina Construction</td>
-                <td className='txtRight'>10,00,000</td>
-              </tr>
-              <tr>
-                <td className='txtRight'>3</td>
-                <td>Mon, 6th Jan</td>
-                <td>NRBC (Bank) [NRBC (Loan)]</td>
-                <td>Marina Construction</td>
-                <td className='txtRight'>10,00,000</td>
-              </tr>
-              <tr>
-                <td className='txtRight'>4</td>
-                <td>Mon, 6th Jan</td>
-                <td>NRBC (Bank) [NRBC (Loan)]</td>
-                <td>Marina Construction</td>
-                <td className='txtRight'>10,00,000</td>
-              </tr>
-              <tr>
-                <td className='txtRight'>5</td>
-                <td>Mon, 6th Jan</td>
-                <td>NRBC (Bank) [NRBC (Loan)]</td>
-                <td>Marina Construction</td>
-                <td className='txtRight'>10,00,000</td>
-              </tr>
-              <tr>
-                <td className='txtRight'>6</td>
-                <td>Mon, 6th Jan</td>
-                <td>NRBC (Bank) [NRBC (Loan)]</td>
-                <td>Marina Construction</td>
-                <td className='txtRight'>10,00,000</td>
-              </tr>
-              <tr>
-                <td className='txtRight'>1</td>
-                <td>Mon, 6th Jan</td>
-                <td>NRBC (Bank) [NRBC (Loan)]</td>
-                <td>Marina Construction</td>
-                <td className='txtRight'>10,00,000</td>
-              </tr>
-              <tr>
-                <td className='txtRight'>1</td>
-                <td>Mon, 6th Jan</td>
-                <td>NRBC (Bank) [NRBC (Loan)]</td>
-                <td>Marina Construction</td>
-                <td className='txtRight'>10,00,000</td>
-              </tr>
-              <tr>
-                <td className='txtRight'>1</td>
-                <td>Mon, 6th Jan</td>
-                <td>NRBC (Bank) [NRBC (Loan)]</td>
-                <td>Marina Construction</td>
-                <td className='txtRight'>10,00,000</td>
-              </tr>
-              <tr>
-                <td className='txtRight'>1</td>
-                <td>Mon, 6th Jan</td>
-                <td>NRBC (Bank) [NRBC (Loan)]</td>
-                <td>Marina Construction</td>
-                <td className='txtRight'>10,00,000</td>
-              </tr>
-              <tr>
-                <td className='txtRight'>1</td>
-                <td>Mon, 6th Jan</td>
-                <td>NRBC (Bank) [NRBC (Loan)]</td>
-                <td>Marina Construction</td>
-                <td className='txtRight'>10,00,000</td>
-              </tr>
-              <tr>
-                <td className='txtRight'>1</td>
-                <td>Mon, 6th Jan</td>
-                <td>NRBC (Bank) [NRBC (Loan)]</td>
-                <td>Marina Construction</td>
-                <td className='txtRight'>10,00,000</td>
-              </tr>
-              <tr>
-                <td className='txtRight'>1</td>
-                <td>Mon, 6th Jan</td>
-                <td>NRBC (Bank) [NRBC (Loan)]</td>
-                <td>Marina Construction</td>
-                <td className='txtRight'>10,00,000</td>
-              </tr>
-              <tr>
-                <td className='txtRight'>1</td>
-                <td>Mon, 6th Jan</td>
-                <td>NRBC (Bank) [NRBC (Loan)]</td>
-                <td>Marina Construction</td>
-                <td className='txtRight'>10,00,000</td>
-              </tr>
-              <tr>
-                <td className='txtRight'>1</td>
-                <td>Mon, 6th Jan</td>
-                <td>NRBC (Bank) [NRBC (Loan)]</td>
-                <td>Marina Construction</td>
-                <td className='txtRight'>10,00,000</td>
-              </tr>
-              <tr>
-                <td className='txtRight'>1</td>
-                <td>Mon, 6th Jan</td>
-                <td>NRBC (Bank) [NRBC (Loan)]</td>
-                <td>Marina Construction</td>
-                <td className='txtRight'>10,00,000</td>
-              </tr>
-              <tr>
-                <td className='txtRight'>1</td>
-                <td>Mon, 6th Jan</td>
-                <td>NRBC (Bank) [NRBC (Loan)]</td>
-                <td>Marina Construction</td>
-                <td className='txtRight'>10,00,000</td>
-              </tr>
-              <tr>
-                <td className='txtRight'>1</td>
-                <td>Mon, 6th Jan</td>
-                <td>NRBC (Bank) [NRBC (Loan)]</td>
-                <td>Marina Construction</td>
-                <td className='txtRight'>10,00,000</td>
-              </tr>
-              <tr>
-                <td className='txtRight'>1</td>
-                <td>Mon, 6th Jan</td>
-                <td>NRBC (Bank) [NRBC (Loan)]</td>
-                <td>Marina Construction</td>
-                <td className='txtRight'>10,00,000</td>
-              </tr>
-              <tr>
-                <td className='txtRight'>1</td>
-                <td>Mon, 6th Jan</td>
-                <td>NRBC (Bank) [NRBC (Loan)]</td>
-                <td>Marina Construction</td>
-                <td className='txtRight'>10,00,000</td>
-              </tr>
+              <JournalTableRows
+                data={this.props.journal}
+                modalOpen={() => this.toggleModal(true)}
+                setJournalIndex={this.setJournalIndex}
+                filterAccount={this.state.account_filter}
+              />
             </tbody>
           </table>
+          <button onClick={this.addPage}>Show more</button>
+          {this.state.journal_modal && (
+            <Modal title='Journal' modalClose={() => this.toggleModal(false)}>
+              {this.state.journal_index && (
+                <Fragment>
+                  <td>
+                    <span
+                      title={dateFormat(
+                        this.props.journal[this.state.journal_index].date,
+                        'ddd, dS mmm, yyyy, h:MM:ss TT'
+                      )}
+                    >
+                      {dateFormat(
+                        this.props.journal[this.state.journal_index].date,
+                        'ddd, dS mmm'
+                      )}
+                    </span>
+                  </td>
+                  <td>
+                    {this.props.journal[this.state.journal_index].debit.name} -
+                    ({this.props.journal[this.state.journal_index].credit.name})
+                  </td>
+                  <td>
+                    {this.props.journal[this.state.journal_index].description}
+                  </td>
+                  <td className='txtRight' style={{ textAlign: 'right' }}>
+                    <span>৳</span>{' '}
+                    {fmt.format(
+                      this.props.journal[this.state.journal_index].amount,
+                      2
+                    )}
+                  </td>
+                  <td>
+                    {this.props.journal[this.state.journal_index].comment}
+                  </td>
+                </Fragment>
+              )}
+            </Modal>
+          )}
         </Card>
       </Container>
     ) : (
@@ -207,11 +162,13 @@ export class Journal extends Component {
 }
 
 const mapStateToProps = state => ({
-  journal: state.journal,
+  journal: state.journal.journal,
+  account_list: state.journal.account_list,
 })
 const mapDispatchToProps = dispatch => ({
-  fetchJournal: payload => dispatch(fetchJournal(payload)),
-  // addNewJournal: payload => dispatch(addNewJournal(payload)),
+  fetchJournalInit: payload => dispatch(fetchJournalInit(payload)),
+  fetchJournalMore: payload => dispatch(fetchJournalMore(payload)),
+  fetchJournalOfAccount: payload => dispatch(fetchJournalOfAccount(payload)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Journal)
