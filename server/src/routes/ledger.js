@@ -1,5 +1,5 @@
 import Router from 'express'
-import Account from '../models/account'
+import Ledger from '../models/ledger'
 
 // Express > Router
 const app = Router()
@@ -9,7 +9,7 @@ app.get('/api/ledger', async (req, res) => {
   const { startDate, endDate } = req.query
 
   try {
-    const ledger = await Account.fetchLedger(startDate, endDate)
+    const ledger = await Ledger.fetchLedger(startDate, endDate)
     console.log('TCL: ledger', ledger)
 
     return res.send(ledger)

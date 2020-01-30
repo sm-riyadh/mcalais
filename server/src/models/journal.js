@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import Account from './account'
+import Ledger from './ledger'
 import { subDays, endOfDay } from 'date-fns'
 
 const ObjectIdDate = date =>
@@ -69,18 +69,18 @@ JournalSchema.methods.toJSON = function() {
 }
 
 JournalSchema.statics.fetch = async (
-  size = 50,
+  ledger,
+  size = 20,
   page = 0,
-  account,
-  startDate = subDays(new Date(), 5),
+  startDate = subDays(new Date(), 10),
   endDate = endOfDay(new Date())
 ) => {
   size = 5
   if (startDate) startDate = new Date(startDate)
   if (endDate) endDate = new Date(endDate)
 
-  if (!account)
-    return await Journal.find({
+  if (!ledger) {
+    const journal = await Journal.find({
       _id: {
         $gte: ObjectIdDate(startDate),
         $lt: ObjectIdDate(endDate),
@@ -89,35 +89,44 @@ JournalSchema.statics.fetch = async (
       .skip(+size * +page)
       .limit(+size)
       .sort({ _id: -1 })
-  else
-    return await Journal.find({
-      _id: {
-        $gte: ObjectIdDate(startDate),
-        $lt: ObjectIdDate(endDate),
-      },
-      $or: [
-        { 'debit.code': { $eq: account } },
-        { 'credit.code': { $eq: account } },
-      ],
+
+    return journal
+  } else {
+    const { transaction } = await Ledger.fetchOneByCode(+ledger)
+
+    if (!transaction) return []
+
+    let journalID = transaction.map(({ journal_id }) => {
+      if (journal_id >= ObjectIdDate(startDate)) return journal_id
+
+      if (
+        journal_id >= ObjectIdDate(startDate) &&
+        journal_id <= ObjectIdDate(endDate)
+      )
+        return journal_id
     })
-      .skip(+size * +page)
-      .limit(+size)
-      .sort({ _id: -1 })
+    journalID = journalID.filter(id => id != null)
+
+    const journal = await Promise.all(
+      journalID.map(async id => await Journal.fetchSpecific(id))
+    )
+
+    return journal
+  }
 }
 JournalSchema.statics.fetchSpecific = async id => await Journal.findById(id)
 JournalSchema.statics.create = async payload => {
-  console.log('TCL: payload', payload)
   const { _id, credit, debit, description, amount, comment } = await Journal(
     payload
   ).save()
 
-  await Account.addJournal(_id, credit.code, debit.code, amount)
+  await Ledger.addJournal(_id, credit.code, debit.code, amount)
   return { _id, credit, debit, description, amount, comment }
 }
 JournalSchema.statics.remove = async id => {
   const journal = await Journal.findById(id)
 
-  await Account.update(
+  await Ledger.update(
     { code: journal.destination },
     {
       $pull: {
@@ -125,7 +134,7 @@ JournalSchema.statics.remove = async id => {
       },
     }
   )
-  await Account.update(
+  await Ledger.update(
     { code: journal.source },
     {
       $pull: {

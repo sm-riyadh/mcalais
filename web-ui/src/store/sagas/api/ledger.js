@@ -1,15 +1,16 @@
-const URL = `http://192.168.0.100/api/ledger`
+import Axios from './axios-instance'
 
-const fetchLedger = async payload => {
-  const startDate = payload[0].start_date
-  const endDate = payload[0].end_date
+const fetchLedgerList = async () => {
+  try {
+    const { data } = await Axios({
+      method: 'get',
+      url: '/account/list',
+    })
 
-  const res = await fetch(`${URL}?startDate=${startDate}&endDate=${endDate}`)
-  const data = await res.json()
-  if (res.status >= 400) {
-    throw new Error(data.errors)
+    return data
+  } catch (err) {
+    return { ERROR: err }
   }
-  return data
 }
 
-export default { fetchLedger }
+export default { fetchLedgerList }

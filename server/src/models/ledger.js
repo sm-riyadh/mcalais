@@ -6,7 +6,7 @@ const ObjectIdDate = date =>
     Math.floor(date / 1000).toString(16) + '0000000000000000'
   )
 
-const AccountSchema = new mongoose.Schema({
+const LedgerSchema = new mongoose.Schema({
   name: {
     type: String,
     trim: true,
@@ -42,21 +42,26 @@ const AccountSchema = new mongoose.Schema({
     },
   ],
 })
+LedgerSchema.methods.toJSON = function() {
+  return this.toObject()
+}
 
-AccountSchema.statics.fetch = async code =>
-  await Account.find({ code: code }).sort({ code: 1 })
+LedgerSchema.statics.fetchOneByCode = async code =>
+  await Ledger.findOne({
+    code,
+  })
 
-AccountSchema.statics.fetchList = async () =>
-  await Account.find({ transaction: { $exists: true, $ne: [] } })
+LedgerSchema.statics.fetchList = async () =>
+  await Ledger.find({ transaction: { $exists: true, $ne: [] } })
 
-AccountSchema.statics.fetchLedger = async (
+LedgerSchema.statics.fetchLedger = async (
   startDate = new Date() - 24 * 60 * 60 * 1000 * 7,
   endDate = new Date()
 ) => {
   if (startDate) startDate = new Date(startDate)
   if (endDate) endDate = new Date(endDate)
 
-  const account = JSON.parse(JSON.stringify(await Account.find()))
+  const account = JSON.parse(JSON.stringify(await Ledger.find()))
 
   const ledger = await Promise.all(
     account.map(async account => {
@@ -116,11 +121,11 @@ AccountSchema.statics.fetchLedger = async (
   )
   return ledger
 }
-AccountSchema.statics.create = async payload => {
-  return await Account(payload).save()
+LedgerSchema.statics.create = async payload => {
+  return await Ledger(payload).save()
 }
-AccountSchema.statics.insertPreset = async payload =>
-  await Account.findOneAndUpdate(
+LedgerSchema.statics.insertPreset = async payload =>
+  await Ledger.findOneAndUpdate(
     { id: payload.account_id },
     {
       $push: {
@@ -129,8 +134,8 @@ AccountSchema.statics.insertPreset = async payload =>
     }
   )
 
-AccountSchema.statics.addJournal = async (journalID, credit, debit, amount) => {
-  await Account.findOneAndUpdate(
+LedgerSchema.statics.addJournal = async (journalID, credit, debit, amount) => {
+  await Ledger.findOneAndUpdate(
     { code: credit },
     {
       $push: {
@@ -138,7 +143,7 @@ AccountSchema.statics.addJournal = async (journalID, credit, debit, amount) => {
       },
     }
   )
-  await Account.update(
+  await Ledger.update(
     { code: debit },
     {
       $push: {
@@ -157,11 +162,11 @@ AccountSchema.statics.addJournal = async (journalID, credit, debit, amount) => {
     400000 <= credit &&
     credit < 500000
   ) {
-    await Account.findOneAndUpdate(
+    await Ledger.findOneAndUpdate(
       { code: credit },
       { $inc: { balance: -amount } }
     )
-    await Account.findOneAndUpdate(
+    await Ledger.findOneAndUpdate(
       { code: debit },
       { $inc: { balance: amount } }
     )
@@ -175,31 +180,31 @@ AccountSchema.statics.addJournal = async (journalID, credit, debit, amount) => {
     500000 <= credit &&
     credit < 600000
   ) {
-    await Account.findOneAndUpdate(
+    await Ledger.findOneAndUpdate(
       { code: credit },
       { $inc: { balance: amount } }
     )
-    await Account.findOneAndUpdate(
+    await Ledger.findOneAndUpdate(
       { code: debit },
       { $inc: { balance: -amount } }
     )
   } else {
-    await Account.findOneAndUpdate(
+    await Ledger.findOneAndUpdate(
       { code: credit },
       { $inc: { balance: amount } }
     )
-    await Account.findOneAndUpdate(
+    await Ledger.findOneAndUpdate(
       { code: debit },
       { $inc: { balance: amount } }
     )
   }
 }
-AccountSchema.statics.isExist = async code => await Account.exists({ code })
+LedgerSchema.statics.isExist = async code => await Ledger.exists({ code })
 
-AccountSchema.statics.remove = async id => {
-  return await Account.findByIdAndRemove(id)
+LedgerSchema.statics.remove = async id => {
+  return await Ledger.findByIdAndRemove(id)
 }
 
-const Account = mongoose.model('Account', AccountSchema)
+const Ledger = mongoose.model('Ledger', LedgerSchema)
 
-export default Account
+export default Ledger

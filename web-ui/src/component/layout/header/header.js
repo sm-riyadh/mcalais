@@ -8,10 +8,10 @@ import ml from '../../../res/image/ml.png'
 import { Container, Text } from '../../common/'
 
 function header() {
-  const click = new UIfx(Click, {
-    volume: 0.8,
-    throttleMs: 10,
-  })
+  // const click = new UIfx(Click, {
+  //   volume: 0.8,
+  //   throttleMs: 10,
+  // })
 
   return (
     <div className='header'>
@@ -20,32 +20,34 @@ function header() {
       </audio>
       <Container vPos='middle' noPad>
         {/* <button className='btn btn-header-nav-black'>icon</button> */}
-        <img src={ml} style={{ height: '2.5rem', paddingLeft: '1rem' }}></img>
-        <Text className='m-left-3'>Marina Construction</Text>
+        {/* <img src={ml} style={{ height: '2.5rem', paddingLeft: '1rem' }}></img> */}
+        <Text className='m-left-3'>
+          <b>MCALAIS</b>
+        </Text>
       </Container>
       <Container vPos='middle'>
         <Text className='m-right'>Pikachu</Text>
         <button
           className='btn btn-header-nav btn-header-nav-img'
-          onMouseEnter={() => click.play()}
+          // onMouseEnter={() => click.play()}
         >
           <img src={PikachuAvator} />
         </button>
         <button
           className='btn btn-header-nav black'
-          onMouseEnter={() => click.play()}
+          // onMouseEnter={() => click.play()}
         >
           O
         </button>
         <button
           className='btn btn-header-nav black'
-          onMouseEnter={() => click.play()}
+          // onMouseEnter={() => click.play()}
         >
           O
         </button>
         <button
           className='btn btn-header-nav black'
-          onMouseEnter={() => click.play()}
+          // onMouseEnter={() => click.play()}
         >
           O
         </button>

@@ -1,20 +1,20 @@
 import { call, put, takeLatest } from 'redux-saga/effects'
+import API from './api/ledger'
 
 import { LEDGER } from '../index'
-import Api from './api/ledger'
-import { saveLedger } from '../actions'
+import { saveLedgerList } from '../actions'
 
-function* handleLedgerFetch(payload) {
+function* handleLedgerListFetch() {
   try {
-    const ledger = yield call(Api.fetchLedger, [payload.data])
-    yield put(saveLedger(ledger))
+    const ledger = yield call(API.fetchLedgerList)
+    yield put(saveLedgerList(ledger))
   } catch (err) {
     yield put({ type: 'LEDGER.SAVE', message: err.message })
   }
 }
 
 function* watchLedger() {
-  yield takeLatest(LEDGER.FETCH, handleLedgerFetch)
+  yield takeLatest(LEDGER.FETCH.LIST, handleLedgerListFetch)
 }
 
 export default watchLedger

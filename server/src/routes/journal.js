@@ -10,59 +10,26 @@ const app = Router()
 // Route
 const url = 'api/journal'
 
-// FETCHES
 app.get(`/${url}`, async (req, res) => {
-  const { size, page, account, startDate, endDate } = req.query
+  const { size, page, ledger, startDate, endDate } = req.query
 
   try {
-    const journal = await Journal.fetch(size, page, account, startDate, endDate)
-
-    if (!page || page <= 0) {
-      const accountList = await Account.fetchList()
-      return res.send({ journal, account_list: accountList })
-    }
-
-    return res.send(journal)
-  } catch (err) {
-    return res.send('Error: ' + err)
-  }
-})
-app.get(`/${url}/more`, async (req, res) => {
-  const { size, page, startDate, endDate } = req.query
-
-  try {
-    if (!page || page <= 0) {
+    if (!ledger) {
+      const journal = await Journal.fetch(null, size, page, startDate, endDate)
+      return res.send(journal)
+    } else {
       const journal = await Journal.fetch(
+        ledger,
         size,
-        account,
+        page,
         startDate,
-        endDate,
-        page
+        endDate
       )
       return res.send(journal)
     }
-
-    return res.send()
   } catch (err) {
     return res.send('Error: ' + err)
   }
-})
-
-app.get(`/${url}/:account`, async (req, res) => {
-  // const { size, page, account, startDate, endDate } = req.query
-  // try {
-  //   if (size && !validator.isNumeric(size)) throw err
-  //   if (startDate && !validator.isISO8601(startDate)) throw err
-  //   if (endDate && !validator.isISO8601(endDate)) throw err
-  //   const journal = await Journal.fetch(size, page, account, startDate, endDate)
-  //   if (!page || page <= 0) {
-  //     const accountList = await Account.fetchList()
-  //     return res.send({ journal, account_list: accountList })
-  //   }
-  //   return res.send(journal)
-  // } catch (err) {
-  //   return res.send('Error: ' + err)
-  // }
 })
 
 app.post(`/${url}`, async (req, res) => {

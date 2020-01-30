@@ -11,6 +11,16 @@ const app = Router()
 const url = 'api/account'
 
 // Fetch
+app.get(`/${url}/list`, async (req, res) => {
+  try {
+    // Fetch all
+    const accountList = await Account.fetchList()
+
+    return res.send(accountList)
+  } catch (err) {
+    return res.send('Error: ' + err)
+  }
+})
 app.get(`/${url}`, async (req, res) => {
   try {
     // Fetch all

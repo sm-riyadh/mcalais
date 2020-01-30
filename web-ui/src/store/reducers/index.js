@@ -1,15 +1,11 @@
 import { combineReducers } from 'redux'
 
-// import account from './account'
 import journal from './journal'
-// import ledger from './ledger'
-// import catagory from './catagory'
+import ledger from './ledger'
 
 const rootReducer = combineReducers({
-  // account: account,
   journal: journal,
-  // ledger: ledger,
-  // catagory: catagory,
+  ledger: ledger,
 })
 
 export default rootReducer

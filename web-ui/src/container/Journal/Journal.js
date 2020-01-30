@@ -11,22 +11,23 @@ import {
   Placeholder,
 } from '../../component/common'
 import {
-  fetchJournalInit,
+  fetchLedgerList,
+  fetchJournal,
   fetchJournalMore,
-  fetchJournalOfAccount,
 } from '../../store/actions'
 
 import JournalTableRows from './components/JournalTableRows'
 
 export class Journal extends Component {
   componentDidMount() {
-    this.props.fetchJournalInit()
+    this.props.fetchLedgerList()
+    this.props.fetchJournal()
   }
   state = {
     journal_index: '',
     journal_modal: false,
     page: 0,
-    account_filter: '',
+    ledger_filter: '',
   }
   toggleModal = action => this.setState({ journal_modal: action })
   setJournalIndex = index => this.setState({ journal_index: index })
@@ -34,13 +35,13 @@ export class Journal extends Component {
     const { name, value } = value
     this.setState({ [name]: value })
   }
-  accountFilterChangeHandler = e => {
-    const { value } = e.target.value
-    this.setState({ account_filter: value })
-
-    this.props.fetchJournalOfAccount({ account: value })
+  ledgerFilterChangeHandler = e => {
+    const { value } = e.target
+    this.setState({ ledger_filter: value }, () =>
+      this.props.fetchJournal({ ledger: this.state.ledger_filter })
+    )
   }
-  addPage = () => {
+  appendMore = () => {
     this.setState(
       state => ({
         page: state.page + 1,
@@ -48,7 +49,7 @@ export class Journal extends Component {
       () =>
         this.props.fetchJournalMore({
           page: this.state.page,
-          account: this.state.account,
+          ledger: this.state.ledger_filter,
         })
     )
   }
@@ -77,13 +78,13 @@ export class Journal extends Component {
               <option>Sort by...</option>
             </select> */}
               <select
-                name='account_filter'
+                name='ledger_filter'
                 className='btn btn-chip'
-                onChange={this.accountFilterChangeHandler}
+                onChange={this.ledgerFilterChangeHandler}
               >
                 <option value=''>All</option>
-                {this.props.account_list.map(account => (
-                  <option value={account.code}>{account.name}</option>
+                {this.props.ledger_list.map(ledger => (
+                  <option value={ledger.code}>{ledger.name}</option>
                 ))}
               </select>
               <select className='btn btn-chip'>
@@ -110,11 +111,11 @@ export class Journal extends Component {
                 data={this.props.journal}
                 modalOpen={() => this.toggleModal(true)}
                 setJournalIndex={this.setJournalIndex}
-                filterAccount={this.state.account_filter}
+                filterLedger={this.state.ledger_filter}
               />
             </tbody>
           </table>
-          <button onClick={this.addPage}>Show more</button>
+          <button onClick={this.appendMore}>Show more</button>
           {this.state.journal_modal && (
             <Modal title='Journal' modalClose={() => this.toggleModal(false)}>
               {this.state.journal_index && (
@@ -163,12 +164,12 @@ export class Journal extends Component {
 
 const mapStateToProps = state => ({
   journal: state.journal.journal,
-  account_list: state.journal.account_list,
+  ledger_list: state.ledger.ledger_list,
 })
 const mapDispatchToProps = dispatch => ({
-  fetchJournalInit: payload => dispatch(fetchJournalInit(payload)),
+  fetchLedgerList: payload => dispatch(fetchLedgerList(payload)),
+  fetchJournal: payload => dispatch(fetchJournal(payload)),
   fetchJournalMore: payload => dispatch(fetchJournalMore(payload)),
-  fetchJournalOfAccount: payload => dispatch(fetchJournalOfAccount(payload)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Journal)

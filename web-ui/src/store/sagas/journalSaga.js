@@ -1,41 +1,28 @@
 import { call, put, takeLatest } from 'redux-saga/effects'
+import API from './api/journal'
 
 import { JOURNAL } from '../index'
-import Api from './api/journal'
-import {
-  saveJournalInit,
-  saveJournalMore,
-  saveJournalOfAccount,
-} from '../actions'
+import { saveJournal, saveJournalMore } from '../actions'
 
-function* HandleFetchJournalInit({ payload }) {
+function* HandleFetchJournal({ payload }) {
   try {
-    const journal = yield call(Api.fetchJournalInit, [payload])
-    yield put(saveJournalInit(journal))
+    const journal = yield call(API.fetchJournal, [payload])
+    yield put(saveJournal(journal))
   } catch (err) {
     yield put({ type: 'JOURNAL.SAVE', message: err.message })
   }
 }
-function* HandleFetchJournalMore(payload) {
+function* HandleFetchJournalMore({ payload }) {
   try {
-    const journal = yield call(Api.fetchJournalMore, [payload])
+    const journal = yield call(API.fetchJournal, [payload])
     yield put(saveJournalMore(journal))
-  } catch (err) {
-    yield put({ type: 'JOURNAL.SAVE', message: err.message })
-  }
-}
-function* HandleFetchJournalOfAccount(payload) {
-  try {
-    const journal = yield call(Api.fetchJournalOfAccount, [payload])
-    yield put(saveJournalOfAccount(journal))
   } catch (err) {
     yield put({ type: 'JOURNAL.SAVE', message: err.message })
   }
 }
 
 function* watchJournal() {
-  yield takeLatest(JOURNAL.FETCH.INIT, HandleFetchJournalInit)
-  yield takeLatest(JOURNAL.FETCH.ACCOUNT, HandleFetchJournalOfAccount)
+  yield takeLatest(JOURNAL.FETCH._, HandleFetchJournal)
   yield takeLatest(JOURNAL.FETCH.MORE, HandleFetchJournalMore)
 }
 
