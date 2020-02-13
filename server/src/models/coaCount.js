@@ -6,7 +6,7 @@ const ObjectIdDate = date =>
     Math.floor(date / 1000).toString(16) + '0000000000000000'
   )
 
-const AccountCountSchema = new mongoose.Schema({
+const CoaCountSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
@@ -23,16 +23,15 @@ const AccountCountSchema = new mongoose.Schema({
   },
 })
 
-AccountCountSchema.statics.fetch = async name =>
-  await AccountCount.findOne({ name })
+CoaCountSchema.statics.fetch = async name => await CoaCount.findOne({ name })
 
-AccountCountSchema.statics.add = async name =>
-  await AccountCount.findOneAndUpdate(
+CoaCountSchema.statics.add = async name =>
+  await CoaCount.findOneAndUpdate(
     { name },
     { $inc: { count: 1, abs_count: 1 } },
     { upsert: true }
   )
 
-const AccountCount = mongoose.model('AccountCount', AccountCountSchema)
+const CoaCount = mongoose.model('CoaCount', CoaCountSchema)
 
-export default AccountCount
+export default CoaCount

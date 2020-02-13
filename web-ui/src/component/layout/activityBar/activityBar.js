@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { SideBar, Container } from '../../common'
+import { SideBar, Container } from '../../'
 
 const activityBar = props => {
   return (

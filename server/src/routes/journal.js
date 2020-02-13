@@ -1,7 +1,7 @@
 import Router from 'express'
 import validator from 'validator'
 import Journal from '../models/journal'
-import Account from '../models/account'
+import Coa from '../models/coa'
 // import { Types } from 'mongoose'
 
 // Express > Router
@@ -11,15 +11,23 @@ const app = Router()
 const url = 'api/journal'
 
 app.get(`/${url}`, async (req, res) => {
-  const { size, page, ledger, startDate, endDate } = req.query
-
   try {
-    if (!ledger) {
-      const journal = await Journal.fetch(null, size, page, startDate, endDate)
+    const { site, size, page, coa, startDate, endDate } = req.query
+
+    if (!coa) {
+      const journal = await Journal.fetch(
+        site,
+        null,
+        size,
+        page,
+        startDate,
+        endDate
+      )
       return res.send(journal)
     } else {
       const journal = await Journal.fetch(
-        ledger,
+        site,
+        coa,
         size,
         page,
         startDate,
@@ -33,7 +41,7 @@ app.get(`/${url}`, async (req, res) => {
 })
 
 app.post(`/${url}`, async (req, res) => {
-  const { credit, debit, description, amount, comment } = req.body
+  const { site, credit, debit, description, amount, comment } = req.body
 
   try {
     // Validation
@@ -45,20 +53,21 @@ app.post(`/${url}`, async (req, res) => {
     )
       throw 'Invalid type'
 
-    if (!(await Account.isExist(credit)) || !(await Account.isExist(debit)))
-      throw 'Invilid account code'
+    if (!(await Coa.isExist(credit)) || !(await Coa.isExist(debit)))
+      throw 'Invilid coa code'
 
-    const debitAccount = await Account.fetch(debit)
-    const creditAccount = await Account.fetch(credit)
+    const debitCoa = await Coa.fetchOneByCode(debit)
+    const creditCoa = await Coa.fetchOneByCode(credit)
 
     const newJournal = await Journal.create({
+      site,
       credit: {
-        code: creditAccount[0].code,
-        name: creditAccount[0].name,
+        code: creditCoa.code,
+        name: creditCoa.name,
       },
       debit: {
-        code: debitAccount[0].code,
-        name: debitAccount[0].name,
+        code: debitCoa.code,
+        name: debitCoa.name,
       },
       description,
       amount,
@@ -70,7 +79,7 @@ app.post(`/${url}`, async (req, res) => {
     return res.send('Error: ' + err)
   }
 })
-
+/*
 // Delete
 app.delete(`/${url}`, async (req, res) => {
   const { id } = req.query
@@ -83,6 +92,6 @@ app.delete(`/${url}`, async (req, res) => {
   } catch (err) {
     return res.send('Error: ' + err)
   }
-})
+}) */
 
 export default app

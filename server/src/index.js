@@ -7,9 +7,8 @@ import bodyparser from 'body-parser'
 // import logger from 'morgan'
 // }
 
-import account from './routes/account'
 import journal from './routes/journal'
-import ledger from './routes/ledger'
+import coa from './routes/coa'
 
 const app = express()
 
@@ -26,9 +25,8 @@ app.use((req, res, next) => {
   next()
 })
 
-app.use(account)
 app.use(journal)
-app.use(ledger)
+app.use(coa)
 
 // Server Config
 const port = 8080

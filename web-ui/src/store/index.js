@@ -1,3 +1,6 @@
+const MAIN = {
+  SET: 'MAIN_SET',
+}
 const JOURNAL = {
   FETCH: {
     _: 'JOURNAL_FETCH',
@@ -10,13 +13,15 @@ const JOURNAL = {
     _: 'JOURNAL_ADD',
   },
 }
-const LEDGER = {
+const COA = {
   FETCH: {
-    LIST: 'LEDGER_FETCH_LIST',
+    _: 'COA_FETCH',
+    LIST: 'COA_FETCH_LIST',
   },
   REPLACE: {
-    LIST: 'LEDGER_REPLACE_LIST',
+    _: 'COA_REPLACE',
+    LIST: 'COA_REPLACE_LIST',
   },
 }
 
-export { JOURNAL, LEDGER }
+export { MAIN, JOURNAL, COA }

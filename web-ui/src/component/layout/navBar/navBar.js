@@ -1,7 +1,7 @@
 import React from 'react'
 import { NavLink } from 'react-router-dom'
 
-import { SideBar } from '../../common'
+import { SideBar } from '../../'
 
 const navBar = props => {
   return (

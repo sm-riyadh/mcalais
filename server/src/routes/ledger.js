@@ -1,21 +1,20 @@
 import Router from 'express'
-import Ledger from '../models/ledger'
+import Coa from '../models/coa'
 
 // Express > Router
 const app = Router()
 
-// FETCHES LEDGER
+// FETCHES COA
 app.get('/api/ledger', async (req, res) => {
   const { startDate, endDate } = req.query
 
   try {
-    const ledger = await Ledger.fetchLedger(startDate, endDate)
-    console.log('TCL: ledger', ledger)
+    const coa = await Coa.fetchCoa(startDate, endDate)
+    console.log('TCL: coa', coa)
 
-    return res.send(ledger)
+    return res.send(coa)
   } catch (err) {
     return res.send('Error: ' + err)
   }
 })
-
 export default app

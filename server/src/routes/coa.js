@@ -1,36 +1,62 @@
 import Router from 'express'
 import validator from 'validator'
-import Account from '../models/account'
-import AccountCount from '../models/accountCount'
+import Coa from '../models/coa'
+import CoaCount from '../models/coaCount'
 import Catagory from '../models/catagory'
 
 // Express > Router
 const app = Router()
 
 // Route
-const url = 'api/account'
+const url = 'api/coa'
 
 // Fetch
+app.get(`/${url}`, async (req, res) => {
+  try {
+    const { site } = req.query
+
+    // Fetch all
+    const coa = await Coa.fetchAll(site)
+
+    const sortedCoa = {
+      assets: [],
+      liabilities: [],
+      equities: [],
+      expenses: [],
+      incomes: [],
+    }
+    sortedCoa.assets = coa.filter(({ code }) => 100000 < code && code < 200000)
+    sortedCoa.liabilities = coa.filter(
+      ({ code }) => 200000 < code && code < 300000
+    )
+    sortedCoa.equities = coa.filter(
+      ({ code }) => 300000 < code && code < 400000
+    )
+    sortedCoa.expenses = coa.filter(
+      ({ code }) => 400000 < code && code < 500000
+    )
+    sortedCoa.incomes = coa.filter(({ code }) => 500000 < code && code < 600000)
+
+    return res.send(sortedCoa)
+  } catch (err) {
+    return res.send('Error: ' + err)
+  }
+})
 app.get(`/${url}/list`, async (req, res) => {
   try {
     // Fetch all
-    const accountList = await Account.fetchList()
+    const coaList = await Coa.fetchList()
 
-    return res.send(accountList)
+    return res.send(coaList)
   } catch (err) {
     return res.send('Error: ' + err)
   }
 })
-app.get(`/${url}`, async (req, res) => {
-  try {
-    // Fetch all
-    const account = await Account.fetchAll()
-
-    return res.send(account)
-  } catch (err) {
-    return res.send('Error: ' + err)
-  }
-})
+//
+//
+//
+//
+//
 app.get(`/api/catagory`, async (req, res) => {
   try {
     // Fetch all
@@ -62,12 +88,12 @@ app.post(`/${url}`, async (req, res) => {
   try {
     change_tree.map(async (change, index) => {
       if (change.action === 'ADD') {
-        let count = await AccountCount.add(change.data.catagory_id)
+        let count = await CoaCount.add(change.data.catagory_id)
         if (count) count = count.count
 
         const code = codeGen(change.data.catagory_id, count)
 
-        await Account.create({
+        await Coa.create({
           id: change.data.id,
           name: change.data.name,
           type: change.data.catagory_id,
@@ -75,8 +101,8 @@ app.post(`/${url}`, async (req, res) => {
           code,
         })
         if (change.type === 'preset')
-          await Account.insertPreset({
-            account_id: change.data.account_id,
+          await Coa.insertPreset({
+            coa_id: change.data.coa_id,
             preset_id: change.data.id,
           })
       }
@@ -97,7 +123,7 @@ app.delete(`/${url}`, async (req, res) => {
   try {
     if (!validator.isMongoId(id)) throw 'Invalid type'
 
-    await Account.remove(id)
+    await Coa.remove(id)
     return res.send()
   } catch (err) {
     return res.send('Error: ' + err)

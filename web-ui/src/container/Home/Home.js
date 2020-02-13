@@ -1,11 +1,14 @@
 import React, { Component, Fragment } from 'react'
+import { connect } from 'react-redux'
 import { Switch, Route } from 'react-router-dom'
 
-import { Container } from '../../component/common'
-import { Header, NavBar, ActivityBar } from '../../component/layout'
-import Journal from '../Journal/Journal'
+import { NavBar, ActivityBar } from '../../component/layout'
 
-// import container from '../../component/common/container/container'
+import Header from '../Header/Header'
+import Journal from '../Journal/Journal'
+import Coa from '../Coa/Coa'
+
+// import container from '../../component/container/container'
 
 export class Home extends Component {
   render() {
@@ -15,22 +18,19 @@ export class Home extends Component {
         <main>
           <NavBar>
             {[
-              { title: 'Overview', path: '/', icon: 'O' },
               { title: 'Journal', path: '/journal', icon: 'O' },
-              { title: 'Ledgers', path: '/ledger', icon: 'O' },
               { title: 'Chart of Accounts', path: '/coa', icon: 'O' },
             ]}
           </NavBar>
 
           <Switch>
-            <Route path='/' exact component={Journal} />
-            <Route path='/journal' exact component={Journal} />
-            <Route path='/ledger'>
-              <Container className='p-6'>
-                <h2>Coming Soon...</h2>
-              </Container>
-            </Route>
-            {/* <Route path='/account' component={Account} /> */}
+            <Route
+              path='/journal'
+              exact
+              component={Journal}
+              key={this.props.site}
+            />
+            <Route path='/coa' component={Coa} />
             {/* <Route path='/catalogue' component={Catalogue} /> */}
           </Switch>
           <ActivityBar />
@@ -41,4 +41,7 @@ export class Home extends Component {
   }
 }
 
-export default Home
+const mapStateToProps = state => ({
+  site: state.main.site,
+})
+export default connect(mapStateToProps)(Home)

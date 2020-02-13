@@ -1,4 +1,13 @@
-import { JOURNAL, LEDGER } from './index'
+import { MAIN, JOURNAL, COA } from './index'
+
+/*
+ * Main
+ */
+const updateMain = (name, payload) => ({
+  type: MAIN.SET,
+  name,
+  payload,
+})
 
 /*
  * JOURNAL
@@ -7,12 +16,13 @@ const fetchJournal = payload => ({
   type: JOURNAL.FETCH._,
   payload,
 })
-const fetchJournalMore = payload => ({
-  type: JOURNAL.FETCH.MORE,
-  payload,
-})
 const saveJournal = payload => ({
   type: JOURNAL.REPLACE._,
+  payload,
+})
+
+const fetchJournalMore = payload => ({
+  type: JOURNAL.FETCH.MORE,
   payload,
 })
 const saveJournalMore = payload => ({
@@ -21,23 +31,36 @@ const saveJournalMore = payload => ({
 })
 
 /*
- * LEDGER
+ * COA
  */
-const fetchLedgerList = () => ({
-  type: LEDGER.FETCH.LIST,
+const fetchCoa = payload => ({
+  type: COA.FETCH._,
+  payload,
 })
-const saveLedgerList = payload => ({
-  type: LEDGER.REPLACE.LIST,
+const saveCoa = payload => ({
+  type: COA.REPLACE._,
+  payload,
+})
+const fetchCoaList = payload => ({
+  type: COA.FETCH.LIST,
+  payload,
+})
+const saveCoaList = payload => ({
+  type: COA.REPLACE.LIST,
   payload,
 })
 
 export {
+  // Main
+  updateMain,
   // JOURNAL
   fetchJournal,
-  fetchJournalMore,
   saveJournal,
+  fetchJournalMore,
   saveJournalMore,
-  saveLedgerList,
-  // LEDGER
-  fetchLedgerList,
+  // COA
+  fetchCoa,
+  saveCoa,
+  fetchCoaList,
+  saveCoaList,
 }

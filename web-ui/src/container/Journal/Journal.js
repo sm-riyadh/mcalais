@@ -3,15 +3,9 @@ import { connect } from 'react-redux'
 import dateFormat from 'dateformat'
 import fmt from 'indian-number-format'
 
+import { Modal, Container, Card, Text, Placeholder } from '../../component'
 import {
-  Modal,
-  Container,
-  Card,
-  Text,
-  Placeholder,
-} from '../../component/common'
-import {
-  fetchLedgerList,
+  fetchCoaList,
   fetchJournal,
   fetchJournalMore,
 } from '../../store/actions'
@@ -19,26 +13,30 @@ import {
 import JournalTableRows from './components/JournalTableRows'
 
 export class Journal extends Component {
-  componentDidMount() {
-    this.props.fetchLedgerList()
-    this.props.fetchJournal()
-  }
   state = {
     journal_index: '',
     journal_modal: false,
     page: 0,
-    ledger_filter: '',
+    coa_filter: '',
   }
+  componentDidMount() {
+    this.props.fetchCoaList({ site: this.props.site })
+    this.props.fetchJournal({ site: this.props.site })
+  }
+
   toggleModal = action => this.setState({ journal_modal: action })
   setJournalIndex = index => this.setState({ journal_index: index })
-  changeHandler = e => {
-    const { name, value } = value
+  changeHandler = ({ target }) => {
+    const { name, value } = target
     this.setState({ [name]: value })
   }
-  ledgerFilterChangeHandler = e => {
+  coaFilterChangeHandler = e => {
     const { value } = e.target
-    this.setState({ ledger_filter: value }, () =>
-      this.props.fetchJournal({ ledger: this.state.ledger_filter })
+    this.setState({ coa_filter: value }, () =>
+      this.props.fetchJournal({
+        site: this.props.site,
+        coa: this.state.coa_filter,
+      })
     )
   }
   appendMore = () => {
@@ -48,8 +46,9 @@ export class Journal extends Component {
       }),
       () =>
         this.props.fetchJournalMore({
+          site: 'HQ',
           page: this.state.page,
-          ledger: this.state.ledger_filter,
+          coa: this.state.coa_filter,
         })
     )
   }
@@ -59,14 +58,20 @@ export class Journal extends Component {
       <Container vertical className='scrollable p-hor-8 p-top-5'>
         <Container className='flex-pos-between p-hor-4 p-bottom-4'>
           <div>
-            <select className='btn btn-chip m-right-2'>
-              <option>Journal</option>
+            {/* <select
+              name='site'
+              className='btn btn-chip m-right-2'
+              onChange={this.mainChangeHandler}
+              value={this.props.site}
+            >
+              <option value='HQ'>HQ</option>
+              <option value='SUST Boundary'>SUST Boundary</option>
             </select>
             <input
               type='text'
               className='btn btn-chip m-right-2'
               placeholder='Search...'
-            />
+            /> */}
           </div>
           <button className='btn btn-chip primary'>ADD &nbsp;&nbsp; +</button>
         </Container>
@@ -78,13 +83,13 @@ export class Journal extends Component {
               <option>Sort by...</option>
             </select> */}
               <select
-                name='ledger_filter'
+                name='coa_filter'
                 className='btn btn-chip'
-                onChange={this.ledgerFilterChangeHandler}
+                onChange={this.coaFilterChangeHandler}
               >
                 <option value=''>All</option>
-                {this.props.ledger_list.map(ledger => (
-                  <option value={ledger.code}>{ledger.name}</option>
+                {this.props.coa_list.map(coa => (
+                  <option value={coa.code}>{coa.name}</option>
                 ))}
               </select>
               <select className='btn btn-chip'>
@@ -111,7 +116,7 @@ export class Journal extends Component {
                 data={this.props.journal}
                 modalOpen={() => this.toggleModal(true)}
                 setJournalIndex={this.setJournalIndex}
-                filterLedger={this.state.ledger_filter}
+                filterCoa={this.state.coa_filter}
               />
             </tbody>
           </table>
@@ -163,11 +168,12 @@ export class Journal extends Component {
 }
 
 const mapStateToProps = state => ({
+  site: state.main.site,
   journal: state.journal.journal,
-  ledger_list: state.ledger.ledger_list,
+  coa_list: state.coa.coa_list,
 })
 const mapDispatchToProps = dispatch => ({
-  fetchLedgerList: payload => dispatch(fetchLedgerList(payload)),
+  fetchCoaList: payload => dispatch(fetchCoaList(payload)),
   fetchJournal: payload => dispatch(fetchJournal(payload)),
   fetchJournalMore: payload => dispatch(fetchJournalMore(payload)),
 })

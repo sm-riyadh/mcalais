@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react'
-import { Card, Container } from '../../../component/common'
+import { Card, Container } from '../'
 
 const modal = props => {
   return (
