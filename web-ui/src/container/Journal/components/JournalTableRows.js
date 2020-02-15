@@ -13,7 +13,7 @@ const JournalTableRows = props =>
             props.setJournalIndex(index)
           }}
         >
-          <td className='txtRight'>{index}</td>
+          <td className='txtRight'>{index + 1}</td>
           <td>
             <span title={dateFormat(date, 'ddd, dS mmm, yyyy, h:MM:ss TT')}>
               {dateFormat(date, 'ddd, dS mmm')}

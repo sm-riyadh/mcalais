@@ -38,5 +38,26 @@ const fetchCoaList = async payload => {
     return { ERROR: err }
   }
 }
+const sendCoa = async payload => {
+  try {
+    if (payload[0]) payload = payload[0]
 
-export default { fetchCoa, fetchCoaList }
+    const { site, name, type } = payload
+
+    const { data } = await Axios({
+      method: 'post',
+      url: '/coa',
+      data: {
+        site,
+        name,
+        type,
+      },
+    })
+
+    return data
+  } catch (err) {
+    return { ERROR: err }
+  }
+}
+
+export default { fetchCoa, fetchCoaList, sendCoa }

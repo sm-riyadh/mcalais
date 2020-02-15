@@ -16,17 +16,26 @@ const fetchJournal = payload => ({
   type: JOURNAL.FETCH._,
   payload,
 })
-const saveJournal = payload => ({
-  type: JOURNAL.REPLACE._,
-  payload,
-})
-
 const fetchJournalMore = payload => ({
   type: JOURNAL.FETCH.MORE,
   payload,
 })
-const saveJournalMore = payload => ({
-  type: JOURNAL.ADD._,
+
+const sendJournal = payload => ({
+  type: JOURNAL.SEND,
+  payload,
+})
+
+const saveJournal = payload => ({
+  type: JOURNAL.REPLACE._,
+  payload,
+})
+const saveJournalOnTop = payload => ({
+  type: JOURNAL.ADD.TOP,
+  payload,
+})
+const saveJournalOnBottom = payload => ({
+  type: JOURNAL.ADD.BOTTOM,
   payload,
 })
 
@@ -37,12 +46,16 @@ const fetchCoa = payload => ({
   type: COA.FETCH._,
   payload,
 })
-const saveCoa = payload => ({
-  type: COA.REPLACE._,
-  payload,
-})
 const fetchCoaList = payload => ({
   type: COA.FETCH.LIST,
+  payload,
+})
+const sendCoa = payload => ({
+  type: COA.SEND,
+  payload,
+})
+const saveCoa = payload => ({
+  type: COA.REPLACE._,
   payload,
 })
 const saveCoaList = payload => ({
@@ -55,12 +68,15 @@ export {
   updateMain,
   // JOURNAL
   fetchJournal,
-  saveJournal,
   fetchJournalMore,
-  saveJournalMore,
+  sendJournal,
+  saveJournal,
+  saveJournalOnTop,
+  saveJournalOnBottom,
   // COA
   fetchCoa,
   saveCoa,
   fetchCoaList,
+  sendCoa,
   saveCoaList,
 }

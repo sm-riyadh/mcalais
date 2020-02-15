@@ -69,7 +69,7 @@ JournalSchema.methods.toJSON = function() {
 JournalSchema.statics.fetch = async (
   site,
   coa,
-  size = 50,
+  size = 10,
   page = 0,
   startDate = subDays(new Date(), 100),
   endDate = endOfDay(new Date())

@@ -11,7 +11,12 @@ const journal = (state = initialState, { type, payload }) => {
       newState.journal = payload
       return newState
     }
-    case JOURNAL.ADD._: {
+    case JOURNAL.ADD.TOP: {
+      const newState = { ...state }
+      newState.journal = [...payload, ...newState.journal]
+      return newState
+    }
+    case JOURNAL.ADD.BOTTOM: {
       const newState = { ...state }
       newState.journal = [...newState.journal, ...payload]
       return newState

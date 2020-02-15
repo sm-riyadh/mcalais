@@ -9,7 +9,7 @@ const CoaTableRows = props =>
       //   props.setJournalIndex(index)
       // }}
     >
-      <td className='txtRight'>{index}</td>
+      <td className='txtRight'>{index + 1}</td>
       <td>{name}</td>
       <td className='txtRight' style={{ textAlign: 'right' }}>
         <span>৳</span> {balance}

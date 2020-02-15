@@ -9,22 +9,26 @@ import {
   Placeholder,
 } from '../../component'
 
-import { fetchCoa } from '../../store/actions'
+import { fetchCoa, sendCoa } from '../../store/actions'
 
 import CoaTableRows from './components/CoaTableRows'
+import CoaManager from './components/CoaManager'
 
 export class Coa extends Component {
   componentDidMount() {
-    this.props.fetchCoa({ site: 'HQ' })
+    this.props.fetchCoa({ site: this.props.site })
   }
 
   state = {
     filter: '',
+    modal_coa_manager: false,
   }
   changeHandler = ({ target }) => {
     const { name, value } = target
     this.setState({ [name]: value })
   }
+  toggleModal = (name, action) => this.setState({ [name]: action })
+
   render() {
     return 1 === 1 ? (
       <Container vertical className='scrollable p-hor-8 p-top-5'>
@@ -44,7 +48,14 @@ export class Coa extends Component {
               <option value='incomes'>Incomes</option>
             </select>
           </div>
-          <button className='btn btn-chip primary'>ADD &nbsp;&nbsp; +</button>
+          <button
+            className='btn btn-chip primary'
+            onClick={() => {
+              this.toggleModal('modal_coa_manager', true)
+            }}
+          >
+            COA MANAGER &nbsp;&nbsp; +
+          </button>
         </Container>
         <Card className='p-top-5' vertical noPad expand>
           <Container className='card-header flex-pos-between p-vrt-4 p-hor-6'>
@@ -153,6 +164,12 @@ export class Coa extends Component {
             </tbody>
           </table>
 
+          <CoaManager
+            isModalOpen={this.state.modal_coa_manager}
+            modalClose={() => this.toggleModal('modal_coa_manager', false)}
+            sendAccount={this.props.sendCoa}
+            site={this.props.site}
+          />
           {/* {this.state.journal_modal && (
             <Modal title='Journal' modalClose={() => this.toggleModal(false)}>
               {this.state.journal_index && (
@@ -201,10 +218,12 @@ export class Coa extends Component {
 }
 
 const mapStateToProps = state => ({
+  site: state.main.site,
   coa: state.coa.coa,
 })
 const mapDispatchToProps = dispatch => ({
   fetchCoa: payload => dispatch(fetchCoa(payload)),
+  sendCoa: payload => dispatch(sendCoa(payload)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Coa)

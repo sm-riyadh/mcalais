@@ -30,7 +30,7 @@ export class Home extends Component {
               component={Journal}
               key={this.props.site}
             />
-            <Route path='/coa' component={Coa} />
+            <Route path='/coa' component={Coa} key={this.props.site} />
             {/* <Route path='/catalogue' component={Catalogue} /> */}
           </Switch>
           <ActivityBar />

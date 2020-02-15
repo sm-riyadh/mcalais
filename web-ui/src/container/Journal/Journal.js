@@ -1,35 +1,39 @@
 import React, { Component, Fragment } from 'react'
 import { connect } from 'react-redux'
-import dateFormat from 'dateformat'
-import fmt from 'indian-number-format'
 
 import { Modal, Container, Card, Text, Placeholder } from '../../component'
 import {
+  fetchCoa,
   fetchCoaList,
   fetchJournal,
   fetchJournalMore,
+  sendJournal,
 } from '../../store/actions'
 
 import JournalTableRows from './components/JournalTableRows'
+import JournalDetailModal from './components/JournalDetailModal'
+import JournalEntry from './components/JournalEntry'
 
 export class Journal extends Component {
-  state = {
-    journal_index: '',
-    journal_modal: false,
-    page: 0,
-    coa_filter: '',
-  }
   componentDidMount() {
+    this.props.fetchCoa({ site: this.props.site })
     this.props.fetchCoaList({ site: this.props.site })
     this.props.fetchJournal({ site: this.props.site })
   }
 
-  toggleModal = action => this.setState({ journal_modal: action })
-  setJournalIndex = index => this.setState({ journal_index: index })
-  changeHandler = ({ target }) => {
-    const { name, value } = target
-    this.setState({ [name]: value })
+  state = {
+    modal_journal_details: false,
+
+    modal_journal_entry: false,
+    journal_index: '',
+
+    page: 0,
+    coa_filter: '',
   }
+
+  toggleModal = (name, action) => this.setState({ [name]: action })
+  setJournalIndex = index => this.setState({ journal_index: index })
+
   coaFilterChangeHandler = e => {
     const { value } = e.target
     this.setState({ coa_filter: value }, () =>
@@ -73,7 +77,14 @@ export class Journal extends Component {
               placeholder='Search...'
             /> */}
           </div>
-          <button className='btn btn-chip primary'>ADD &nbsp;&nbsp; +</button>
+          <button
+            className='btn btn-chip primary'
+            onClick={() => {
+              this.toggleModal('modal_journal_entry', true)
+            }}
+          >
+            ADD &nbsp;&nbsp; +
+          </button>
         </Container>
         <Card className='p-top-5' vertical noPad expand>
           <Container className='card-header flex-pos-between p-vrt-4 p-hor-6'>
@@ -114,51 +125,27 @@ export class Journal extends Component {
             <tbody>
               <JournalTableRows
                 data={this.props.journal}
-                modalOpen={() => this.toggleModal(true)}
+                modalOpen={() =>
+                  this.toggleModal('modal_journal_details', true)
+                }
                 setJournalIndex={this.setJournalIndex}
                 filterCoa={this.state.coa_filter}
               />
             </tbody>
           </table>
           <button onClick={this.appendMore}>Show more</button>
-          {this.state.journal_modal && (
-            <Modal title='Journal' modalClose={() => this.toggleModal(false)}>
-              {this.state.journal_index && (
-                <Fragment>
-                  <td>
-                    <span
-                      title={dateFormat(
-                        this.props.journal[this.state.journal_index].date,
-                        'ddd, dS mmm, yyyy, h:MM:ss TT'
-                      )}
-                    >
-                      {dateFormat(
-                        this.props.journal[this.state.journal_index].date,
-                        'ddd, dS mmm'
-                      )}
-                    </span>
-                  </td>
-                  <td>
-                    {this.props.journal[this.state.journal_index].debit.name} -
-                    ({this.props.journal[this.state.journal_index].credit.name})
-                  </td>
-                  <td>
-                    {this.props.journal[this.state.journal_index].description}
-                  </td>
-                  <td className='txtRight' style={{ textAlign: 'right' }}>
-                    <span>৳</span>{' '}
-                    {fmt.format(
-                      this.props.journal[this.state.journal_index].amount,
-                      2
-                    )}
-                  </td>
-                  <td>
-                    {this.props.journal[this.state.journal_index].comment}
-                  </td>
-                </Fragment>
-              )}
-            </Modal>
-          )}
+          <JournalEntry
+            isModalOpen={this.state.modal_journal_entry}
+            modalClose={() => this.toggleModal('modal_journal_entry', false)}
+            sendJournal={this.props.sendJournal}
+            coa={this.props.coa}
+            site={this.props.site}
+          />
+          <JournalDetailModal
+            isModalOpen={this.state.modal_journal_details}
+            modalClose={() => this.toggleModal('modal_journal_details', false)}
+            journalIndex={this.state.journal_index}
+          />
         </Card>
       </Container>
     ) : (
@@ -170,12 +157,15 @@ export class Journal extends Component {
 const mapStateToProps = state => ({
   site: state.main.site,
   journal: state.journal.journal,
+  coa: state.coa.coa,
   coa_list: state.coa.coa_list,
 })
 const mapDispatchToProps = dispatch => ({
+  fetchCoa: payload => dispatch(fetchCoa(payload)),
   fetchCoaList: payload => dispatch(fetchCoaList(payload)),
   fetchJournal: payload => dispatch(fetchJournal(payload)),
   fetchJournalMore: payload => dispatch(fetchJournalMore(payload)),
+  sendJournal: payload => dispatch(sendJournal(payload)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Journal)

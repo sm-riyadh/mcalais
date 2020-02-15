@@ -8,6 +8,10 @@ const ObjectIdDate = date =>
 
 const CoaSchema = new mongoose.Schema(
   {
+    site: {
+      type: String,
+      required: true,
+    },
     name: {
       type: String,
       trim: true,
@@ -15,7 +19,7 @@ const CoaSchema = new mongoose.Schema(
     },
     id: {
       type: String,
-      required: true,
+      required: false,
     },
     type: {
       type: String,
@@ -34,7 +38,7 @@ const CoaSchema = new mongoose.Schema(
     },
     under: {
       type: String,
-      required: true,
+      required: false,
     },
     preset: [{ type: Object }],
     transaction: [
@@ -57,14 +61,11 @@ CoaSchema.statics.fetchOneByCode = async code =>
 CoaSchema.statics.fetchList = async () =>
   await Coa.find({ transaction: { $exists: true, $ne: [] } })
 
-CoaSchema.statics.fetchAll = async site => {
-  const coa = await Coa.find({ site: { $eq: site } })
+CoaSchema.statics.fetchAll = async site =>
+  await Coa.find({ site: { $eq: site } })
 
-  return coa
-}
-CoaSchema.statics.create = async payload => {
-  return await Coa(payload).save()
-}
+CoaSchema.statics.create = async payload => await Coa(payload).save()
+
 CoaSchema.statics.insertPreset = async payload =>
   await Coa.findOneAndUpdate(
     { id: payload.coa_id },

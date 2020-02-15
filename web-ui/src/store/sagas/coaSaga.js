@@ -20,10 +20,18 @@ function* handleCoaListFetch({ payload }) {
     yield put({ type: 'COA.SAVE', message: err.message })
   }
 }
-
+function* handleCoaSend({ payload }) {
+  try {
+    const coa = yield call(API.sendCoa, [payload])
+    yield put(saveCoa(coa))
+  } catch (err) {
+    yield put({ type: 'COA.SAVE', message: err.message })
+  }
+}
 function* watchCoa() {
   yield takeLatest(COA.FETCH._, handleCoaFetch)
   yield takeLatest(COA.FETCH.LIST, handleCoaListFetch)
+  yield takeLatest(COA.SEND, handleCoaSend)
 }
 
 export default watchCoa

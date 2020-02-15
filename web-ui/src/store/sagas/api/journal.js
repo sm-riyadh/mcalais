@@ -24,4 +24,28 @@ const fetchJournal = async payload => {
     return { ERROR: err }
   }
 }
-export default { fetchJournal }
+const sendJournal = async payload => {
+  try {
+    if (payload[0]) payload = payload[0]
+
+    const { site, credit, debit, description, amount, comment } = payload
+
+    const { data } = await Axios({
+      method: 'post',
+      url: '/journal',
+      data: {
+        site,
+        credit,
+        debit,
+        description,
+        amount,
+        comment,
+      },
+    })
+
+    return data
+  } catch (err) {
+    return { ERROR: err }
+  }
+}
+export default { fetchJournal, sendJournal }

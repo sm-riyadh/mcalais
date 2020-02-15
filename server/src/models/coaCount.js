@@ -7,7 +7,11 @@ const ObjectIdDate = date =>
   )
 
 const CoaCountSchema = new mongoose.Schema({
-  name: {
+  company: {
+    type: String,
+    required: true,
+  },
+  type: {
     type: String,
     required: true,
   },
@@ -16,19 +20,15 @@ const CoaCountSchema = new mongoose.Schema({
     default: 0,
     required: true,
   },
-  abs_count: {
-    type: Number,
-    default: 0,
-    required: true,
-  },
 })
 
-CoaCountSchema.statics.fetch = async name => await CoaCount.findOne({ name })
+CoaCountSchema.statics.fetch = async (company, type) =>
+  await CoaCount.findOne({ company, type })
 
-CoaCountSchema.statics.add = async name =>
+CoaCountSchema.statics.add = async (company, type) =>
   await CoaCount.findOneAndUpdate(
-    { name },
-    { $inc: { count: 1, abs_count: 1 } },
+    { company, type },
+    { $inc: { count: 1 } },
     { upsert: true }
   )
 

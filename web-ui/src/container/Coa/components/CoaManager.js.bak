@@ -1,0 +1,111 @@
+import React, { Fragment, useState } from 'react'
+
+import { Modal } from '../../../component'
+
+const TreeViewer = ({ setCurrentBranch, branch }) => (
+  <ul>
+    {console.log(branch)}
+    {branch.map(({ type, id, location, name, children }) => (
+      <Fragment>
+        <li>
+          {type == 'folder' && '[ '}
+          {name}
+          {type == 'folder' && ' ]'} - {id}
+          &nbsp;
+          <button
+            style={{ borderRadius: '4px' }}
+            onClick={e => setCurrentBranch(location)}
+          >
+            &nbsp;+&nbsp;
+          </button>
+        </li>
+        <TreeViewer branch={children} setCurrentBranch={setCurrentBranch} />
+      </Fragment>
+    ))}
+  </ul>
+)
+
+const CoaManager = props => {
+  const [tree, setTree] = useState([
+    {
+      type: 'folder',
+      id: 'asset',
+      location: [0],
+      name: 'A',
+      children: [
+        {
+          type: 'folder',
+          id: 'asset/a',
+          location: [0, 0],
+          name: 'AA',
+          children: [],
+        },
+        {
+          type: 'folder',
+          id: 'asset/a',
+          location: [0, 1],
+          name: 'AB',
+          children: [],
+        },
+        { type: 'account', id: 'account_id', name: 'AC', children: [] },
+        { type: 'account', id: 'account_id', name: 'AD', children: [] },
+      ],
+    },
+    { type: 'folder', id: 'asset', location: [1], name: 'B', children: [] },
+    { type: 'folder', id: 'asset', location: [2], name: 'C', children: [] },
+  ])
+  const [currentBranch, setCurrentBranch] = useState('')
+  const [folder, setFolder] = useState('')
+
+  const addFolder = e => {
+    e.preventDefault()
+
+    const newTree = [...tree]
+
+    let currentBranchRef = []
+    let currentBranchChildren = []
+
+    currentBranch.map(loc => {
+      currentBranchChildren = [...newTree[loc].children]
+      currentBranchRef = newTree[loc].children
+    })
+
+    currentBranchRef = [
+      currentBranchChildren,
+      {
+        type: 'folder',
+        // id: `asset/${newTree[loc].name.toLowerCase()}`,
+        id: `test`,
+        // location: [0, newTree[loc].children.length],
+        location: [0, 0, 0, 0, 0],
+        name: folder,
+        children: [],
+      },
+    ]
+
+    setTree(newTree)
+  }
+  return (
+    props.isModalOpen && (
+      <Modal title='COA Manager' modalClose={props.modalClose}>
+        <form onSubmit={e => addFolder(e)}>
+          <input
+            type='text'
+            name='folder'
+            onChange={e => setFolder(e.target.value)}
+            value={folder}
+          />
+          &nbsp;
+          <input type='submit' name='folder' value=' Create ' />
+        </form>
+        <Fragment>
+          <Fragment>
+            <TreeViewer branch={tree} setCurrentBranch={setCurrentBranch} />
+          </Fragment>
+        </Fragment>
+      </Modal>
+    )
+  )
+}
+
+export default CoaManager
