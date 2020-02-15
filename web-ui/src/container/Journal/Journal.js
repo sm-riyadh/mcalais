@@ -16,9 +16,9 @@ import JournalEntry from './components/JournalEntry'
 
 export class Journal extends Component {
   componentDidMount() {
-    this.props.fetchCoa({ site: this.props.site })
-    this.props.fetchCoaList({ site: this.props.site })
-    this.props.fetchJournal({ site: this.props.site })
+    this.props.fetchCoa({ company: this.props.company })
+    this.props.fetchCoaList({ company: this.props.company })
+    this.props.fetchJournal({ company: this.props.company })
   }
 
   state = {
@@ -38,7 +38,7 @@ export class Journal extends Component {
     const { value } = e.target
     this.setState({ coa_filter: value }, () =>
       this.props.fetchJournal({
-        site: this.props.site,
+        company: this.props.company,
         coa: this.state.coa_filter,
       })
     )
@@ -50,7 +50,7 @@ export class Journal extends Component {
       }),
       () =>
         this.props.fetchJournalMore({
-          site: 'HQ',
+          company: 'HQ',
           page: this.state.page,
           coa: this.state.coa_filter,
         })
@@ -63,10 +63,10 @@ export class Journal extends Component {
         <Container className='flex-pos-between p-hor-4 p-bottom-4'>
           <div>
             {/* <select
-              name='site'
+              name='company'
               className='btn btn-chip m-right-2'
               onChange={this.mainChangeHandler}
-              value={this.props.site}
+              value={this.props.company}
             >
               <option value='HQ'>HQ</option>
               <option value='SUST Boundary'>SUST Boundary</option>
@@ -139,7 +139,7 @@ export class Journal extends Component {
             modalClose={() => this.toggleModal('modal_journal_entry', false)}
             sendJournal={this.props.sendJournal}
             coa={this.props.coa}
-            site={this.props.site}
+            company={this.props.company}
           />
           <JournalDetailModal
             isModalOpen={this.state.modal_journal_details}
@@ -155,7 +155,7 @@ export class Journal extends Component {
 }
 
 const mapStateToProps = state => ({
-  site: state.main.site,
+  company: state.main.company,
   journal: state.journal.journal,
   coa: state.coa.coa,
   coa_list: state.coa.coa_list,

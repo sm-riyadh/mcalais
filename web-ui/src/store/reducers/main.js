@@ -1,7 +1,7 @@
 import { MAIN } from '..'
 
 const initialState = {
-  site: 'HQ',
+  company: 'HQ',
 }
 
 const main = (state = initialState, { type, name, payload }) => {

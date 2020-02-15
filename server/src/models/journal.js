@@ -8,7 +8,7 @@ const ObjectIdDate = date =>
   )
 
 const JournalSchema = new mongoose.Schema({
-  site: {
+  company: {
     type: String,
     required: true,
   },
@@ -55,7 +55,7 @@ const JournalSchema = new mongoose.Schema({
 JournalSchema.methods.toJSON = function() {
   const {
     _id,
-    site,
+    company,
     credit,
     debit,
     description,
@@ -63,11 +63,11 @@ JournalSchema.methods.toJSON = function() {
     comment,
   } = this.toObject()
   const date = _id.getTimestamp()
-  return { id: _id, site, date, credit, debit, description, amount, comment }
+  return { id: _id, company, date, credit, debit, description, amount, comment }
 }
 // FETCH
 JournalSchema.statics.fetch = async (
-  site,
+  company,
   coa,
   size = 10,
   page = 0,
@@ -79,7 +79,7 @@ JournalSchema.statics.fetch = async (
 
   if (!coa) {
     const journal = await Journal.find({
-      site: { $eq: site },
+      company: { $eq: company },
       _id: {
         $gte: ObjectIdDate(startDate),
         $lt: ObjectIdDate(endDate),
@@ -118,7 +118,7 @@ JournalSchema.statics.fetchOne = async id => await Journal.findById(id)
 JournalSchema.statics.create = async payload => {
   const {
     _id,
-    site,
+    company,
     credit,
     debit,
     description,
@@ -127,7 +127,7 @@ JournalSchema.statics.create = async payload => {
   } = await Journal(payload).save()
 
   await Coa.addJournal(_id, credit.code, debit.code, amount)
-  return { _id, site, credit, debit, description, amount, comment }
+  return { _id, company, credit, debit, description, amount, comment }
 }
 
 JournalSchema.statics.remove = async id => {

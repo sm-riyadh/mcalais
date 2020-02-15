@@ -8,7 +8,7 @@ const ObjectIdDate = date =>
 
 const CoaSchema = new mongoose.Schema(
   {
-    site: {
+    company: {
       type: String,
       required: true,
     },
@@ -61,8 +61,8 @@ CoaSchema.statics.fetchOneByCode = async code =>
 CoaSchema.statics.fetchList = async () =>
   await Coa.find({ transaction: { $exists: true, $ne: [] } })
 
-CoaSchema.statics.fetchAll = async site =>
-  await Coa.find({ site: { $eq: site } })
+CoaSchema.statics.fetchAll = async company =>
+  await Coa.find({ company: { $eq: company } })
 
 CoaSchema.statics.create = async payload => await Coa(payload).save()
 

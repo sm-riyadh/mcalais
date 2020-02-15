@@ -12,11 +12,11 @@ const url = 'api/journal'
 
 app.get(`/${url}`, async (req, res) => {
   try {
-    const { site, size, page, coa, startDate, endDate } = req.query
+    const { company, size, page, coa, startDate, endDate } = req.query
 
     if (!coa) {
       const journal = await Journal.fetch(
-        site,
+        company,
         null,
         size,
         page,
@@ -26,7 +26,7 @@ app.get(`/${url}`, async (req, res) => {
       return res.send(journal)
     } else {
       const journal = await Journal.fetch(
-        site,
+        company,
         coa,
         size,
         page,
@@ -41,7 +41,7 @@ app.get(`/${url}`, async (req, res) => {
 })
 
 app.post(`/${url}`, async (req, res) => {
-  const { site, credit, debit, description, amount, comment } = req.body
+  const { company, credit, debit, description, amount, comment } = req.body
 
   try {
     // Validation
@@ -60,7 +60,7 @@ app.post(`/${url}`, async (req, res) => {
     const creditCoa = await Coa.fetchOneByCode(credit)
 
     const newJournal = await Journal.create({
-      site,
+      company,
       credit: {
         code: creditCoa.code,
         name: creditCoa.name,

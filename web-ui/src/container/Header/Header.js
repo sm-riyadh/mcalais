@@ -26,10 +26,10 @@ export class Header extends Component {
               <b>MCALAIS</b>
             </Text>
             <select
-              name='site'
+              name='company'
               className='btn primary m-left-3'
               onChange={this.mainChangeHandler}
-              value={this.props.site}
+              value={this.props.company}
             >
               <option value='HQ'>HQ</option>
               <option value='SUST Boundary'>SUST Boundary</option>
@@ -71,7 +71,7 @@ export class Header extends Component {
 }
 
 const mapStateToProps = state => ({
-  site: state.main.site,
+  company: state.main.company,
 })
 const mapDispatchToProps = dispatch => ({
   updateMain: (name, payload) => dispatch(updateMain(name, payload)),

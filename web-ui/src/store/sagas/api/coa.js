@@ -4,13 +4,13 @@ const fetchCoa = async payload => {
   try {
     if (payload[0]) payload = payload[0]
 
-    const { site } = payload
+    const { company } = payload
 
     const { data } = await Axios({
       method: 'get',
       url: '/coa',
       params: {
-        site,
+        company,
       },
     })
 
@@ -23,13 +23,13 @@ const fetchCoaList = async payload => {
   try {
     if (payload[0]) payload = payload[0]
 
-    const { site } = payload
+    const { company } = payload
 
     const { data } = await Axios({
       method: 'get',
       url: '/coa/list',
       params: {
-        site,
+        company,
       },
     })
 
@@ -42,13 +42,13 @@ const sendCoa = async payload => {
   try {
     if (payload[0]) payload = payload[0]
 
-    const { site, name, type } = payload
+    const { company, name, type } = payload
 
     const { data } = await Axios({
       method: 'post',
       url: '/coa',
       data: {
-        site,
+        company,
         name,
         type,
       },

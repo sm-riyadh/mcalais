@@ -10,7 +10,7 @@ const CoaManager = props => {
     e.preventDefault()
 
     props.sendAccount({
-      site: props.site,
+      company: props.company,
       type,
       name,
     })

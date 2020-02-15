@@ -16,7 +16,7 @@ import CoaManager from './components/CoaManager'
 
 export class Coa extends Component {
   componentDidMount() {
-    this.props.fetchCoa({ site: this.props.site })
+    this.props.fetchCoa({ company: this.props.company })
   }
 
   state = {
@@ -38,7 +38,7 @@ export class Coa extends Component {
               name='filter'
               className='btn btn-chip m-right-2'
               onChange={this.changeHandler}
-              value={this.state.site}
+              value={this.state.company}
             >
               <option value=''>All</option>
               <option value='assets'>Assets</option>
@@ -168,7 +168,7 @@ export class Coa extends Component {
             isModalOpen={this.state.modal_coa_manager}
             modalClose={() => this.toggleModal('modal_coa_manager', false)}
             sendAccount={this.props.sendCoa}
-            site={this.props.site}
+            company={this.props.company}
           />
           {/* {this.state.journal_modal && (
             <Modal title='Journal' modalClose={() => this.toggleModal(false)}>
@@ -218,7 +218,7 @@ export class Coa extends Component {
 }
 
 const mapStateToProps = state => ({
-  site: state.main.site,
+  company: state.main.company,
   coa: state.coa.coa,
 })
 const mapDispatchToProps = dispatch => ({

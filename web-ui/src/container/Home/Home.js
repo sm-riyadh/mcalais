@@ -28,9 +28,9 @@ export class Home extends Component {
               path='/journal'
               exact
               component={Journal}
-              key={this.props.site}
+              key={this.props.company}
             />
-            <Route path='/coa' component={Coa} key={this.props.site} />
+            <Route path='/coa' component={Coa} key={this.props.company} />
             {/* <Route path='/catalogue' component={Catalogue} /> */}
           </Switch>
           <ActivityBar />
@@ -42,6 +42,6 @@ export class Home extends Component {
 }
 
 const mapStateToProps = state => ({
-  site: state.main.site,
+  company: state.main.company,
 })
 export default connect(mapStateToProps)(Home)

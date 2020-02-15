@@ -26,7 +26,7 @@ const JournalEntryModal = props => {
     e.preventDefault()
 
     props.sendJournal({
-      site: props.site,
+      company: props.company,
       credit,
       debit,
       description,
