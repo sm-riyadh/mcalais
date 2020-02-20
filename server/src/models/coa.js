@@ -41,6 +41,20 @@ const CoaSchema = new mongoose.Schema(
       required: false,
     },
     preset: [{ type: Object }],
+    intercompany: {
+      to_company: {
+        type: String,
+        trim: true,
+        required: true,
+      },
+      to_account: {
+        type: Number,
+        min: 100000,
+        max: 999999,
+        required: true,
+      },
+      required: false,
+    },
     transaction: [
       {
         journal_id: mongoose.Schema.ObjectId,
@@ -50,7 +64,26 @@ const CoaSchema = new mongoose.Schema(
   { collection: 'coa' }
 )
 CoaSchema.methods.toJSON = function() {
-  return this.toObject()
+  const {
+    _id,
+    company,
+    name,
+    type,
+    code,
+    balance,
+    intercompany,
+    transaction,
+  } = this.toObject()
+  return {
+    id: _id,
+    company,
+    name,
+    type,
+    code,
+    balance,
+    intercompany,
+    transaction,
+  }
 }
 
 CoaSchema.statics.fetchOneByCode = async code =>
@@ -61,8 +94,10 @@ CoaSchema.statics.fetchOneByCode = async code =>
 CoaSchema.statics.fetchList = async () =>
   await Coa.find({ transaction: { $exists: true, $ne: [] } })
 
-CoaSchema.statics.fetchAll = async company =>
-  await Coa.find({ company: { $eq: company } })
+CoaSchema.statics.fetchAll = async company => await Coa.find({ company })
+
+CoaSchema.statics.checkInterCompany = async (company, code) =>
+  await Coa.find({ company, code, intercompany: { $exists: true } })
 
 CoaSchema.statics.create = async payload => await Coa(payload).save()
 

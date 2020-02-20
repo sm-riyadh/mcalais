@@ -98,7 +98,7 @@ app.post(`/${url}`, async (req, res) => {
       transaction: [],
     })
 
-    await CoaCount.findOneAndUpdate(company, type)
+    await CoaCount.newAccount(company, type)
 
     // Fetch all
     const coa = await Coa.fetchAll(company)

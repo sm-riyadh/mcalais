@@ -1,76 +1,82 @@
-import { LEDGER, JOURNAL, ACCOUNT, CATAGORY } from './index'
+import { MAIN, JOURNAL, COA } from './index'
 
 /*
- * Chart of Accounts
+ * Main
  */
-const fetchCatagory = () => ({
-  type: CATAGORY.FETCH,
+const updateMain = (name, payload) => ({
+  type: MAIN.SET,
+  name,
+  payload,
 })
-const saveCatagory = payload => ({
-  type: CATAGORY.SAVE,
-  data: payload,
-})
-const fetchAccount = () => ({
-  type: ACCOUNT.FETCH,
-})
-const saveAccount = payload => ({
-  type: ACCOUNT.SAVE,
-  data: payload,
-})
-const addAccount = payload => ({
-  type: ACCOUNT.ADD,
-  data: payload,
-})
-const sumbitChange = payload => ({
-  type: ACCOUNT.CHANGE,
-  data: payload,
-})
+
 /*
- * Journal
+ * JOURNAL
  */
 const fetchJournal = payload => ({
-  type: JOURNAL.FETCH,
-  data: payload,
+  type: JOURNAL.FETCH._,
+  payload,
 })
+const fetchJournalMore = payload => ({
+  type: JOURNAL.FETCH.MORE,
+  payload,
+})
+
+const sendJournal = payload => ({
+  type: JOURNAL.SEND,
+  payload,
+})
+
 const saveJournal = payload => ({
-  type: JOURNAL.SAVE,
-  data: payload,
+  type: JOURNAL.REPLACE._,
+  payload,
 })
-const addNewJournal = payload => ({
-  type: JOURNAL.NEW,
-  data: payload,
+const saveJournalOnTop = payload => ({
+  type: JOURNAL.ADD.TOP,
+  payload,
 })
-const saveNewJournal = payload => ({
-  type: JOURNAL.NEW_SAVE,
-  data: payload,
+const saveJournalOnBottom = payload => ({
+  type: JOURNAL.ADD.BOTTOM,
+  payload,
 })
 
 /*
- * Ledger
+ * COA
  */
-const fetchLedger = payload => ({
-  type: LEDGER.FETCH,
-  data: payload,
+const fetchCoa = payload => ({
+  type: COA.FETCH._,
+  payload,
 })
-const saveLedger = payload => ({
-  type: LEDGER.SAVE,
-  data: payload,
+const fetchCoaList = payload => ({
+  type: COA.FETCH.LIST,
+  payload,
+})
+const sendCoa = payload => ({
+  type: COA.SEND,
+  payload,
+})
+const saveCoa = payload => ({
+  type: COA.REPLACE._,
+  payload,
+})
+const saveCoaList = payload => ({
+  type: COA.REPLACE.LIST,
+  payload,
 })
 
 export {
-  // Journal
+  // Main
+  updateMain,
+  // JOURNAL
   fetchJournal,
+  fetchJournalMore,
+  sendJournal,
   saveJournal,
-  addNewJournal,
-  saveNewJournal,
-  // Ledger
-  fetchLedger,
-  saveLedger,
-  // Chart of accounts
-  fetchCatagory,
-  saveCatagory,
-  fetchAccount,
-  saveAccount,
-  addAccount,
-  sumbitChange,
+  saveJournalOnTop,
+  saveJournalOnBottom,
+  // COA
+  fetchCoa,
+  saveCoa,
+  fetchCoaList,
+  sendCoa,
+  saveCoaList,
 }

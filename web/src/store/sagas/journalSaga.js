@@ -1,29 +1,38 @@
 import { call, put, takeLatest } from 'redux-saga/effects'
+import API from './api/journal'
 
 import { JOURNAL } from '../index'
-import Api from './api/journal'
-import { saveJournal, saveNewJournal } from '../actions'
+import { saveJournal, saveJournalOnBottom, saveJournalOnTop } from '../actions'
 
-function* handleJournalFetch(payload) {
+function* HandleFetchJournal({ payload }) {
   try {
-    const journal = yield call(Api.fetchJournal, [payload.data])
+    const journal = yield call(API.fetchJournal, [payload])
     yield put(saveJournal(journal))
   } catch (err) {
     yield put({ type: 'JOURNAL.SAVE', message: err.message })
   }
 }
-function* handleJournalAdd(payload) {
+function* HandleFetchJournalMore({ payload }) {
   try {
-    const journal = yield call(Api.createJournal, [payload.data])
-    yield put(saveNewJournal(journal))
+    const journal = yield call(API.fetchJournal, [payload])
+    yield put(saveJournalOnBottom(journal))
+  } catch (err) {
+    yield put({ type: 'JOURNAL.SAVE', message: err.message })
+  }
+}
+function* HandleSendJournal({ payload }) {
+  try {
+    const journal = yield call(API.sendJournal, [payload])
+    yield put(saveJournalOnTop([journal]))
   } catch (err) {
     yield put({ type: 'JOURNAL.SAVE', message: err.message })
   }
 }
 
 function* watchJournal() {
-  yield takeLatest(JOURNAL.FETCH, handleJournalFetch)
-  yield takeLatest(JOURNAL.NEW, handleJournalAdd)
+  yield takeLatest(JOURNAL.FETCH._, HandleFetchJournal)
+  yield takeLatest(JOURNAL.FETCH.MORE, HandleFetchJournalMore)
+  yield takeLatest(JOURNAL.SEND, HandleSendJournal)
 }
 
 export default watchJournal

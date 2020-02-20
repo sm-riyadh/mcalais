@@ -1,33 +1,25 @@
 import { JOURNAL } from '..'
 
-const initialState = []
+const initialState = {
+  journal: [],
+}
 
-const journal = (state = initialState, action) => {
-  switch (action.type) {
-    case JOURNAL.SAVE:
-      return action.data
-    case JOURNAL.NEW_SAVE: {
-      const {
-        id,
-        date,
-        credit,
-        debit,
-        description,
-        amount,
-        comment,
-      } = action.data
-      return [
-        {
-          id,
-          date,
-          credit,
-          debit,
-          description,
-          amount,
-          comment,
-        },
-        ...state,
-      ]
+const journal = (state = initialState, { type, payload }) => {
+  switch (type) {
+    case JOURNAL.REPLACE._: {
+      const newState = { ...state }
+      newState.journal = payload
+      return newState
+    }
+    case JOURNAL.ADD.TOP: {
+      const newState = { ...state }
+      newState.journal = [...payload, ...newState.journal]
+      return newState
+    }
+    case JOURNAL.ADD.BOTTOM: {
+      const newState = { ...state }
+      newState.journal = [...newState.journal, ...payload]
+      return newState
     }
     default:
       return state

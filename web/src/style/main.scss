@@ -1,65 +1,32 @@
-* {
-  box-sizing: border-box;
-}
-
-.main-container {
+main {
   background-color: #e4e4e4;
-  max-height: 100vh;
-
-  overflow: hidden;
-}
-
-.container-scrollable {
-  height: 100vh;
-  width: 100%;
-  padding: 4rem;
-  overflow: auto;
-
-  /* width */
-  &::-webkit-scrollbar {
-    width: 10px;
-  }
-
-  /* Track */
-  &::-webkit-scrollbar-track {
-    background: #f1f1f100;
-  }
-
-  /* Handle */
-  &::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 0.2rem;
-  }
-
-  /* Handle on hover */
-  &::-webkit-scrollbar-thumb:hover {
-    background: #555;
-  }
-}
-.container-card {
-  background-color: #ffffff;
-  min-height: 80%;
-  width: 100%;
-  padding: 4rem;
-  padding-top: 3rem;
-  border-radius: 0.5rem;
-  box-shadow: 0 0.2rem 1rem #0000001e;
-}
-.grid {
-  width: 100%;
-  display: inline-grid;
-  grid-template-columns: 20rem auto;
-  grid-column-gap: 0.5rem;
-}
-.grid-2 {
-  width: 100%;
-  display: inline-grid;
-  grid-template-columns: auto 25rem;
-  grid-column-gap: 0.5rem;
-}
-// .grid-item {
-//   display: inline-grid;
-// }
-.flex {
   display: flex;
+  justify-content: space-between;
+
+  // height: calc(100vh - 4.6rem);
+  width: 100vw;
+  height: 100vh;
+  padding: 0;
+  padding-top: 4.6rem;
+  overflow-y: hidden;
+}
+.scrollable {
+  width: 100%;
+  overflow-y: auto;
+  // overflow-x: hidden;
+}
+
+.container {
+  display: flex;
+  padding: 0.5rem;
+
+  &.noPad {
+    padding: 0;
+  }
+}
+.web-app {
+  * {
+    outline: none;
+    user-select: none;
+  }
 }

@@ -71,7 +71,7 @@ JournalSchema.statics.fetch = async (
   coa,
   size = 10,
   page = 0,
-  startDate = subDays(new Date(), 100),
+  startDate = subDays(new Date(), 200),
   endDate = endOfDay(new Date())
 ) => {
   if (startDate) startDate = new Date(startDate)
@@ -79,7 +79,7 @@ JournalSchema.statics.fetch = async (
 
   if (!coa) {
     const journal = await Journal.find({
-      company: { $eq: company },
+      company,
       _id: {
         $gte: ObjectIdDate(startDate),
         $lt: ObjectIdDate(endDate),
@@ -115,6 +115,7 @@ JournalSchema.statics.fetch = async (
 }
 JournalSchema.statics.fetchOne = async id => await Journal.findById(id)
 
+// TODO: Please change out we store credit. just take the code not the name
 JournalSchema.statics.create = async payload => {
   const {
     _id,
@@ -125,9 +126,38 @@ JournalSchema.statics.create = async payload => {
     amount,
     comment,
   } = await Journal(payload).save()
+  await Coa.addJournal(_id, credit.code, debit.code, amount)
+
+  const account = await Coa.checkInterCompany(company, debit.code)
+  if (account.length != 0) {
+    const { to_company, to_account } = account[0].intercompany
+
+    await interCompanyJournalCreator(to_company, to_account, payload)
+  }
+
+  return { _id, company, credit, debit, description, amount, comment }
+}
+const interCompanyJournalCreator = async (company, code, account) => {
+  const { _id, credit, debit, amount } = await Journal({
+    company,
+    credit: account.credit,
+    debit: {
+      name: `${code}`,
+      code: code,
+    },
+    description: `From: ${account.credit.name}, to: ${account.debit.name}`,
+    amount: account.amount,
+    comment: '...',
+  }).save()
+  console.log(
+    'TCL: interCompanyJournalCreator -> _id, credit, debit, amount',
+    _id,
+    credit,
+    debit,
+    amount
+  )
 
   await Coa.addJournal(_id, credit.code, debit.code, amount)
-  return { _id, company, credit, debit, description, amount, comment }
 }
 
 JournalSchema.statics.remove = async id => {

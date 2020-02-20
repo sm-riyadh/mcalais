@@ -1,1 +1,13 @@
-web-ui/debug.log
+/scripts
+
+# dependencies
+/node_modules
+
+# production
+/build
+/dev_build
+
+# misc
+/.vscode
+.env
+deploy

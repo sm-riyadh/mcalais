@@ -1,9 +1,9 @@
 import { all } from 'redux-saga/effects'
 
-import accountSaga from './accountSaga'
+// import coaSaga from './coaSaga'
 import journalSaga from './journalSaga'
-import ledgerSaga from './ledgerSaga'
+import coaSaga from './coaSaga'
 
 export default function* rootSaga() {
-  yield all([accountSaga(), journalSaga(), ledgerSaga()])
+  yield all([journalSaga(), coaSaga()])
 }

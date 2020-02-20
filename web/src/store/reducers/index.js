@@ -1,15 +1,9 @@
 import { combineReducers } from 'redux'
 
-import account from './account'
+import main from './main'
 import journal from './journal'
-import ledger from './ledger'
-import catagory from './catagory'
+import coa from './coa'
 
-const rootReducer = combineReducers({
-  account: account,
-  journal: journal,
-  ledger: ledger,
-  catagory: catagory,
-})
+const rootReducer = combineReducers({ main, journal, coa })
 
 export default rootReducer
