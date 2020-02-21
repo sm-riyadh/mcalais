@@ -9,5 +9,5 @@
 
 # misc
 /.vscode
+/deploy
 .env
-deploy
