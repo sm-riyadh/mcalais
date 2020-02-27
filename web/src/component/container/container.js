@@ -8,6 +8,7 @@ const container = props => {
       }${props.vPos ? ` flex-vpos-to-${props.vPos}` : ''}${
         props.vertical ? ` flex-d-col` : ''
       }${props.className ? ` ${props.className}` : ''}`}
+      style={props.style}
     >
       {props.children}
     </div>

@@ -7,6 +7,14 @@ const initialState = {
     equities: [],
     expenses: [],
     incomes: [],
+
+    balance: {
+      assets: '',
+      liabilities: '',
+      equities: '',
+      expenses: '',
+      incomes: '',
+    },
   },
   coa_list: [],
 }

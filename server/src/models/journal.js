@@ -69,9 +69,9 @@ JournalSchema.methods.toJSON = function() {
 JournalSchema.statics.fetch = async (
   company,
   coa,
-  size = 10,
+  size = 100,
   page = 0,
-  startDate = subDays(new Date(), 200),
+  startDate = subDays(new Date(), 50),
   endDate = endOfDay(new Date())
 ) => {
   if (startDate) startDate = new Date(startDate)
@@ -126,38 +126,35 @@ JournalSchema.statics.create = async payload => {
     amount,
     comment,
   } = await Journal(payload).save()
-  await Coa.addJournal(_id, credit.code, debit.code, amount)
+
+  await Coa.addJournal(company, _id, credit.code, debit.code, amount)
 
   const account = await Coa.checkInterCompany(company, debit.code)
   if (account.length != 0) {
-    const { to_company, to_account } = account[0].intercompany
+    const { to_company, deposit, due } = account[0].intercompany
 
-    await interCompanyJournalCreator(to_company, to_account, payload)
+    await interCompanyJournalCreator(to_company, deposit, due, payload)
   }
 
   return { _id, company, credit, debit, description, amount, comment }
 }
-const interCompanyJournalCreator = async (company, code, account) => {
+const interCompanyJournalCreator = async (company, deposit, due, account) => {
   const { _id, credit, debit, amount } = await Journal({
     company,
-    credit: account.credit,
+    credit: {
+      name: `${due}`,
+      code: due,
+    },
     debit: {
-      name: `${code}`,
-      code: code,
+      name: `${deposit}`,
+      code: deposit,
     },
     description: `From: ${account.credit.name}, to: ${account.debit.name}`,
     amount: account.amount,
     comment: '...',
   }).save()
-  console.log(
-    'TCL: interCompanyJournalCreator -> _id, credit, debit, amount',
-    _id,
-    credit,
-    debit,
-    amount
-  )
 
-  await Coa.addJournal(_id, credit.code, debit.code, amount)
+  await Coa.addJournal(company, _id, credit.code, debit.code, amount)
 }
 
 JournalSchema.statics.remove = async id => {

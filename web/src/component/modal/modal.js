@@ -13,7 +13,9 @@ const modal = props => {
               Close
             </button>
           </div>
-          <Container className='modal-body'>{props.children}</Container>
+          <Container className='modal-body' style={props.style}>
+            {props.children}
+          </Container>
           <Container className='modal-bottom-pad'></Container>
         </Card>
       </div>

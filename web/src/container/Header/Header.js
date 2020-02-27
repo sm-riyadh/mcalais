@@ -32,7 +32,10 @@ export class Header extends Component {
               value={this.props.company}
             >
               <option value='HQ'>HQ</option>
+              <option value='Jagannatpur'>Jagannatpur</option>
+              <option value='Mithamoin'>Mithamoin</option>
               <option value='SUST Boundary'>SUST Boundary</option>
+              <option value='Dharmapassa'>Dharmapassa</option>
             </select>
           </Fragment>
         }

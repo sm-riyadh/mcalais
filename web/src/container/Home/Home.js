@@ -7,6 +7,7 @@ import { NavBar, ActivityBar } from '../../component/layout'
 import Header from '../Header/Header'
 import Journal from '../Journal/Journal'
 import Coa from '../Coa/Coa'
+import Company from '../Company/Company'
 
 // import container from '../../component/container/container'
 
@@ -20,10 +21,17 @@ export class Home extends Component {
             {[
               { title: 'Journal', path: '/journal', icon: 'O' },
               { title: 'Chart of Accounts', path: '/coa', icon: 'O' },
+              { title: 'Company', path: '/company', icon: 'O' },
             ]}
           </NavBar>
 
           <Switch>
+            <Route
+              path='/'
+              exact
+              component={Journal}
+              key={this.props.company}
+            />
             <Route
               path='/journal'
               exact
@@ -31,6 +39,11 @@ export class Home extends Component {
               key={this.props.company}
             />
             <Route path='/coa' component={Coa} key={this.props.company} />
+            <Route
+              path='/company'
+              component={Company}
+              key={this.props.company}
+            />
             {/* <Route path='/catalogue' component={Catalogue} /> */}
           </Switch>
           <ActivityBar />

@@ -36,7 +36,7 @@ const CoaManager = props => {
                 </option>
                 <option value='assets'>Assets</option>
                 <option value='liabilities'>Liabilities</option>
-                <option value='equityies'>Equityies</option>
+                <option value='equities'>Equities</option>
                 <option value='expenses'>Expenses</option>
                 <option value='incomes'>Incomes</option>
               </select>

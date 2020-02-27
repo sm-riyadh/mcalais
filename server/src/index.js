@@ -9,6 +9,7 @@ import bodyparser from 'body-parser'
 
 import journal from './routes/journal'
 import coa from './routes/coa'
+import company from './routes/company'
 
 const app = express()
 
@@ -27,6 +28,7 @@ app.use((req, res, next) => {
 
 app.use(journal)
 app.use(coa)
+app.use(company)
 
 // Server Config
 const port = 8080

@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import Journal from './journal'
+import Company from './company'
 
 const ObjectIdDate = date =>
   mongoose.Types.ObjectId(
@@ -17,10 +17,6 @@ const CoaSchema = new mongoose.Schema(
       trim: true,
       required: true,
     },
-    id: {
-      type: String,
-      required: false,
-    },
     type: {
       type: String,
       required: true,
@@ -36,24 +32,24 @@ const CoaSchema = new mongoose.Schema(
       default: 0,
       required: true,
     },
-    under: {
-      type: String,
-      required: false,
-    },
-    preset: [{ type: Object }],
     intercompany: {
       to_company: {
         type: String,
         trim: true,
-        required: true,
+        required: false,
       },
-      to_account: {
+      deposit: {
         type: Number,
         min: 100000,
         max: 999999,
-        required: true,
+        required: false,
       },
-      required: false,
+      due: {
+        type: Number,
+        min: 100000,
+        max: 999999,
+        required: false,
+      },
     },
     transaction: [
       {
@@ -91,8 +87,8 @@ CoaSchema.statics.fetchOneByCode = async code =>
     code,
   })
 
-CoaSchema.statics.fetchList = async () =>
-  await Coa.find({ transaction: { $exists: true, $ne: [] } })
+CoaSchema.statics.fetchList = async company =>
+  await Coa.find({ company, transaction: { $exists: true, $ne: [] } })
 
 CoaSchema.statics.fetchAll = async company => await Coa.find({ company })
 
@@ -111,9 +107,34 @@ CoaSchema.statics.insertPreset = async payload =>
     }
   )
 
-CoaSchema.statics.addJournal = async (journalID, credit, debit, amount) => {
+const assets = type => 100000 < type && type < 200000
+const liabilities = type => 200000 < type && type < 300000
+const equities = type => 300000 < type && type < 400000
+const expenses = type => 400000 < type && type < 500000
+const incomes = type => 500000 < type && type < 600000
+const typeFinder = code => {
+  switch (+('' + code)[0]) {
+    case 1:
+      return 'assets'
+    case 2:
+      return 'liabilities'
+    case 3:
+      return 'equities'
+    case 4:
+      return 'expenses'
+    case 5:
+      return 'incomes'
+  }
+}
+CoaSchema.statics.addJournal = async (
+  company,
+  journalID,
+  credit,
+  debit,
+  amount
+) => {
   await Coa.findOneAndUpdate(
-    { code: credit },
+    { company, code: credit },
     {
       $push: {
         transaction: { journal_id: journalID },
@@ -121,7 +142,7 @@ CoaSchema.statics.addJournal = async (journalID, credit, debit, amount) => {
     }
   )
   await Coa.update(
-    { code: debit },
+    { company, code: debit },
     {
       $push: {
         transaction: { journal_id: journalID },
@@ -130,32 +151,51 @@ CoaSchema.statics.addJournal = async (journalID, credit, debit, amount) => {
   )
 
   if (
-    100000 <= debit &&
-    debit < 200000 &&
-    400000 <= debit &&
-    debit < 500000 &&
-    100000 <= credit &&
-    credit < 200000 &&
-    400000 <= credit &&
-    credit < 500000
+    (assets(debit) && liabilities(credit)) ||
+    (assets(debit) && incomes(credit)) ||
+    (assets(debit) && equities(credit))
   ) {
-    await Coa.findOneAndUpdate({ code: credit }, { $inc: { balance: -amount } })
-    await Coa.findOneAndUpdate({ code: debit }, { $inc: { balance: amount } })
+    await Coa.findOneAndUpdate(
+      { company, code: credit },
+      { $inc: { balance: amount } }
+    )
+    await Coa.findOneAndUpdate(
+      { company, code: debit },
+      { $inc: { balance: amount } }
+    )
+    await Company.updateAccountBalance(company, typeFinder(credit), +amount)
+    await Company.updateAccountBalance(company, typeFinder(debit), +amount)
   } else if (
-    200000 <= debit &&
-    debit < 400000 &&
-    500000 <= debit &&
-    debit < 600000 &&
-    200000 <= credit &&
-    credit < 400000 &&
-    500000 <= credit &&
-    credit < 600000
+    (liabilities(debit) && assets(credit)) ||
+    (equities(debit) && assets(credit))
   ) {
-    await Coa.findOneAndUpdate({ code: credit }, { $inc: { balance: amount } })
-    await Coa.findOneAndUpdate({ code: debit }, { $inc: { balance: -amount } })
-  } else {
-    await Coa.findOneAndUpdate({ code: credit }, { $inc: { balance: amount } })
-    await Coa.findOneAndUpdate({ code: debit }, { $inc: { balance: amount } })
+    await Coa.findOneAndUpdate(
+      { company, code: credit },
+      { $inc: { balance: -amount } }
+    )
+    await Coa.findOneAndUpdate(
+      { company, code: debit },
+      { $inc: { balance: -amount } }
+    )
+    await Company.updateAccountBalance(company, typeFinder(credit), -amount)
+    await Company.updateAccountBalance(company, typeFinder(debit), -amount)
+  } else if (
+    (assets(debit) && assets(credit)) ||
+    (expenses(debit) && assets(credit)) ||
+    (assets(debit) && expenses(credit)) ||
+    (assets(debit) && incomes(credit)) ||
+    (incomes(debit) && assets(credit))
+  ) {
+    await Coa.findOneAndUpdate(
+      { company, code: credit },
+      { $inc: { balance: -amount } }
+    )
+    await Coa.findOneAndUpdate(
+      { company, code: debit },
+      { $inc: { balance: +amount } }
+    )
+    await Company.updateAccountBalance(company, typeFinder(credit), -amount)
+    await Company.updateAccountBalance(company, typeFinder(debit), +amount)
   }
 }
 CoaSchema.statics.isExist = async code => await Coa.exists({ code })
