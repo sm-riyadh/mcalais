@@ -1,10 +1,4 @@
 import mongoose from 'mongoose'
-import Journal from './journal'
-
-const ObjectIdDate = date =>
-  mongoose.Types.ObjectId(
-    Math.floor(date / 1000).toString(16) + '0000000000000000'
-  )
 
 const CompanySchema = new mongoose.Schema({
   name: {
@@ -68,13 +62,15 @@ const CompanySchema = new mongoose.Schema({
   },
 })
 CompanySchema.methods.toJSON = function() {
-  const { _id, name } = this.toObject()
+  const { _id, name, balance, account_count } = this.toObject()
   return {
     id: _id,
     name,
+    balance,
+    account_count,
   }
 }
-CompanySchema.statics.fetch = async name => await Company.find({ name })
+CompanySchema.statics.fetch = async () => await Company.find()
 CompanySchema.statics.fetchOne = async name => await Company.findOne({ name })
 
 CompanySchema.statics.updateAccountCount = async (name, account) =>

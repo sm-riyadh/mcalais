@@ -1,6 +1,7 @@
 import React, { Fragment, useState, useEffect } from 'react'
 
 import { Modal, Text } from '../../../component'
+import dateFormat from 'dateformat'
 import fmt from 'indian-number-format'
 
 const CoaSelection = ({ coa }) =>
@@ -28,6 +29,7 @@ const JournalEntryModal = props => {
   //   }
   // })
 
+  const [date, setDate] = useState(new Date().toLocaleDateString('en-CA'))
   const [debit, setDebit] = useState('')
   const [credit, setCredit] = useState('')
   const [description, setDescription] = useState('')
@@ -51,7 +53,6 @@ const JournalEntryModal = props => {
 
     let creditName, debitName
     Object.values(accounts).map(a => {
-      console.log(a)
       a.filter(e => e.code === +credit).map(e =>
         e.length != 0 ? (creditName = e.name) : null
       )
@@ -64,6 +65,7 @@ const JournalEntryModal = props => {
 
     setShadowEntries([
       {
+        date,
         credit: creditName,
         debit: debitName,
         description,
@@ -81,6 +83,7 @@ const JournalEntryModal = props => {
     setAmount('')
     setComment('')
   }
+
   return (
     props.isModalOpen && (
       <Modal
@@ -93,6 +96,7 @@ const JournalEntryModal = props => {
             <table className='table-entry'>
               <thead>
                 <tr>
+                  <th>Date</th>
                   <th>To</th>
                   <th>From</th>
                   <th>Description</th>
@@ -103,6 +107,14 @@ const JournalEntryModal = props => {
               </thead>
               <tbody>
                 <tr>
+                  <td>
+                    <input
+                      type='date'
+                      name='vdate'
+                      onChange={e => setDate(e.target.value)}
+                      value={date}
+                    />
+                  </td>
                   <td>
                     <select
                       name='debit'
@@ -165,6 +177,7 @@ const JournalEntryModal = props => {
                     progress,
                   }) => (
                     <tr className='shadow'>
+                      <td>{dateFormat(date, 'ddd, dS mmm')}</td>
                       <td>{credit}</td>
                       <td>{debit}</td>
                       <td>{description}</td>

@@ -27,4 +27,11 @@ const COA = {
   },
 }
 
-export { MAIN, JOURNAL, COA }
+const COMPANY = {
+  FETCH: 'COMPANY_FETCH',
+  SEND: 'COMPANY_SEND',
+  REPLACE: 'COMPANY_REPLACE',
+  ADD: 'COMPANY_ADD',
+}
+
+export { MAIN, JOURNAL, COA, COMPANY }

@@ -1,4 +1,4 @@
-import { MAIN, JOURNAL, COA } from './index'
+import { MAIN, JOURNAL, COA, COMPANY } from './index'
 
 /*
  * Main
@@ -63,6 +63,21 @@ const saveCoaList = payload => ({
   payload,
 })
 
+/*
+ * COMPANY
+ */
+const fetchCompany = () => ({
+  type: COMPANY.FETCH,
+})
+const sendCompany = payload => ({
+  type: COMPANY.SEND,
+  payload,
+})
+const saveCompany = payload => ({
+  type: COMPANY.REPLACE,
+  payload,
+})
+
 export {
   // Main
   updateMain,
@@ -79,4 +94,8 @@ export {
   fetchCoaList,
   sendCoa,
   saveCoaList,
+  // COMPANY
+  fetchCompany,
+  sendCompany,
+  saveCompany,
 }

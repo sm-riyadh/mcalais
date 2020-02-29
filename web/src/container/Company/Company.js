@@ -2,21 +2,13 @@ import React, { Component, Fragment } from 'react'
 import { connect } from 'react-redux'
 
 import { Modal, Container, Card, Text, Placeholder } from '../../component'
-import {
-  fetchCoa,
-  fetchCoaList,
-  fetchJournal,
-  fetchJournalMore,
-  sendJournal,
-} from '../../store/actions'
+import { fetchCompany, sendCompany } from '../../store/actions'
 
 import CompanyEntry from './components/CompanyEntry'
 
 export class Journal extends Component {
   componentDidMount() {
-    this.props.fetchCoa({ company: this.props.company })
-    this.props.fetchCoaList({ company: this.props.company })
-    this.props.fetchJournal({ company: this.props.company })
+    this.props.fetchCompany()
   }
 
   state = {
@@ -31,29 +23,6 @@ export class Journal extends Component {
 
   toggleModal = (name, action) => this.setState({ [name]: action })
   setJournalIndex = index => this.setState({ journal_index: index })
-
-  coaFilterChangeHandler = e => {
-    const { value } = e.target
-    this.setState({ coa_filter: value }, () =>
-      this.props.fetchJournal({
-        company: this.props.company,
-        coa: this.state.coa_filter,
-      })
-    )
-  }
-  appendMore = () => {
-    this.setState(
-      state => ({
-        page: state.page + 1,
-      }),
-      () =>
-        this.props.fetchJournalMore({
-          company: 'HQ',
-          page: this.state.page,
-          coa: this.state.coa_filter,
-        })
-    )
-  }
 
   render() {
     return 1 === 1 ? (
@@ -78,42 +47,49 @@ export class Journal extends Component {
               <table className='table-card'>
                 <thead>
                   <tr>
-                    <th>No</th>
-                    <th>Name</th>
-                    <th>Accounts</th>
+                    <th rowSpan='2'>No</th>
+                    <th rowSpan='2'>Name</th>
+                    <th style={{ textAlign: 'center' }} colSpan='5'>
+                      Accounts (Balance)
+                    </th>
+                  </tr>
+                  <tr>
+                    <th>Assets</th>
+                    <th>Liabilities</th>
+                    <th>Equities</th>
+                    <th>Expenses</th>
+                    <th>Incomes</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td>1</td>
-                    <td>HQ</td>
-                    <td>100</td>
-                  </tr>
-                  <tr>
-                    <td>1</td>
-                    <td>HQ</td>
-                    <td>100</td>
-                  </tr>
-                  <tr>
-                    <td>1</td>
-                    <td>HQ</td>
-                    <td>100</td>
-                  </tr>
-                  <tr>
-                    <td>1</td>
-                    <td>HQ</td>
-                    <td>100</td>
-                  </tr>
-                  <tr>
-                    <td>1</td>
-                    <td>HQ</td>
-                    <td>100</td>
-                  </tr>
-                  <tr>
-                    <td>1</td>
-                    <td>HQ</td>
-                    <td>100</td>
-                  </tr>
+                  {this.props.company.map(
+                    ({ name, account_count, balance }, index) => (
+                      <tr key={index}>
+                        <td>{index + 1}</td>
+                        <td>{name}</td>
+                        {account_count && balance && (
+                          <Fragment>
+                            <td>
+                              {account_count.assets} ({balance.assets})
+                            </td>
+                            <td>
+                              {account_count.liabilities} ({balance.liabilities}
+                              )
+                            </td>
+                            <td>
+                              {account_count.equities} ({balance.equities})
+                            </td>
+                            <td>
+                              {account_count.expenses} ({balance.expenses})
+                            </td>
+                            <td>
+                              {account_count.incomes} ({balance.incomes})
+                            </td>
+                          </Fragment>
+                        )}
+                      </tr>
+                    )
+                  )}
                 </tbody>
               </table>
             </Card>
@@ -122,7 +98,7 @@ export class Journal extends Component {
         <CompanyEntry
           isModalOpen={this.state.modal_company_entry}
           modalClose={() => this.toggleModal('modal_company_entry', false)}
-          sendJournal={this.props.sendJournal}
+          sendCompany={this.props.sendCompany}
           // coa={this.props.coa}
           company={this.props.company}
         />
@@ -134,17 +110,12 @@ export class Journal extends Component {
 }
 
 const mapStateToProps = state => ({
-  company: state.main.company,
-  journal: state.journal.journal,
-  coa: state.coa.coa,
-  coa_list: state.coa.coa_list,
+  current_company: state.main.company,
+  company: state.company.company,
 })
 const mapDispatchToProps = dispatch => ({
-  fetchCoa: payload => dispatch(fetchCoa(payload)),
-  fetchCoaList: payload => dispatch(fetchCoaList(payload)),
-  fetchJournal: payload => dispatch(fetchJournal(payload)),
-  fetchJournalMore: payload => dispatch(fetchJournalMore(payload)),
-  sendJournal: payload => dispatch(sendJournal(payload)),
+  fetchCompany: () => dispatch(fetchCompany()),
+  sendCompany: payload => dispatch(sendCompany(payload)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Journal)
