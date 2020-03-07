@@ -124,7 +124,8 @@ const TreeViewer = ({ branch, accountType, creationModal, nested = [], coa }) =>
 export class Coa extends Component {
   async componentDidMount() {
     this.props.fetchCoa({ company: this.props.company })
-    this.setState({tree: await API.fetchTree({ company: this.props.company })})
+    const tree = await API.fetchTree({ company: this.props.company })
+    tree && this.setState({tree })
   }
 
   state = {

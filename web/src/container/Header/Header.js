@@ -7,8 +7,13 @@ import HeaderBar from './components/HeaderBar'
 import PikachuAvator from '../../res/image/pikachu-avatar.jpg'
 
 import { Text } from '../../component'
+import { fetchCompany } from '../../store/actions'
 
 export class Header extends Component {
+  componentDidMount() {
+    this.props.fetchCompany()
+  }
+
   mainChangeHandler = ({ target }) => {
     const { name, value } = target
     this.props.updateMain(name, value)
@@ -29,13 +34,9 @@ export class Header extends Component {
               name='company'
               className='btn primary m-left-3'
               onChange={this.mainChangeHandler}
-              value={this.props.company}
-            >
-              <option value='HQ'>HQ</option>
-              <option value='Jagannatpur'>Jagannatpur</option>
-              <option value='Mithamoin'>Mithamoin</option>
-              <option value='SUST Boundary'>SUST Boundary</option>
-              <option value='Dharmapassa'>Dharmapassa</option>
+              value={this.props.currentCompany}
+              >
+              {this.props.company.length !== 0 ? this.props.company.map(({name}, index) => <option key={index} value={name}>{name}</option>): <option value='' selected disabled>No Company</option>}
             </select>
           </Fragment>
         }
@@ -74,9 +75,11 @@ export class Header extends Component {
 }
 
 const mapStateToProps = state => ({
-  company: state.main.company,
+  currentCompany: state.main.company,
+  company: state.company.company,
 })
 const mapDispatchToProps = dispatch => ({
+  fetchCompany: () => dispatch(fetchCompany()),
   updateMain: (name, payload) => dispatch(updateMain(name, payload)),
   fetchCoa: payload => dispatch(fetchCoa(payload)),
 })
