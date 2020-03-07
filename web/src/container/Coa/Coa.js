@@ -12,30 +12,105 @@ import {
 import { fetchCoa, sendCoa } from '../../store/actions'
 
 import CoaTableRows from './components/CoaTableRows'
+// import CoaManagerLegacy from './components/CoaManagerLegacy'
 import CoaManager from './components/CoaManager'
 
-const TreeViewer = ({ branch, setCurrentBranch }) => (
-  <ul>
-    {branch.map(({ type, id, location, name, children }) => (
-      <Fragment>
-        <li>
-          {type == 'folder' && '['}
-          {name}
-          {type == 'folder' && '] '}
-          {/* - {id} */}
-          &nbsp;
-          <button
-            style={{ borderRadius: '4px' }}
-            onClick={() => setCurrentBranch({ location })}
+const TreeViewer = ({ branch, creationModal, nested = [], coa }) =>
+  branch.map(({ type, code, location, path, name, children }, index) => {
+    const account = coa.length != 0 && coa.filter(e => e.code === code)[0]
+
+    return (
+      <Fragment key={index}>
+        <tr>
+          <td
+            style={
+              type === 'folder'
+                ? {
+                    backgroundColor: '#f7f7f7',
+                  }
+                : null
+            }
           >
-            &nbsp;+&nbsp;
-          </button>
-        </li>
-        <TreeViewer branch={children} setCurrentBranch={setCurrentBranch} />
+            {nested.length != 0 && (
+              <span
+                style={{
+                  borderRight: '0.1rem solid #aaa',
+                  marginRight: '0.5rem',
+                  padding: '0.8rem 0',
+                }}
+              >
+                {nested.map(n => (
+                  <span
+                    style={{
+                      borderLeft: '0.1rem solid #ddd',
+                      padding: '0.8rem 0',
+                    }}
+                  >
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  </span>
+                ))}
+              </span>
+            )}
+            {type === 'folder' && '🖿 '}
+            {type === 'account' && '💰 '}
+            {name}
+          </td>
+          {type == 'account' && (
+            <td
+              style={{
+                paddingTop: '0',
+                paddingBottom: '0',
+              }}
+              className='txtRight'
+            >
+              {account.balance}
+            </td>
+          )}
+          {type == 'folder' && (
+            <td
+              style={
+                type === 'folder'
+                  ? {
+                      backgroundColor: '#f7f7f7',
+                      paddingTop: '0',
+                      paddingBottom: '0',
+                    }
+                  : {
+                      paddingTop: '0',
+                      paddingBottom: '0',
+                    }
+              }
+              className='txtRight'
+            >
+              <Fragment>
+                <button
+                  style={{ borderRadius: '4px' }}
+                  onClick={() => creationModal('folder', location, path)}
+                >
+                  &nbsp;✎ Folder&nbsp;
+                </button>
+                &nbsp;
+                <button
+                  style={{ borderRadius: '4px' }}
+                  onClick={() => creationModal('account', location, path)}
+                >
+                  &nbsp;✎ Account&nbsp;
+                </button>
+              </Fragment>
+            </td>
+          )}
+        </tr>
+        {type == 'folder' && (
+          <TreeViewer
+            branch={children}
+            creationModal={creationModal}
+            coa={coa}
+            nested={[...nested, null]}
+          />
+        )}
       </Fragment>
-    ))}
-  </ul>
-)
+    )
+  })
 
 export class Coa extends Component {
   componentDidMount() {
@@ -46,25 +121,27 @@ export class Coa extends Component {
     filter: '',
     location: '',
     folder: '',
+    account: '',
+    path: '',
     modal_coa_manager: false,
     tree: [
       {
         type: 'folder',
-        id: 'asset',
+        path: ['asset'],
         location: [0],
         name: 'Cash',
         children: [],
       },
       {
         type: 'folder',
-        id: 'asset',
+        path: ['asset'],
         location: [1],
         name: 'Bank',
         children: [],
       },
       {
         type: 'folder',
-        id: 'asset',
+        path: ['asset'],
         location: [2],
         name: 'Receivable',
         children: [],
@@ -88,69 +165,74 @@ export class Coa extends Component {
         : (selectedBranch = selectedBranch[depth])
     )
 
-    console.log(selectedBranch.children.length)
     selectedBranch.children = [
       ...selectedBranch.children,
       {
         type: 'folder',
-        id: `asset/${selectedBranch.name.toLowerCase()}`,
+        path: [...this.state.path, selectedBranch.name.toLowerCase()],
         location: [...this.state.location, selectedBranch.children.length],
         name: this.state.folder,
         children: [],
       },
     ]
 
-    // console.log(this.state.tree[0].children[this.state.location.slice(1)])
-    // const newState = { ...this.state }
-    // this.state.location.map(
-    //   depth => (selectedBranch = selectedBranch[depth].children)
-    // )
-    // const newTree = [...tree]
-
-    // let currentBranchRef = []
-    // let currentBranchChildren = []
-
-    // currentBranch.map(loc => {
-    //   currentBranchChildren = [...newTree[loc].children]
-    //   currentBranchRef = newTree[loc].children
-    // })
-
-    // currentBranchRef = [
-    //   currentBranchChildren,
-    //   {
-    //     type: 'folder',
-    //     // id: `asset/${newTree[loc].name.toLowerCase()}`,
-    //     id: `test`,
-    //     // location: [0, newTree[loc].children.length],
-    //     location: [0, 0, 0, 0, 0],
-    //     name: folder,
-    //     children: [],
-    //   },
-    // ]
-
-    // setTree(newTree)
     this.setState({ selectedBranch, folder: '' })
+  }
+  addAccount = ({ company, type, name }) => {
+    let selectedBranch = { ...this.state.tree }
+    this.state.location.map(depth =>
+      selectedBranch.children
+        ? (selectedBranch = selectedBranch.children[depth])
+        : (selectedBranch = selectedBranch[depth])
+    )
+
+    selectedBranch.children = [
+      ...selectedBranch.children,
+      {
+        type: 'account',
+        path: ['asset', ...this.state.path, selectedBranch.name.toLowerCase()],
+        location: [...this.state.location, selectedBranch.children.length],
+        code: 100008,
+        name: this.state.account,
+        children: [],
+      },
+    ]
+
+    this.setState({ selectedBranch, account: '' }, () =>
+      this.props.sendCoa({
+        company,
+        type,
+        name,
+        path: this.state.path,
+      })
+    )
+  }
+  creationModal = (type, location, path) => {
+    if (type == 'folder') this.setState({ location, path })
+    else if (type == 'account')
+      this.setState(
+        { location, path },
+        this.toggleModal('modal_coa_manager', true)
+      )
   }
 
   render() {
     return 1 === 1 ? (
       <Container vertical className='scrollable p-hor-8 p-top-5'>
         <Container className='flex-pos-between p-hor-4 p-bottom-4'>
-          <div>
-            <select
-              name='filter'
-              className='btn btn-chip m-right-2'
-              onChange={this.changeHandler}
-              value={this.state.company}
-            >
-              <option value=''>All</option>
-              <option value='assets'>Assets</option>
-              <option value='liabilities'>Liabilities</option>
-              <option value='equity'>Equity</option>
-              <option value='expenses'>Expenses</option>
-              <option value='incomes'>Incomes</option>
-            </select>
-          </div>
+          <select
+            name='filter'
+            className='btn btn-chip m-right-2'
+            onChange={this.changeHandler}
+            value={this.state.company}
+          >
+            <option value=''>All</option>
+            <option value='assets'>Assets</option>
+            <option value='liabilities'>Liabilities</option>
+            <option value='equity'>Equity</option>
+            <option value='expenses'>Expenses</option>
+            <option value='incomes'>Incomes</option>
+          </select>
           <button
             className='btn btn-chip primary'
             onClick={() => {
@@ -160,32 +242,35 @@ export class Coa extends Component {
             COA MANAGER &nbsp;&nbsp; +
           </button>
         </Container>
-        <Card className='p-top-5' vertical noPad expand>
-          <h1>{this.state.location}</h1>
-          <form onSubmit={e => this.addFolder(e)}>
-            <input
-              type='text'
-              name='folder'
-              onChange={e => this.setState({ folder: e.target.value })}
-              value={this.state.folder}
-            />
-            &nbsp;
-            <input type='submit' name='folder' value=' Create ' />
-          </form>
-          <TreeViewer
-            branch={this.state.tree}
-            setCurrentBranch={loc => this.setState(loc)}
+        <form onSubmit={e => this.addFolder(e)}>
+          <input
+            type='text'
+            name='folder'
+            onChange={e => this.setState({ folder: e.target.value })}
+            value={this.state.folder}
           />
-          {/* {this.state.tree.map(tree => (
-              <Fragment>
-                <li>{tree.name}</li>
-                <ul>
-                  {tree.branch.map(tree => (
-                    <li>{tree.name}</li>
-                  ))}
-                </ul>
-              </Fragment>
-            ))} */}
+          &nbsp;
+          <input type='submit' name='folder' value=' Create ' />
+        </form>
+        <Card className='p-top-5' vertical noPad expand>
+          <Container className='card-header flex-pos-between p-vrt-4 p-hor-6'>
+            <Text>Assets</Text>
+          </Container>
+          <table className='table-card'>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th className='txtRight'>Balance</th>
+              </tr>
+            </thead>
+            <tbody>
+              <TreeViewer
+                branch={this.state.tree}
+                creationModal={this.creationModal}
+                coa={this.props.coa['assets']}
+              />
+            </tbody>
+          </table>
         </Card>
         <Card className='p-top-5' vertical noPad expand>
           <Container className='card-header flex-pos-between p-vrt-4 p-hor-6'>
@@ -200,13 +285,7 @@ export class Coa extends Component {
               </tr>
             </thead>
             <tbody>
-              <CoaTableRows
-                data={this.props.coa}
-                accountOf={'assets'}
-                // modalOpen={() => this.toggleModal(true)}
-                // setJournalIndex={this.setJournalIndex}
-                // filterCoa={this.state.coa_filter}
-              />
+              <CoaTableRows data={this.props.coa} accountOf={'assets'} />
               <tr>
                 <td className='txtRight' colSpan='2'>
                   <b>Total</b>
@@ -320,13 +399,7 @@ export class Coa extends Component {
               </tr>
             </thead>
             <tbody>
-              <CoaTableRows
-                data={this.props.coa}
-                accountOf={'incomes'}
-                // modalOpen={() => this.toggleModal(true)}
-                // setJournalIndex={this.setJournalIndex}
-                // filterCoa={this.state.coa_filter}
-              />
+              <CoaTableRows data={this.props.coa} accountOf={'incomes'} />
               <tr>
                 <td className='txtRight' colSpan='2'>
                   <b>Total</b>
@@ -338,53 +411,24 @@ export class Coa extends Component {
               </tr>
             </tbody>
           </table>
-
-          <CoaManager
-            isModalOpen={this.state.modal_coa_manager}
-            modalClose={() => this.toggleModal('modal_coa_manager', false)}
-            sendAccount={this.props.sendCoa}
-            company={this.props.company}
-          />
-          {/* {this.state.journal_modal && (
-            <Modal title='Journal' modalClose={() => this.toggleModal(false)}>
-              {this.state.journal_index && (
-                <Fragment>
-                  <td>
-                    <span
-                      title={dateFormat(
-                        this.props.journal[this.state.journal_index].date,
-                        'ddd, dS mmm, yyyy, h:MM:ss TT'
-                      )}
-                    >
-                      {dateFormat(
-                        this.props.journal[this.state.journal_index].date,
-                        'ddd, dS mmm'
-                      )}
-                    </span>
-                  </td>
-                  <td>
-                    {this.props.journal[this.state.journal_index].debit.name} -
-                    ({this.props.journal[this.state.journal_index].credit.name})
-                  </td>
-                  <td>
-                    {this.props.journal[this.state.journal_index].description}
-                  </td>
-                  <td className='txtRight' style={{ textAlign: 'right' }}>
-                    <span>৳</span>{' '}
-                    {fmt.format(
-                      this.props.journal[this.state.journal_index].amount,
-                      2
-                    )}
-                  </td>
-                  <td>
-                    {this.props.journal[this.state.journal_index].comment}
-                  </td>
-                </Fragment>
-              )}
-            </Modal>
-          )}
-        */}
         </Card>
+
+        {/* <CoaManagerLegacy
+          isModalOpen={this.state.modal_coa_manager}
+          modalClose={() => this.toggleModal('modal_coa_manager', false)}
+          sendAccount={this.props.sendCoa}
+          company={this.props.company}
+        /> */}
+        <CoaManager
+          isModalOpen={this.state.modal_coa_manager}
+          modalClose={() => this.toggleModal('modal_coa_manager', false)}
+          addAccount={payload => this.addAccount(payload)}
+          type={this.state.type}
+          setType={type => this.setState({ type })}
+          name={this.state.account}
+          setName={name => this.setState({ account: name })}
+          company={this.props.company}
+        />
       </Container>
     ) : (
       <Placeholder type='table' />

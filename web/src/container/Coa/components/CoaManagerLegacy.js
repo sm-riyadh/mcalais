@@ -3,30 +3,33 @@ import React, { Fragment, useState } from 'react'
 import { Modal } from '../../../component'
 
 const CoaManager = props => {
-  const accountSubmit = e => {
+  const [type, setType] = useState('')
+  const [name, setName] = useState('')
+
+  const newAccount = e => {
     e.preventDefault()
 
-    props.addAccount({
+    props.sendAccount({
       company: props.company,
-      type: props.type,
-      name: props.name,
+      type,
+      name,
     })
 
-    props.setType('')
-    props.setName('')
     props.modalClose()
+    setType('')
+    setName('')
   }
   return (
     props.isModalOpen && (
       <Modal title='Transaction' modalClose={props.modalClose}>
         <Fragment>
-          <form style={{ width: '100%' }} onSubmit={accountSubmit}>
+          <form style={{ width: '100%' }} onSubmit={newAccount}>
             <section>
               From
               <select
                 name='type'
-                onChange={e => props.setType(e.target.value)}
-                value={props.type}
+                onChange={e => setType(e.target.value)}
+                value={type}
               >
                 <option value='' disabled>
                   Choose a catagory
@@ -44,8 +47,8 @@ const CoaManager = props => {
             <input
               type='text'
               name='description'
-              onChange={e => props.setName(e.target.value)}
-              value={props.name}
+              onChange={e => setName(e.target.value)}
+              value={name}
             />
             <br />
             <br />

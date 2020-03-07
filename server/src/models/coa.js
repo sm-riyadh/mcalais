@@ -32,6 +32,11 @@ const CoaSchema = new mongoose.Schema(
       default: 0,
       required: true,
     },
+    path: [
+      {
+        type: String,
+      },
+    ],
     intercompany: {
       to_company: {
         type: String,
@@ -66,6 +71,7 @@ CoaSchema.methods.toJSON = function() {
     name,
     type,
     code,
+    path,
     balance,
     intercompany,
     transaction,
@@ -76,6 +82,7 @@ CoaSchema.methods.toJSON = function() {
     name,
     type,
     code,
+    path,
     balance,
     intercompany,
     transaction,

@@ -36,6 +36,6 @@ const port = 8080
 app.listen(port, () => {
   console.clear()
   console.log(
-    `> Server started and running on port: ${port} \n----------------------------------------`
+    `> Server started :D [Post: ${port}] \n----------------------------------------`
   )
 })

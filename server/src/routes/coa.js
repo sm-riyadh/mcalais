@@ -73,20 +73,21 @@ const codeGen = (name, count = 0) => {
 
 app.post(`/${url}`, async (req, res) => {
   try {
-    const { company, type, name, intercompany } = req.body
+    const { company, type, name, path, intercompany } = req.body
+    
+    console.log('path', path)
     const { account_count } = await Company.fetchOne(company)
     const code = codeGen(type, account_count[type])
 
-    console.log(
-      await Coa.create({
-        company,
-        type,
-        name,
-        code,
-        intercompany,
-        transaction: [],
-      })
-    )
+    await Coa.create({
+      company,
+      type,
+      name,
+      code,
+      path,
+      intercompany,
+      transaction: [],
+    })
     await Company.updateAccountCount(company, type)
     // Fetch all
     const coa = await Coa.fetchAll(company)

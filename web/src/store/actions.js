@@ -54,6 +54,7 @@ const sendCoa = payload => ({
   type: COA.SEND,
   payload,
 })
+
 const saveCoa = payload => ({
   type: COA.REPLACE._,
   payload,

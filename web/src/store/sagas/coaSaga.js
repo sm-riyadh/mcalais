@@ -23,7 +23,8 @@ function* handleCoaListFetch({ payload }) {
 function* handleCoaSend({ payload }) {
   try {
     const coa = yield call(API.sendCoa, [payload])
-    yield put(saveCoa(coa))
+    console.log('function*handleCoaSend -> coa', coa)
+    // yield put(saveCoa(coa))
   } catch (err) {
     yield put({ type: 'COA.SAVE', message: err.message })
   }

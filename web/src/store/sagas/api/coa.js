@@ -42,7 +42,7 @@ const sendCoa = async payload => {
   try {
     if (payload[0]) payload = payload[0]
 
-    const { company, name, type } = payload
+    const { company, name, path, type } = payload
 
     const { data } = await Axios({
       method: 'post',
@@ -51,6 +51,7 @@ const sendCoa = async payload => {
         company,
         name,
         type,
+        path,
       },
     })
 
