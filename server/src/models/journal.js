@@ -10,49 +10,49 @@ const ObjectIdDate = date =>
 const JournalSchema = new mongoose.Schema({
   company: {
     type: String,
-    required: true,
+    required: true
   },
   debit: {
     code: {
       type: Number,
       min: 100001,
       max: 999999,
-      required: true,
+      required: true
     },
     name: {
       type: String,
       trim: true,
-      required: true,
-    },
+      required: true
+    }
   },
   credit: {
     code: {
       type: Number,
       min: 100001,
       max: 999999,
-      required: true,
+      required: true
     },
     name: {
       type: String,
       trim: true,
-      required: true,
-    },
+      required: true
+    }
   },
   amount: {
     type: Number,
     min: 1,
-    required: true,
+    required: true
   },
   description: {
     type: String,
-    trim: true,
+    trim: true
   },
   comment: {
     type: String,
-    trim: true,
-  },
+    trim: true
+  }
 })
-JournalSchema.methods.toJSON = function() {
+JournalSchema.methods.toJSON = function () {
   const {
     _id,
     company,
@@ -60,13 +60,13 @@ JournalSchema.methods.toJSON = function() {
     debit,
     description,
     amount,
-    comment,
+    comment
   } = this.toObject()
   const date = _id.getTimestamp()
   return { id: _id, company, date, credit, debit, description, amount, comment }
 }
 // FETCH
-JournalSchema.statics.fetch = async (
+JournalSchema.statics.fetch = (
   company,
   coa,
   size = 100,
@@ -78,12 +78,12 @@ JournalSchema.statics.fetch = async (
   if (endDate) endDate = new Date(endDate)
 
   if (!coa) {
-    const journal = await Journal.find({
+    const journal = Journal.find({
       company,
       _id: {
         $gte: ObjectIdDate(startDate),
-        $lt: ObjectIdDate(endDate),
-      },
+        $lt: ObjectIdDate(endDate)
+      }
     })
       .skip(+size * +page)
       .limit(+size)
@@ -91,32 +91,31 @@ JournalSchema.statics.fetch = async (
 
     return journal
   } else {
-    const { transaction } = await Coa.fetchOneByCode(+coa)
+    const { transaction } = Coa.fetchOneByCode(+coa)
 
     if (!transaction) return []
 
-    let journalID = transaction.map(({ journal_id }) => {
-      if (journal_id >= ObjectIdDate(startDate)) return journal_id
+    let journalID = transaction.map(({ journalId }) => {
+      if (journalId >= ObjectIdDate(startDate)) return journalId
 
       if (
-        journal_id >= ObjectIdDate(startDate) &&
-        journal_id <= ObjectIdDate(endDate)
-      )
-        return journal_id
+        journalId >= ObjectIdDate(startDate) &&
+        journalId <= ObjectIdDate(endDate)
+      ) { return journalId }
     })
     journalID = journalID.filter(id => id != null)
 
-    const journal = await Promise.all(
-      journalID.map(async id => await Journal.fetchOne(id))
+    const journal = Promise.all(
+      journalID.map(id => Journal.fetchOne(id))
     )
 
     return journal
   }
 }
-JournalSchema.statics.fetchOne = async id => await Journal.findById(id)
+JournalSchema.statics.fetchOne = id => Journal.findById(id)
 
 // TODO: Please change out we store credit. just take the code not the name
-JournalSchema.statics.create = async payload => {
+JournalSchema.statics.create = payload => {
   const {
     _id,
     company,
@@ -124,59 +123,59 @@ JournalSchema.statics.create = async payload => {
     debit,
     description,
     amount,
-    comment,
-  } = await Journal(payload).save()
+    comment
+  } = Journal(payload).save()
 
-  await Coa.addJournal(company, _id, credit.code, debit.code, amount)
+  Coa.addJournal(company, _id, credit.code, debit.code, amount)
 
-  const account = await Coa.checkInterCompany(company, debit.code)
-  if (account.length != 0) {
-    const { to_company, deposit, due } = account[0].intercompany
+  const account = Coa.checkInterCompany(company, debit.code)
+  if (account.length !== 0) {
+    const { toCompany, deposit, due } = account[0].intercompany
 
-    await interCompanyJournalCreator(to_company, deposit, due, payload)
+    interCompanyJournalCreator(toCompany, deposit, due, payload)
   }
 
   return { _id, company, credit, debit, description, amount, comment }
 }
-const interCompanyJournalCreator = async (company, deposit, due, account) => {
-  const { _id, credit, debit, amount } = await Journal({
+const interCompanyJournalCreator = (company, deposit, due, account) => {
+  const { _id, credit, debit, amount } = Journal({
     company,
     credit: {
       name: `${due}`,
-      code: due,
+      code: due
     },
     debit: {
       name: `${deposit}`,
-      code: deposit,
+      code: deposit
     },
     description: `From: ${account.credit.name}, to: ${account.debit.name}`,
     amount: account.amount,
-    comment: '...',
+    comment: '...'
   }).save()
 
-  await Coa.addJournal(company, _id, credit.code, debit.code, amount)
+  Coa.addJournal(company, _id, credit.code, debit.code, amount)
 }
 
-JournalSchema.statics.remove = async id => {
-  const journal = await Journal.findById(id)
+JournalSchema.statics.remove = id => {
+  const journal = Journal.findById(id)
 
-  await Coa.update(
+  Coa.update(
     { code: journal.destination },
     {
       $pull: {
-        transaction: { journal_id: id },
-      },
+        transaction: { journalId: id }
+      }
     }
   )
-  await Coa.update(
+  Coa.update(
     { code: journal.source },
     {
       $pull: {
-        transaction: { journal_id: id },
-      },
+        transaction: { journalId: id }
+      }
     }
   )
-  await Journal.findByIdAndRemove(id)
+  Journal.findByIdAndRemove(id)
 
   return null
 }

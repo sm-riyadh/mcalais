@@ -24,19 +24,19 @@ app.get(`/${url}`, async (req, res) => {
       liabilities: [],
       equities: [],
       expenses: [],
-      incomes: [],
+      incomes: []
     }
-    sortedCoa.assets = coa.filter(({ code }) => 100000 < code && code < 200000)
+    sortedCoa.assets = coa.filter(({ code }) => code > 100000 && code < 200000)
     sortedCoa.liabilities = coa.filter(
-      ({ code }) => 200000 < code && code < 300000
+      ({ code }) => code > 200000 && code < 300000
     )
     sortedCoa.equities = coa.filter(
-      ({ code }) => 300000 < code && code < 400000
+      ({ code }) => code > 300000 && code < 400000
     )
     sortedCoa.expenses = coa.filter(
-      ({ code }) => 400000 < code && code < 500000
+      ({ code }) => code > 400000 && code < 500000
     )
-    sortedCoa.incomes = coa.filter(({ code }) => 500000 < code && code < 600000)
+    sortedCoa.incomes = coa.filter(({ code }) => code > 500000 && code < 600000)
 
     return res.send(sortedCoa)
   } catch (err) {
@@ -74,10 +74,10 @@ const codeGen = (name, count = 0) => {
 app.post(`/${url}`, async (req, res) => {
   try {
     const { company, type, name, path, intercompany } = req.body
-    
-    console.log('path', path)
-    const { account_count } = await Company.fetchOne(company)
-    const code = codeGen(type, account_count[type])
+    console.log('company, type, name, path, intercompany', company, type, name, path, intercompany)
+
+    const { accountCount } = await Company.fetchOne(company)
+    const code = codeGen(type, accountCount[type])
 
     await Coa.create({
       company,
@@ -86,7 +86,7 @@ app.post(`/${url}`, async (req, res) => {
       code,
       path,
       intercompany,
-      transaction: [],
+      transaction: []
     })
     await Company.updateAccountCount(company, type)
     // Fetch all
@@ -97,19 +97,19 @@ app.post(`/${url}`, async (req, res) => {
       liabilities: [],
       equities: [],
       expenses: [],
-      incomes: [],
+      incomes: []
     }
-    sortedCoa.assets = coa.filter(({ code }) => 100000 < code && code < 200000)
+    sortedCoa.assets = coa.filter(({ code }) => code > 100000 && code < 200000)
     sortedCoa.liabilities = coa.filter(
-      ({ code }) => 200000 < code && code < 300000
+      ({ code }) => code > 200000 && code < 300000
     )
     sortedCoa.equities = coa.filter(
-      ({ code }) => 300000 < code && code < 400000
+      ({ code }) => code > 300000 && code < 400000
     )
     sortedCoa.expenses = coa.filter(
-      ({ code }) => 400000 < code && code < 500000
+      ({ code }) => code > 400000 && code < 500000
     )
-    sortedCoa.incomes = coa.filter(({ code }) => 500000 < code && code < 600000)
+    sortedCoa.incomes = coa.filter(({ code }) => code > 500000 && code < 600000)
 
     return res.send(sortedCoa)
   } catch (err) {
