@@ -50,11 +50,9 @@ app.post(`/${url}`, async (req, res) => {
       !validator.isNumeric(debit) ||
       !validator.isNumeric(amount) ||
       !(amount > 0)
-    )
-      throw 'Invalid type'
+    ) { throw Error('Invalid type') }
 
-    if (!(await Coa.isExist(credit)) || !(await Coa.isExist(debit)))
-      throw 'Invilid coa code'
+    if (!(await Coa.isExist(credit)) || !(await Coa.isExist(debit))) { throw Error('Invilid coa code') }
 
     const debitCoa = await Coa.fetchOneByCode(debit)
     const creditCoa = await Coa.fetchOneByCode(credit)
@@ -63,15 +61,15 @@ app.post(`/${url}`, async (req, res) => {
       company,
       credit: {
         code: creditCoa.code,
-        name: creditCoa.name,
+        name: creditCoa.name
       },
       debit: {
         code: debitCoa.code,
-        name: debitCoa.name,
+        name: debitCoa.name
       },
       description,
       amount,
-      comment,
+      comment
     })
 
     return res.send(newJournal)

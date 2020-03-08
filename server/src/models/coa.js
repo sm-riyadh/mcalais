@@ -133,14 +133,14 @@ const typeFinder = code => {
       return 'incomes'
   }
 }
-CoaSchema.statics.addJournal = (
+CoaSchema.statics.addJournal = async (
   company,
   journalID,
   credit,
   debit,
   amount
 ) => {
-  Coa.findOneAndUpdate(
+  await Coa.findOneAndUpdate(
     { company, code: credit },
     {
       $push: {
@@ -148,7 +148,7 @@ CoaSchema.statics.addJournal = (
       }
     }
   )
-  Coa.update(
+  await Coa.update(
     { company, code: debit },
     {
       $push: {
@@ -162,30 +162,32 @@ CoaSchema.statics.addJournal = (
     (assets(debit) && incomes(credit)) ||
     (assets(debit) && equities(credit))
   ) {
-    Coa.findOneAndUpdate(
+    await Coa.findOneAndUpdate(
       { company, code: credit },
       { $inc: { balance: amount } }
     )
-    Coa.findOneAndUpdate(
+    await Coa.findOneAndUpdate(
       { company, code: debit },
       { $inc: { balance: amount } }
     )
-    Company.updateAccountBalance(company, typeFinder(credit), +amount)
-    Company.updateAccountBalance(company, typeFinder(debit), +amount)
+
+    await Company.updateAccountBalance(company, typeFinder(credit), +amount)
+    await Company.updateAccountBalance(company, typeFinder(debit), +amount)
   } else if (
     (liabilities(debit) && assets(credit)) ||
     (equities(debit) && assets(credit))
   ) {
-    Coa.findOneAndUpdate(
+    await Coa.findOneAndUpdate(
       { company, code: credit },
       { $inc: { balance: -amount } }
     )
-    Coa.findOneAndUpdate(
+    await Coa.findOneAndUpdate(
       { company, code: debit },
       { $inc: { balance: -amount } }
     )
-    Company.updateAccountBalance(company, typeFinder(credit), -amount)
-    Company.updateAccountBalance(company, typeFinder(debit), -amount)
+
+    await Company.updateAccountBalance(company, typeFinder(credit), -amount)
+    await Company.updateAccountBalance(company, typeFinder(debit), -amount)
   } else if (
     (assets(debit) && assets(credit)) ||
     (expenses(debit) && assets(credit)) ||
@@ -193,23 +195,20 @@ CoaSchema.statics.addJournal = (
     (assets(debit) && incomes(credit)) ||
     (incomes(debit) && assets(credit))
   ) {
-    Coa.findOneAndUpdate(
+    await Coa.findOneAndUpdate(
       { company, code: credit },
       { $inc: { balance: -amount } }
     )
-    Coa.findOneAndUpdate(
+    await Coa.findOneAndUpdate(
       { company, code: debit },
       { $inc: { balance: +amount } }
     )
-    Company.updateAccountBalance(company, typeFinder(credit), -amount)
-    Company.updateAccountBalance(company, typeFinder(debit), +amount)
+
+    await Company.updateAccountBalance(company, typeFinder(credit), -amount)
+    await Company.updateAccountBalance(company, typeFinder(debit), +amount)
   }
 }
 CoaSchema.statics.isExist = code => Coa.exists({ code })
-
-CoaSchema.statics.remove = id => {
-  return Coa.findByIdAndRemove(id)
-}
 
 const Coa = mongoose.model('Coa', CoaSchema)
 

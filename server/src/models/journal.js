@@ -115,7 +115,7 @@ JournalSchema.statics.fetch = (
 JournalSchema.statics.fetchOne = id => Journal.findById(id)
 
 // TODO: Please change out we store credit. just take the code not the name
-JournalSchema.statics.create = payload => {
+JournalSchema.statics.create = async payload => {
   const {
     _id,
     company,
@@ -124,11 +124,12 @@ JournalSchema.statics.create = payload => {
     description,
     amount,
     comment
-  } = Journal(payload).save()
+  } = await Journal(payload).save()
 
-  Coa.addJournal(company, _id, credit.code, debit.code, amount)
+  await Coa.addJournal(company, _id, credit.code, debit.code, amount)
 
-  const account = Coa.checkInterCompany(company, debit.code)
+  const account = await Coa.checkInterCompany(company, debit.code)
+
   if (account.length !== 0) {
     const { toCompany, deposit, due } = account[0].intercompany
 
@@ -137,8 +138,8 @@ JournalSchema.statics.create = payload => {
 
   return { _id, company, credit, debit, description, amount, comment }
 }
-const interCompanyJournalCreator = (company, deposit, due, account) => {
-  const { _id, credit, debit, amount } = Journal({
+const interCompanyJournalCreator = async (company, deposit, due, account) => {
+  const { _id, credit, debit, amount } = await Journal({
     company,
     credit: {
       name: `${due}`,
@@ -153,7 +154,7 @@ const interCompanyJournalCreator = (company, deposit, due, account) => {
     comment: '...'
   }).save()
 
-  Coa.addJournal(company, _id, credit.code, debit.code, amount)
+  await Coa.addJournal(company, _id, credit.code, debit.code, amount)
 }
 
 JournalSchema.statics.remove = id => {
