@@ -1,7 +1,8 @@
 import { MAIN } from '..'
 
 const initialState = {
-  company: 'HQ',
+  sidebar_collapse : false,
+  company          : 'HQ',
 }
 
 const main = (state = initialState, { type, name, payload }) => {

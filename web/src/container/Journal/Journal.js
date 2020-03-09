@@ -2,13 +2,7 @@ import React, { Component, Fragment } from 'react'
 import { connect } from 'react-redux'
 
 import { Modal, Container, Card, Text, Placeholder } from '../../component'
-import {
-  fetchCoa,
-  fetchCoaList,
-  fetchJournal,
-  fetchJournalMore,
-  sendJournal,
-} from '../../store/actions'
+import { fetchCoa, fetchCoaList, fetchJournal, fetchJournalMore, sendJournal } from '../../store/actions'
 
 import JournalTableRows from './components/JournalTableRows'
 import JournalDetailModal from './components/JournalDetailModal'
@@ -22,13 +16,13 @@ export class Journal extends Component {
   }
 
   state = {
-    modal_journal_details: false,
+    modal_journal_details : false,
 
-    modal_journal_entry: false,
-    journal_index: '',
+    modal_journal_entry   : false,
+    journal_index         : '',
 
-    page: 0,
-    coa_filter: '',
+    page                  : 0,
+    coa_filter            : '',
   }
 
   toggleModal = (name, action) => this.setState({ [name]: action })
@@ -38,21 +32,21 @@ export class Journal extends Component {
     const { value } = e.target
     this.setState({ coa_filter: value }, () =>
       this.props.fetchJournal({
-        company: this.props.company,
-        coa: this.state.coa_filter,
+        company : this.props.company,
+        coa     : this.state.coa_filter,
       })
     )
   }
   appendMore = () => {
     this.setState(
       state => ({
-        page: state.page + 1,
+        page : state.page + 1,
       }),
       () =>
         this.props.fetchJournalMore({
-          company: 'HQ',
-          page: this.state.page,
-          coa: this.state.coa_filter,
+          company : 'HQ',
+          page    : this.state.page,
+          coa     : this.state.coa_filter,
         })
     )
   }
@@ -63,20 +57,12 @@ export class Journal extends Component {
         <Container vertical className='scrollable p-hor-8 p-top-5'>
           <Container className='flex-pos-between p-hor-4 p-bottom-4'>
             <div>
-              {/* <select
-              name='company'
-              className='btn btn-chip m-right-2'
-              onChange={this.mainChangeHandler}
-              value={this.props.company}
-            >
-              <option value='HQ'>HQ</option>
-              <option value='SUST Boundary'>SUST Boundary</option>
-            </select>
-            <input
-              type='text'
-              className='btn btn-chip m-right-2'
-              placeholder='Search...'
-            /> */}
+              <select name='company' className='btn btn-chip m-right-2'>
+                <option value='journal'>Journal</option>
+                <option value='expenses'>Expenses</option>
+                <option value='incomes'>Incomes</option>
+              </select>
+              <input type='text' className='btn btn-chip m-right-2' placeholder='Search...' />
             </div>
             <button
               className='btn btn-chip primary'
@@ -84,27 +70,19 @@ export class Journal extends Component {
                 this.toggleModal('modal_journal_entry', true)
               }}
             >
-              ADD &nbsp;&nbsp; +
+              New Voucher &nbsp; 🧾
             </button>
           </Container>
           <Card className='p-top-5' vertical noPad expand>
-            <Container className='card-header flex-pos-between p-vrt-4 p-hor-6'>
-              <Text>
-                <b>Journal</b>
-              </Text>
+            <Container className='card-header flex-pos-between p-hor-6'>
+              <Text>Journal</Text>
               <div>
                 {/* <select className='btn btn-chip'>
               <option>Sort by...</option>
             </select> */}
-                <select
-                  name='coa_filter'
-                  className='btn btn-chip'
-                  onChange={this.coaFilterChangeHandler}
-                >
+                <select name='coa_filter' className='btn btn-chip' onChange={this.coaFilterChangeHandler}>
                   <option value=''>All</option>
-                  {this.props.coa_list.map(coa => (
-                    <option value={coa.code}>{coa.name}</option>
-                  ))}
+                  {this.props.coa_list.map(coa => <option value={coa.code}>{coa.name}</option>)}
                 </select>
                 <select className='btn btn-chip'>
                   <option>Today</option>
@@ -128,9 +106,7 @@ export class Journal extends Component {
               <tbody>
                 <JournalTableRows
                   data={this.props.journal}
-                  modalOpen={() =>
-                    this.toggleModal('modal_journal_details', true)
-                  }
+                  modalOpen={() => this.toggleModal('modal_journal_details', true)}
                   setJournalIndex={this.setJournalIndex}
                   filterCoa={this.state.coa_filter}
                 />
@@ -159,17 +135,17 @@ export class Journal extends Component {
 }
 
 const mapStateToProps = state => ({
-  company: state.main.company,
-  journal: state.journal.journal,
-  coa: state.coa.coa,
-  coa_list: state.coa.coa_list,
+  company  : state.main.company,
+  journal  : state.journal.journal,
+  coa      : state.coa.coa,
+  coa_list : state.coa.coa_list,
 })
 const mapDispatchToProps = dispatch => ({
-  fetchCoa: payload => dispatch(fetchCoa(payload)),
-  fetchCoaList: payload => dispatch(fetchCoaList(payload)),
-  fetchJournal: payload => dispatch(fetchJournal(payload)),
-  fetchJournalMore: payload => dispatch(fetchJournalMore(payload)),
-  sendJournal: payload => dispatch(sendJournal(payload)),
+  fetchCoa         : payload => dispatch(fetchCoa(payload)),
+  fetchCoaList     : payload => dispatch(fetchCoaList(payload)),
+  fetchJournal     : payload => dispatch(fetchJournal(payload)),
+  fetchJournalMore : payload => dispatch(fetchJournalMore(payload)),
+  sendJournal      : payload => dispatch(sendJournal(payload)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Journal)

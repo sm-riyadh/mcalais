@@ -1,5 +1,5 @@
 main {
-  background-color: #e4e4e4;
+  background-color: #e8e8e8;
   display: flex;
   justify-content: space-between;
 
@@ -7,7 +7,7 @@ main {
   width: 100vw;
   height: 100vh;
   padding: 0;
-  padding-top: 4.6rem;
+  padding-top: 6.4rem;
   overflow-y: hidden;
 }
 .scrollable {
@@ -28,5 +28,12 @@ main {
   * {
     outline: none;
     user-select: none;
+  }
+}
+a {
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: none;
   }
 }

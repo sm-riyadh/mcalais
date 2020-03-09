@@ -17,33 +17,19 @@ export class Home extends Component {
       <Fragment>
         <Header />
         <main>
-          <NavBar>
+          <NavBar collapsed={this.props.sidebar_collapse}>
             {[
-              { title: 'Journal', path: '/journal', icon: 'O' },
-              { title: 'Chart of Accounts', path: '/coa', icon: 'O' },
-              { title: 'Company', path: '/company', icon: 'O' },
+              { title: 'Journal', path: '/journal', icon: '♪' },
+              { title: 'Chart of Accounts', path: '/coa', icon: '♪' },
+              { title: 'Company', path: '/company', icon: '♪' },
             ]}
           </NavBar>
 
           <Switch>
-            <Route
-              path='/'
-              exact
-              component={Journal}
-              key={this.props.company}
-            />
-            <Route
-              path='/journal'
-              exact
-              component={Journal}
-              key={this.props.company}
-            />
+            <Route path='/' exact component={Journal} key={this.props.company} />
+            <Route path='/journal' exact component={Journal} key={this.props.company} />
             <Route path='/coa' component={Coa} key={this.props.company} />
-            <Route
-              path='/company'
-              component={Company}
-              key={this.props.company}
-            />
+            <Route path='/company' component={Company} key={this.props.company} />
             {/* <Route path='/catalogue' component={Catalogue} /> */}
           </Switch>
           <ActivityBar />
@@ -55,6 +41,7 @@ export class Home extends Component {
 }
 
 const mapStateToProps = state => ({
-  company: state.main.company,
+  sidebar_collapse : state.main.sidebar_collapse,
+  company          : state.main.company,
 })
 export default connect(mapStateToProps)(Home)
