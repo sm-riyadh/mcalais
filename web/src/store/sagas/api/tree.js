@@ -7,16 +7,16 @@ const fetchTree = async payload => {
     const { company } = payload
 
     const { data } = await Axios({
-      method: 'get',
-      url: '/tree',
-      params: {
+      method : 'get',
+      url    : '/tree',
+      params : {
         company,
       },
     })
 
-    return data
+    return { data }
   } catch (err) {
-    return { ERROR: err }
+    return { error: err }
   }
 }
 const sendTree = async payload => {
@@ -26,17 +26,17 @@ const sendTree = async payload => {
     const { company, tree } = payload
 
     const { data } = await Axios({
-      method: 'post',
-      url: '/tree',
-      data: {
+      method : 'post',
+      url    : '/tree',
+      data   : {
         company,
         tree,
       },
     })
 
-    return data
+    return { data }
   } catch (err) {
-    return { ERROR: err }
+    return { error: err }
   }
 }
 

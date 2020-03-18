@@ -7,7 +7,7 @@ main {
   width: 100vw;
   height: 100vh;
   padding: 0;
-  padding-top: 6.4rem;
+  padding-top: 7rem;
   overflow-y: hidden;
 }
 .scrollable {
@@ -36,4 +36,26 @@ a {
   &:hover {
     text-decoration: none;
   }
+}
+
+.material-icons {
+  line-height: 2.2rem;
+  font-size: inherit;
+}
+
+.text {
+  color: #202020;
+
+  &.sub-title {
+    color: #919191;
+    font-size: 90%;
+  }
+  &.card {
+    font-weight: 600;
+    font-size: 2rem;
+  }
+}
+p {
+  padding: 0;
+  margin: 0;
 }

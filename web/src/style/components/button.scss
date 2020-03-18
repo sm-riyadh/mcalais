@@ -6,6 +6,10 @@
   box-shadow: 0 0.1rem 0.3rem #00000015;
   transition: box-shadow 80ms;
 
+  .material-icons {
+    font-size: 1.6rem;
+  }
+
   &:hover {
     box-shadow: 0 0 0 0.3rem #1613df6c;
   }
@@ -56,6 +60,12 @@
       background-color: #00000021;
     }
   }
+  &.btn-icon-large {
+    .material-icons {
+      font-size: 1.8rem;
+      line-height: 2.2rem;
+    }
+  }
   &.btn-header-nav {
     border-width: 0;
     width: 3.4rem;
@@ -63,8 +73,22 @@
     margin: 0 0.3rem;
     border-radius: 0.6rem;
 
-    box-shadow: 0 0.1rem 0.3rem #00000020;
+    box-shadow: 0 0.1rem 0.3rem #00000020, inset 0 0.05rem 0rem #00000031;
+    transition: background 90ms;
 
+    &:hover {
+      box-shadow: 0 0rem 0.1rem #00000059, inset 0 0.05rem 0rem #00000031;
+    }
+    &:active {
+      box-shadow: 0 0.1rem 0 #00000012, inset 0 0.05rem 0.2rem #00000031;
+    }
+    &.active {
+      box-shadow: 0 0.1rem 0 #00000012, inset 0 0.05rem 0.2rem #00000031;
+
+      &:hover {
+        box-shadow: 0 0.1rem 0 #00000012, inset 0 0.05rem 0.2rem #00000031;
+      }
+    }
     &-img {
       padding: 0;
       background-color: #ffffff;
@@ -82,6 +106,21 @@
     border-radius: 0.6rem;
 
     box-shadow: 0 0.1rem 0.3rem #00000020;
+    transition: background 90ms;
+
+    &:hover {
+      box-shadow: 0 0.1rem 0.2rem #00000016, inset 0 0.05rem 0rem #00000031;
+    }
+    &:active {
+      box-shadow: 0 0.1rem 0 #00000012, inset 0 0.05rem 0.2rem #00000031;
+    }
+    &.active {
+      box-shadow: 0 0.1rem 0 #00000012, inset 0 0.05rem 0.2rem #00000031;
+
+      &:hover {
+        box-shadow: 0 0.1rem 0 #00000012, inset 0 0.05rem 0.2rem #00000031;
+      }
+    }
   }
   &.primary {
     background-color: #773bd6;
@@ -98,5 +137,12 @@
   &.white {
     background-color: #ffffff;
     color: #585858;
+
+    &:active {
+      background-color: #f0f0f0;
+    }
+    &.active {
+      background-color: #f0f0f0;
+    }
   }
 }

@@ -1,7 +1,7 @@
 import React from 'react'
 
 const placeholder = props => {
-  return <h1 style={{ padding: '10rem' }}>Hellow</h1>
+  return <b style={{ padding: '10rem', color: '#999' }}>Loading...</b>
 }
 
 export default placeholder

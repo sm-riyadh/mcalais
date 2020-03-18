@@ -3,13 +3,13 @@ import Axios from './axios-instance'
 const fetchCompany = async () => {
   try {
     const { data } = await Axios({
-      method: 'get',
-      url: '/company',
+      method : 'get',
+      url    : '/company',
     })
 
-    return data
+    return { data }
   } catch (err) {
-    return { ERROR: err }
+    return { error: err }
   }
 }
 const sendCompany = async payload => {
@@ -19,16 +19,16 @@ const sendCompany = async payload => {
     const { name } = payload
 
     const { data } = await Axios({
-      method: 'post',
-      url: '/company',
-      data: {
+      method : 'post',
+      url    : '/company',
+      data   : {
         name,
       },
     })
 
-    return data
+    return { data }
   } catch (err) {
-    return { ERROR: err }
+    return { error: err }
   }
 }
 export default { fetchCompany, sendCompany }

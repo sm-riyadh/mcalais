@@ -2,21 +2,67 @@
   background-color: #ffffff;
   height: 100%;
   width: 23rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  // border: 0.1rem dashed #ccc;
+  box-shadow: 0 0 0.2rem #00000020;
+
+  .widget-header {
+    padding: 0.6rem 1rem;
+    background-color: #dadada;
+  }
+  .widget {
+    padding: 0.8rem;
+
+    input {
+      background-color: #ececec;
+      border: 0.1rem solid #e0e0e0;
+      border-radius: 0.3rem;
+      padding: 0.8rem 1rem;
+      box-shadow: 0 0.1rem 0.2rem rgba(0, 0, 0, 0.089);
+    }
+    label {
+      p {
+        font-size: 80%;
+        padding: 0.6rem;
+        padding-bottom: 0.8rem;
+      }
+    }
+    select {
+      width: 100%;
+      background-color: #ececec;
+      border: 0.1rem solid #e0e0e0;
+      border-radius: 0.3rem;
+      padding: 0.8rem 1rem;
+      box-shadow: 0 0.1rem 0.3rem rgba(0, 0, 0, 0.075);
+    }
+  }
+
+  .widget-footer {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    background-color: #dadada;
+    padding: 1.5rem 1rem;
+  }
 
   &-collapsed {
-    max-width: 5rem;
+    max-width: 6rem;
   }
-  box-shadow: 0 0 0.4rem #00000020;
 
-  ul.navbar {
+  .navbar {
     padding: 0;
     padding-top: 1rem;
+    font-weight: 600;
 
     .active {
-      li {
-        font-weight: 500;
+      .links {
         color: #2e2aaf;
 
+        &:hover {
+          color: #221e88;
+        }
         &::before {
           content: '';
           background-color: #2e2aaf;
@@ -25,8 +71,9 @@
           position: absolute;
           left: 0;
           height: 2.8rem;
-          margin-top: -0.65rem;
-          border-radius: 0 2rem 2rem 0;
+          // margin-left: 0.5rem;
+          // border-radius: 4rem;
+          border-radius: 0 4rem 4rem 0;
           z-index: 10000;
         }
         &:hover {
@@ -36,14 +83,20 @@
       }
     }
 
-    li {
-      color: #585858;
-      list-style: none;
+    .links {
+      font-size: 1.3rem;
+      color: #999999;
       padding: 1rem 0;
       padding-left: 2rem;
+      display: flex;
+      align-items: center;
 
+      .material-icons {
+        font-size: 2rem;
+      }
       &:hover {
-        background-color: rgba(0, 0, 0, 0.096);
+        color: #5f5bb1;
+        background-color: rgba(0, 0, 0, 0.03);
       }
     }
   }

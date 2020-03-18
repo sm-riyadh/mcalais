@@ -8,6 +8,7 @@ import {
   Text,
   Placeholder,
 } from '../../component'
+import { ActivityBar } from '../../component/layout'
 
 import { fetchCoa, sendCoa } from '../../store/actions'
 import API from '../../store/sagas/api/tree'
@@ -18,8 +19,8 @@ import AccountModal from './components/AccountModal'
 import FolderModal from './components/FolderModal'
 
 const TreeViewer = ({ branch, accountType, creationModal, nested = [], coa }) =>
-  branch.map(({ type, code = 100003, location, path, name, children }, index) => {
-    const account = coa.length != 0 && coa.filter(e => e.code === code)[0]
+  branch.map(({ type, location, path, name, children }, index) => {
+    const account = coa.length != 0 && coa.filter(e => e.name === name && e.type === accountType)[0]
 
     return (
       <Fragment key={index}>
@@ -53,8 +54,8 @@ const TreeViewer = ({ branch, accountType, creationModal, nested = [], coa }) =>
                 ))}
               </span>
             )}
-            {type === 'folder' && '📁'}
-            {type === 'account' && '💼 '}
+            {type === 'folder' && <i className='material-icons p-right-1'>folder</i>}
+            {type === 'account' && <i className='material-icons p-right-1'>money</i>}
             {name}
           </td>
           {type == 'account' && (
@@ -89,16 +90,16 @@ const TreeViewer = ({ branch, accountType, creationModal, nested = [], coa }) =>
               <Fragment>
                 <button
                   className='btn btn-small btn-rounded grey'
-                  onClick={() => this.creationModal('folder', accountType, location, path)}
+                  onClick={() => creationModal('folder', accountType, location, path)}
                 >
-                  🖿 +
+                  <i className='material-icons p-right-1'>create_new_folder</i>
                 </button>
                 &nbsp;
                 <button
                   className='btn btn-small btn-rounded grey'
-                  onClick={() => this.creationModal('account', accountType, location, path)}
+                  onClick={() => creationModal('account', accountType, location, path)}
                 >
-                  📑 +
+                  <i className='material-icons p-right-1'>fiber_new</i>
                 </button>
               </Fragment>
             </td>
@@ -241,414 +242,288 @@ export class Coa extends Component {
   }
 
   render() {
-    return 1 === 1 ? (
-      <Container vertical className='scrollable p-hor-8 p-top-5'>
-        <Container className='flex-pos-between p-hor-4 p-bottom-4'>
-          <select
-            name='filter'
-            className='btn btn-chip m-right-2'
-            onChange={this.changeHandler}
-            value={this.state.company}
-          >
-            <option value=''>All</option>
-            <option value='assets'>Assets</option>
-            <option value='liabilities'>Liabilities</option>
-            <option value='equity'>Equity</option>
-            <option value='expenses'>Expenses</option>
-            <option value='incomes'>Incomes</option>
-          </select>
-          <button
-            className='btn btn-chip primary'
-            onClick={() => {
-              this.setState({ modify_account: !this.state.modify_account })
-            }}
-          >
-            Modify Accounts &nbsp; ✎
-          </button>
-        </Container>
-        <Card className='p-top-5' vertical noPad expand>
-          <Container className='card-header flex-pos-between p-vrt-4 p-hor-6'>
-            <Text>Assets</Text>
-            <span>
-              <button
-                className='btn btn-small btn-rounded grey'
-                onClick={() => this.creationModal('folder', 'assets', [], [ 'assets' ])}
+    return (
+      <Fragment>
+        {this.props.status.success ? (
+          <Container vertical className='scrollable p-hor-8 p-top-5'>
+            <Container className='flex-pos-between p-hor-4 p-bottom-4'>
+              <select
+                name='filter'
+                className='btn btn-chip m-right-2'
+                onChange={this.changeHandler}
+                value={this.state.company}
               >
-                🖿 +
-              </button>
-              &nbsp;
+                <option value=''>All</option>
+                <option value='assets'>Assets</option>
+                <option value='liabilities'>Liabilities</option>
+                <option value='equity'>Equity</option>
+                <option value='expenses'>Expenses</option>
+                <option value='incomes'>Incomes</option>
+              </select>
               <button
-                className='btn btn-small btn-rounded grey'
-                onClick={() => this.creationModal('account', 'assets', [], [ 'assets' ])}
+                className='btn btn-chip primary'
+                onClick={() => {
+                  this.setState({ modify_account: !this.state.modify_account })
+                }}
               >
-                📑 +
+                Modify Accounts &nbsp; ✎
               </button>
-            </span>
+            </Container>
+            <Card className='p-top-5' vertical noPad expand>
+              <Container className='card-header flex-pos-between p-vrt-4 p-hor-6'>
+                <Text>Assets</Text>
+                <span>
+                  <button
+                    className='btn btn-small btn-rounded grey'
+                    onClick={() => this.creationModal('folder', 'assets', [], [ 'assets' ])}
+                  >
+                    <i className='material-icons p-right-1'>create_new_folder</i>
+                  </button>
+                  &nbsp;
+                  <button
+                    className='btn btn-small btn-rounded grey'
+                    onClick={() => this.creationModal('account', 'assets', [], [ 'assets' ])}
+                  >
+                    <i className='material-icons p-right-1'>fiber_new</i>
+                  </button>
+                </span>
+              </Container>
+              <table className='table-card'>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th className='txtRight'>Balance</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <TreeViewer
+                    accountType='assets'
+                    branch={this.state.tree.assets}
+                    creationModal={this.creationModal}
+                    coa={this.props.coa['assets']}
+                  />
+                  <tr>
+                    <td className='txtRight' style={{ backgroundColor: '#eeeeee' }}>
+                      <b>Total</b>
+                    </td>
+                    <td className='txtRight' style={{ backgroundColor: '#eeeeee' }}>
+                      <span>৳</span> {this.props.coa.balance && this.props.coa.balance.assets}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <Container className='card-header flex-pos-between p-vrt-4 p-hor-6'>
+                <Text>Liabilities</Text>
+                <span>
+                  <button
+                    className='btn btn-small btn-rounded grey'
+                    onClick={() => this.creationModal('folder', 'liabilities', [], [ 'liabilities' ])}
+                  >
+                    <i className='material-icons p-right-1'>create_new_folder</i>
+                  </button>
+                  &nbsp;
+                  <button
+                    className='btn btn-small btn-rounded grey'
+                    onClick={() => this.creationModal('account', 'liabilities', [], [ 'liabilities' ])}
+                  >
+                    <i className='material-icons p-right-1'>fiber_new</i>
+                  </button>
+                </span>
+              </Container>
+              <table className='table-card'>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th className='txtRight'>Balance</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <TreeViewer
+                    accountType='liabilities'
+                    branch={this.state.tree.liabilities}
+                    creationModal={this.creationModal}
+                    coa={this.props.coa['liabilities']}
+                  />
+                  <tr>
+                    <td className='txtRight' style={{ backgroundColor: '#eeeeee' }}>
+                      <b>Total</b>
+                    </td>
+                    <td className='txtRight' style={{ backgroundColor: '#eeeeee' }}>
+                      <span>৳</span> {this.props.coa.balance && this.props.coa.balance.liabilities}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <Container className='card-header flex-pos-between p-vrt-4 p-hor-6'>
+                <Text>Equities</Text>
+                <span>
+                  <button
+                    className='btn btn-small btn-rounded grey'
+                    onClick={() => this.creationModal('folder', 'equities', [], [ 'equities' ])}
+                  >
+                    <i className='material-icons p-right-1'>create_new_folder</i>
+                  </button>
+                  &nbsp;
+                  <button
+                    className='btn btn-small btn-rounded grey'
+                    onClick={() => this.creationModal('account', 'equities', [], [ 'equities' ])}
+                  >
+                    <i className='material-icons p-right-1'>fiber_new</i>
+                  </button>
+                </span>
+              </Container>
+              <table className='table-card'>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th className='txtRight'>Balance</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <TreeViewer
+                    accountType='equities'
+                    branch={this.state.tree.equities}
+                    creationModal={this.creationModal}
+                    coa={this.props.coa['equities']}
+                  />
+                  <tr>
+                    <td className='txtRight' style={{ backgroundColor: '#eeeeee' }}>
+                      <b>Total</b>
+                    </td>
+                    <td className='txtRight' style={{ backgroundColor: '#eeeeee' }}>
+                      <span>৳</span> {this.props.coa.balance && this.props.coa.balance.equities}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <Container className='card-header flex-pos-between p-vrt-4 p-hor-6'>
+                <Text>Expenses</Text>
+                <span>
+                  <button
+                    className='btn btn-small btn-rounded grey'
+                    onClick={() => this.creationModal('folder', 'expenses', [], [ 'expenses' ])}
+                  >
+                    <i className='material-icons p-right-1'>create_new_folder</i>
+                  </button>
+                  &nbsp;
+                  <button
+                    className='btn btn-small btn-rounded grey'
+                    onClick={() => this.creationModal('account', 'expenses', [], [ 'expenses' ])}
+                  >
+                    <i className='material-icons p-right-1'>fiber_new</i>
+                  </button>
+                </span>
+              </Container>
+              <table className='table-card'>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th className='txtRight'>Balance</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <TreeViewer
+                    accountType='expenses'
+                    branch={this.state.tree.expenses}
+                    creationModal={this.creationModal}
+                    coa={this.props.coa['expenses']}
+                  />
+                  <tr>
+                    <td className='txtRight' style={{ backgroundColor: '#eeeeee' }}>
+                      <b>Total</b>
+                    </td>
+                    <td className='txtRight' style={{ backgroundColor: '#eeeeee' }}>
+                      <span>৳</span> {this.props.coa.balance && this.props.coa.balance.expenses}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <Container className='card-header flex-pos-between p-vrt-4 p-hor-6'>
+                <Text>Incomes</Text>
+                <span>
+                  <button
+                    className='btn btn-small btn-rounded grey'
+                    onClick={() => this.creationModal('folder', 'incomes', [], [ 'incomes' ])}
+                  >
+                    <i className='material-icons p-right-1'>create_new_folder</i>
+                  </button>
+                  &nbsp;
+                  <button
+                    className='btn btn-small btn-rounded grey'
+                    onClick={() => this.creationModal('account', 'incomes', [], [ 'incomes' ])}
+                  >
+                    <i className='material-icons p-right-1'>fiber_new</i>
+                  </button>
+                </span>
+              </Container>
+              <table className='table-card'>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th className='txtRight'>Balance</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <TreeViewer
+                    accountType='incomes'
+                    branch={this.state.tree.incomes}
+                    creationModal={this.creationModal}
+                    coa={this.props.coa['incomes']}
+                  />
+                  <tr>
+                    <td className='txtRight' style={{ backgroundColor: '#eeeeee' }}>
+                      <b>Total</b>
+                    </td>
+                    <td className='txtRight' style={{ backgroundColor: '#eeeeee' }}>
+                      <span>৳</span> {this.props.coa.balance && this.props.coa.balance.incomes}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </Card>
+            <AccountModal
+              isModalOpen={this.state.modal_account}
+              modalClose={() => this.toggleModal('modal_account', false)}
+              addAccount={payload => this.addAccount(payload)}
+              name={this.state.account}
+              setName={name => this.setState({ account: name })}
+            />
+            <FolderModal
+              isModalOpen={this.state.modal_folder}
+              modalClose={() => this.toggleModal('modal_folder', false)}
+              addFolder={payload => this.addFolder(payload)}
+              name={this.state.folder}
+              setName={name => this.setState({ folder: name })}
+            />
           </Container>
-          <table className='table-card'>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th className='txtRight'>Balance</th>
-              </tr>
-            </thead>
-            <tbody>
-              <TreeViewer
-                accountType='assets'
-                branch={this.state.tree.assets}
-                creationModal={this.creationModal}
-                coa={this.props.coa['assets']}
-              />
-              <tr>
-                <td className='txtRight' style={{ backgroundColor: '#eeeeee' }}>
-                  <b>Total</b>
-                </td>
-                <td className='txtRight' style={{ backgroundColor: '#eeeeee' }}>
-                  <span>৳</span> {this.props.coa.balance && this.props.coa.balance.assets}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <Container className='card-header flex-pos-between p-vrt-4 p-hor-6'>
-            <Text>Liabilities</Text>
-            <span>
-              <button
-                className='btn btn-small btn-rounded grey'
-                onClick={() => this.creationModal('folder', 'liabilities', [], [ 'liabilities' ])}
-              >
-                🖿 +
-              </button>
-              &nbsp;
-              <button
-                className='btn btn-small btn-rounded grey'
-                onClick={() => this.creationModal('account', 'liabilities', [], [ 'liabilities' ])}
-              >
-                📑 +
-              </button>
-            </span>
-          </Container>
-          <table className='table-card'>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th className='txtRight'>Balance</th>
-              </tr>
-            </thead>
-            <tbody>
-              <TreeViewer
-                accountType='liabilities'
-                branch={this.state.tree.liabilities}
-                creationModal={this.creationModal}
-                coa={this.props.coa['liabilities']}
-              />
-              <tr>
-                <td className='txtRight' style={{ backgroundColor: '#eeeeee' }}>
-                  <b>Total</b>
-                </td>
-                <td className='txtRight' style={{ backgroundColor: '#eeeeee' }}>
-                  <span>৳</span> {this.props.coa.balance && this.props.coa.balance.liabilities}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <Container className='card-header flex-pos-between p-vrt-4 p-hor-6'>
-            <Text>Equities</Text>
-            <span>
-              <button
-                className='btn btn-small btn-rounded grey'
-                onClick={() => this.creationModal('folder', 'equities', [], [ 'equities' ])}
-              >
-                🖿 +
-              </button>
-              &nbsp;
-              <button
-                className='btn btn-small btn-rounded grey'
-                onClick={() => this.creationModal('account', 'equities', [], [ 'equities' ])}
-              >
-                📑 +
-              </button>
-            </span>
-          </Container>
-          <table className='table-card'>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th className='txtRight'>Balance</th>
-              </tr>
-            </thead>
-            <tbody>
-              <TreeViewer
-                accountType='equities'
-                branch={this.state.tree.equities}
-                creationModal={this.creationModal}
-                coa={this.props.coa['equities']}
-              />
-              <tr>
-                <td className='txtRight' style={{ backgroundColor: '#eeeeee' }}>
-                  <b>Total</b>
-                </td>
-                <td className='txtRight' style={{ backgroundColor: '#eeeeee' }}>
-                  <span>৳</span> {this.props.coa.balance && this.props.coa.balance.equities}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <Container className='card-header flex-pos-between p-vrt-4 p-hor-6'>
-            <Text>Expenses</Text>
-            <span>
-              <button
-                className='btn btn-small btn-rounded grey'
-                onClick={() => this.creationModal('folder', 'expenses', [], [ 'expenses' ])}
-              >
-                🖿 +
-              </button>
-              &nbsp;
-              <button
-                className='btn btn-small btn-rounded grey'
-                onClick={() => this.creationModal('account', 'expenses', [], [ 'expenses' ])}
-              >
-                📑 +
-              </button>
-            </span>
-          </Container>
-          <table className='table-card'>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th className='txtRight'>Balance</th>
-              </tr>
-            </thead>
-            <tbody>
-              <TreeViewer
-                accountType='expenses'
-                branch={this.state.tree.expenses}
-                creationModal={this.creationModal}
-                coa={this.props.coa['expenses']}
-              />
-              <tr>
-                <td className='txtRight' style={{ backgroundColor: '#eeeeee' }}>
-                  <b>Total</b>
-                </td>
-                <td className='txtRight' style={{ backgroundColor: '#eeeeee' }}>
-                  <span>৳</span> {this.props.coa.balance && this.props.coa.balance.incomes}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <Container className='card-header flex-pos-between p-vrt-4 p-hor-6'>
-            <Text>Incomes</Text>
-            <span>
-              <button
-                className='btn btn-small btn-rounded grey'
-                onClick={() => this.creationModal('folder', 'incomes', [], [ 'incomes' ])}
-              >
-                🖿 +
-              </button>
-              &nbsp;
-              <button
-                className='btn btn-small btn-rounded grey'
-                onClick={() => this.creationModal('account', 'incomes', [], [ 'incomes' ])}
-              >
-                📑 +
-              </button>
-            </span>
-          </Container>
-          <table className='table-card'>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th className='txtRight'>Balance</th>
-              </tr>
-            </thead>
-            <tbody>
-              <TreeViewer
-                accountType='incomes'
-                branch={this.state.tree.incomes}
-                creationModal={this.creationModal}
-                coa={this.props.coa['incomes']}
-              />
-              <tr>
-                <td className='txtRight' style={{ backgroundColor: '#eeeeee' }}>
-                  <b>Total</b>
-                </td>
-                <td className='txtRight' style={{ backgroundColor: '#eeeeee' }}>
-                  <span>৳</span> {this.props.coa.balance && this.props.coa.balance.incomes}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </Card>
-
-        {/* <Card className='p-top-5' vertical noPad expand>
-          <Container className='card-header flex-pos-between p-vrt-4 p-hor-6'>
-            <Text>Assets</Text>
-          </Container>
-          <table className='table-card'>
-            <thead>
-              <tr>
-                <th className='txtRight'>No.</th>
-                <th>Name</th>
-                <th className='txtRight'>Balance</th>
-              </tr>
-            </thead>
-            <tbody>
-              <CoaTableRows data={this.props.coa} accountOf={'assets'} />
-              <tr>
-                <td className='txtRight' colSpan='2'>
-                  <b>Total</b>
-                </td>
-                <td className='txtRight'>
-                  <span>৳</span>{' '}
-                  {this.props.coa.balance && this.props.coa.balance.assets}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <Container className='card-header flex-pos-between p-vrt-4 p-hor-6'>
-            <Text>Liabilities</Text>
-          </Container>
-          <table className='table-card'>
-            <thead>
-              <tr>
-                <th className='txtRight'>No.</th>
-                <th>Name</th>
-                <th className='txtRight'>Balance</th>
-              </tr>
-            </thead>
-            <tbody>
-              <CoaTableRows
-                data={this.props.coa}
-                accountOf={'liabilities'}
-                // modalOpen={() => this.toggleModal(true)}
-                // setJournalIndex={this.setJournalIndex}
-                // filterCoa={this.state.coa_filter}
-              />
-              <tr>
-                <td className='txtRight' colSpan='2'>
-                  <b>Total</b>
-                </td>
-                <td className='txtRight'>
-                  <span>৳</span>{' '}
-                  {this.props.coa.balance && this.props.coa.balance.liabilities}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <Container className='card-header flex-pos-between p-vrt-4 p-hor-6'>
-            <Text>Equity</Text>
-          </Container>
-          <table className='table-card'>
-            <thead>
-              <tr>
-                <th className='txtRight'>No.</th>
-                <th>Name</th>
-                <th className='txtRight'>Balance</th>
-              </tr>
-            </thead>
-            <tbody>
-              <CoaTableRows
-                data={this.props.coa}
-                accountOf={'equities'}
-                // modalOpen={() => this.toggleModal(true)}
-                // setJournalIndex={this.setJournalIndex}
-                // filterCoa={this.state.coa_filter}
-              />
-              <tr>
-                <td className='txtRight' colSpan='2'>
-                  <b>Total</b>
-                </td>
-                <td className='txtRight'>
-                  <span>৳</span>{' '}
-                  {this.props.coa.balance && this.props.coa.balance.equities}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <Container className='card-header flex-pos-between p-vrt-4 p-hor-6'>
-            <Text>Expenses</Text>
-          </Container>
-          <table className='table-card'>
-            <thead>
-              <tr>
-                <th className='txtRight'>No.</th>
-                <th>Name</th>
-                <th className='txtRight'>Balance</th>
-              </tr>
-            </thead>
-            <tbody>
-              <CoaTableRows
-                data={this.props.coa}
-                accountOf={'expenses'}
-                // modalOpen={() => this.toggleModal(true)}
-                // setJournalIndex={this.setJournalIndex}
-                // filterCoa={this.state.coa_filter}
-              />
-              <tr>
-                <td className='txtRight' colSpan='2'>
-                  <b>Total</b>
-                </td>
-                <td className='txtRight'>
-                  <span>৳</span>{' '}
-                  {this.props.coa.balance && this.props.coa.balance.expenses}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <Container className='card-header flex-pos-between p-vrt-4 p-hor-6'>
-            <Text>Incomes</Text>
-          </Container>
-          <table className='table-card'>
-            <thead>
-              <tr>
-                <th className='txtRight'>No.</th>
-                <th>Name</th>
-                <th className='txtRight'>Balance</th>
-              </tr>
-            </thead>
-            <tbody>
-              <CoaTableRows data={this.props.coa} accountOf={'incomes'} />
-              <tr>
-                <td className='txtRight' colSpan='2'>
-                  <b>Total</b>
-                </td>
-                <td className='txtRight'>
-                  <span>৳</span>{' '}
-                  {this.props.coa.balance && this.props.coa.balance.incomes}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </Card> */}
-
-        {/* <CoaManagerLegacy
-          isModalOpen={this.state.modal_account}
-          modalClose={() => this.toggleModal('modal_account', false)}
-          sendAccount={this.props.sendCoa}
-          company={this.props.company}
-        /> */}
-        <AccountModal
-          isModalOpen={this.state.modal_account}
-          modalClose={() => this.toggleModal('modal_account', false)}
-          addAccount={payload => this.addAccount(payload)}
-          name={this.state.account}
-          setName={name => this.setState({ account: name })}
-        />
-        <FolderModal
-          isModalOpen={this.state.modal_folder}
-          modalClose={() => this.toggleModal('modal_folder', false)}
-          addFolder={payload => this.addFolder(payload)}
-          name={this.state.folder}
-          setName={name => this.setState({ folder: name })}
-        />
-      </Container>
-    ) : (
-      <Placeholder type='table' />
+        ) : this.props.status.request ? (
+          <Placeholder type='table' />
+        ) : (
+          <b style={{ padding: '10rem', color: '#dd3838' }}>{this.props.status.message}</b>
+        )}
+        <ActivityBar>
+          {this.props.status.success ? (
+            <Fragment>
+              <section>
+                <div className='widget-header'>
+                  <i className='material-icons p-right'>filter</i> Filter
+                </div>
+              </section>
+            </Fragment>
+          ) : this.props.status.request ? (
+            <Placeholder type='table' />
+          ) : (
+            <b style={{ padding: '10rem', color: '#dd3838' }}>{this.props.status.message}</b>
+          )}
+        </ActivityBar>
+      </Fragment>
     )
   }
 }
 
 const mapStateToProps = state => ({
   company : state.main.company,
+  status  : state.coa.status,
   coa     : state.coa.coa,
 })
 const mapDispatchToProps = dispatch => ({

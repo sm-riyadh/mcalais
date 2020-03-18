@@ -4,7 +4,7 @@ import { MAIN, JOURNAL, COA, COMPANY } from './index'
  * Main
  */
 const updateMain = (name, payload) => ({
-  type: MAIN.SET,
+  type    : MAIN.SET,
   name,
   payload,
 })
@@ -13,29 +13,33 @@ const updateMain = (name, payload) => ({
  * JOURNAL
  */
 const fetchJournal = payload => ({
-  type: JOURNAL.FETCH._,
+  type    : JOURNAL.FETCH._,
   payload,
 })
 const fetchJournalMore = payload => ({
-  type: JOURNAL.FETCH.MORE,
+  type    : JOURNAL.FETCH.MORE,
   payload,
 })
 
 const sendJournal = payload => ({
-  type: JOURNAL.SEND,
+  type    : JOURNAL.SEND,
   payload,
 })
 
 const saveJournal = payload => ({
-  type: JOURNAL.REPLACE._,
+  type    : JOURNAL.REPLACE._,
+  payload,
+})
+const updateJournal = payload => ({
+  type    : JOURNAL.UPDATE.INPUT,
   payload,
 })
 const saveJournalOnTop = payload => ({
-  type: JOURNAL.ADD.TOP,
+  type    : JOURNAL.ADD.TOP,
   payload,
 })
 const saveJournalOnBottom = payload => ({
-  type: JOURNAL.ADD.BOTTOM,
+  type    : JOURNAL.ADD.BOTTOM,
   payload,
 })
 
@@ -43,24 +47,24 @@ const saveJournalOnBottom = payload => ({
  * COA
  */
 const fetchCoa = payload => ({
-  type: COA.FETCH._,
+  type    : COA.FETCH._,
   payload,
 })
 const fetchCoaList = payload => ({
-  type: COA.FETCH.LIST,
+  type    : COA.FETCH.LIST,
   payload,
 })
 const sendCoa = payload => ({
-  type: COA.SEND,
+  type    : COA.SEND,
   payload,
 })
 
 const saveCoa = payload => ({
-  type: COA.REPLACE._,
+  type    : COA.REPLACE._,
   payload,
 })
 const saveCoaList = payload => ({
-  type: COA.REPLACE.LIST,
+  type    : COA.REPLACE.LIST,
   payload,
 })
 
@@ -68,14 +72,14 @@ const saveCoaList = payload => ({
  * COMPANY
  */
 const fetchCompany = () => ({
-  type: COMPANY.FETCH,
+  type : COMPANY.FETCH,
 })
 const sendCompany = payload => ({
-  type: COMPANY.SEND,
+  type    : COMPANY.SEND,
   payload,
 })
 const saveCompany = payload => ({
-  type: COMPANY.REPLACE,
+  type    : COMPANY.REPLACE,
   payload,
 })
 
@@ -87,6 +91,7 @@ export {
   fetchJournalMore,
   sendJournal,
   saveJournal,
+  updateJournal,
   saveJournalOnTop,
   saveJournalOnBottom,
   // COA

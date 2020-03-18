@@ -8,76 +8,66 @@ import Company from './company'
 
 const CoaSchema = new mongoose.Schema(
   {
-    company: {
-      type: String,
-      required: true
+    company      : {
+      type     : String,
+      required : true,
     },
-    name: {
-      type: String,
-      trim: true,
-      required: true
+    name         : {
+      type     : String,
+      trim     : true,
+      required : true,
     },
-    type: {
-      type: String,
-      required: true
+    type         : {
+      type     : String,
+      required : true,
     },
-    code: {
-      type: Number,
-      min: 100000,
-      max: 999999,
-      required: true
+    code         : {
+      type     : Number,
+      min      : 100000,
+      max      : 999999,
+      required : true,
     },
-    balance: {
-      type: Number,
-      default: 0,
-      required: true
+    balance      : {
+      type     : Number,
+      default  : 0,
+      required : true,
     },
-    path: [
+    path         : [
       {
-        type: String
-      }
+        type : String,
+      },
     ],
-    intercompany: {
-      to_company: {
-        type: String,
-        trim: true,
-        required: false
+    intercompany : {
+      to_company : {
+        type     : String,
+        trim     : true,
+        required : false,
       },
-      deposit: {
-        type: Number,
-        min: 100000,
-        max: 999999,
-        required: false
+      deposit    : {
+        type     : Number,
+        min      : 100000,
+        max      : 999999,
+        required : false,
       },
-      due: {
-        type: Number,
-        min: 100000,
-        max: 999999,
-        required: false
-      }
+      due        : {
+        type     : Number,
+        min      : 100000,
+        max      : 999999,
+        required : false,
+      },
     },
-    transaction: [
+    transaction  : [
       {
-        journal_id: mongoose.Schema.ObjectId
-      }
-    ]
+        journal_id : mongoose.Schema.ObjectId,
+      },
+    ],
   },
   { collection: 'coa' }
 )
-CoaSchema.methods.toJSON = function () {
-  const {
-    _id,
-    company,
-    name,
-    type,
-    code,
-    path,
-    balance,
-    intercompany,
-    transaction
-  } = this.toObject()
+CoaSchema.methods.toJSON = function() {
+  const { _id, company, name, type, code, path, balance, intercompany, transaction } = this.toObject()
   return {
-    id: _id,
+    id           : _id,
     company,
     name,
     type,
@@ -85,22 +75,20 @@ CoaSchema.methods.toJSON = function () {
     path,
     balance,
     intercompany,
-    transaction
+    transaction,
   }
 }
 
 CoaSchema.statics.fetchOneByCode = code =>
   Coa.findOne({
-    code
+    code,
   })
 
-CoaSchema.statics.fetchList = company =>
-  Coa.find({ company, transaction: { $exists: true, $ne: [] } })
+CoaSchema.statics.fetchList = company => Coa.find({ company, transaction: { $exists: true, $ne: [] } })
 
 CoaSchema.statics.fetchAll = company => Coa.find({ company })
 
-CoaSchema.statics.checkInterCompany = (company, code) =>
-  Coa.find({ company, code, intercompany: { $exists: true } })
+CoaSchema.statics.checkInterCompany = (company, code) => Coa.find({ company, code, intercompany: { $exists: true } })
 
 CoaSchema.statics.create = payload => Coa(payload).save()
 
@@ -108,9 +96,9 @@ CoaSchema.statics.insertPreset = payload =>
   Coa.findOneAndUpdate(
     { id: payload.coa_id },
     {
-      $push: {
-        preset: { preset_id: payload.preset_id }
-      }
+      $push : {
+        preset : { preset_id: payload.preset_id },
+      },
     }
   )
 
@@ -119,6 +107,7 @@ const liabilities = type => type > 200000 && type < 300000
 const equities = type => type > 300000 && type < 400000
 const expenses = type => type > 400000 && type < 500000
 const incomes = type => type > 500000 && type < 600000
+
 const typeFinder = code => {
   switch (+('' + code)[0]) {
     case 1:
@@ -133,58 +122,38 @@ const typeFinder = code => {
       return 'incomes'
   }
 }
-CoaSchema.statics.addJournal = async (
-  company,
-  journalID,
-  credit,
-  debit,
-  amount
-) => {
+CoaSchema.statics.addJournal = async (company, journalID, credit, debit, amount) => {
   await Coa.findOneAndUpdate(
     { company, code: credit },
     {
-      $push: {
-        transaction: { journal_id: journalID }
-      }
+      $push : {
+        transaction : { journal_id: journalID },
+      },
     }
   )
   await Coa.update(
     { company, code: debit },
     {
-      $push: {
-        transaction: { journal_id: journalID }
-      }
+      $push : {
+        transaction : { journal_id: journalID },
+      },
     }
   )
 
   if (
     (assets(debit) && liabilities(credit)) ||
     (assets(debit) && incomes(credit)) ||
-    (assets(debit) && equities(credit))
+    (assets(debit) && equities(credit)) ||
+    (expenses(debit) && liabilities(credit))
   ) {
-    await Coa.findOneAndUpdate(
-      { company, code: credit },
-      { $inc: { balance: amount } }
-    )
-    await Coa.findOneAndUpdate(
-      { company, code: debit },
-      { $inc: { balance: amount } }
-    )
+    await Coa.findOneAndUpdate({ company, code: credit }, { $inc: { balance: amount } })
+    await Coa.findOneAndUpdate({ company, code: debit }, { $inc: { balance: amount } })
 
     await Company.updateAccountBalance(company, typeFinder(credit), +amount)
     await Company.updateAccountBalance(company, typeFinder(debit), +amount)
-  } else if (
-    (liabilities(debit) && assets(credit)) ||
-    (equities(debit) && assets(credit))
-  ) {
-    await Coa.findOneAndUpdate(
-      { company, code: credit },
-      { $inc: { balance: -amount } }
-    )
-    await Coa.findOneAndUpdate(
-      { company, code: debit },
-      { $inc: { balance: -amount } }
-    )
+  } else if ((liabilities(debit) && assets(credit)) || (equities(debit) && assets(credit))) {
+    await Coa.findOneAndUpdate({ company, code: credit }, { $inc: { balance: -amount } })
+    await Coa.findOneAndUpdate({ company, code: debit }, { $inc: { balance: -amount } })
 
     await Company.updateAccountBalance(company, typeFinder(credit), -amount)
     await Company.updateAccountBalance(company, typeFinder(debit), -amount)
@@ -195,14 +164,8 @@ CoaSchema.statics.addJournal = async (
     (assets(debit) && incomes(credit)) ||
     (incomes(debit) && assets(credit))
   ) {
-    await Coa.findOneAndUpdate(
-      { company, code: credit },
-      { $inc: { balance: -amount } }
-    )
-    await Coa.findOneAndUpdate(
-      { company, code: debit },
-      { $inc: { balance: +amount } }
-    )
+    await Coa.findOneAndUpdate({ company, code: credit }, { $inc: { balance: -amount } })
+    await Coa.findOneAndUpdate({ company, code: debit }, { $inc: { balance: +amount } })
 
     await Company.updateAccountBalance(company, typeFinder(credit), -amount)
     await Company.updateAccountBalance(company, typeFinder(debit), +amount)

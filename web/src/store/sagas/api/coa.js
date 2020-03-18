@@ -7,16 +7,16 @@ const fetchCoa = async payload => {
     const { company } = payload
 
     const { data } = await Axios({
-      method: 'get',
-      url: '/coa',
-      params: {
+      method : 'get',
+      url    : '/coa',
+      params : {
         company,
       },
     })
 
-    return data
+    return { data }
   } catch (err) {
-    return { ERROR: err }
+    return { error: err }
   }
 }
 const fetchCoaList = async payload => {
@@ -26,16 +26,16 @@ const fetchCoaList = async payload => {
     const { company } = payload
 
     const { data } = await Axios({
-      method: 'get',
-      url: '/coa/list',
-      params: {
+      method : 'get',
+      url    : '/coa/list',
+      params : {
         company,
       },
     })
 
-    return data
+    return { data }
   } catch (err) {
-    return { ERROR: err }
+    return { error: err }
   }
 }
 const sendCoa = async payload => {
@@ -45,9 +45,9 @@ const sendCoa = async payload => {
     const { company, name, path, type } = payload
 
     const { data } = await Axios({
-      method: 'post',
-      url: '/coa',
-      data: {
+      method : 'post',
+      url    : '/coa',
+      data   : {
         company,
         name,
         type,
@@ -55,9 +55,9 @@ const sendCoa = async payload => {
       },
     })
 
-    return data
+    return { data }
   } catch (err) {
-    return { ERROR: err }
+    return { error: err }
   }
 }
 

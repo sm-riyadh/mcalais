@@ -41,7 +41,9 @@ table.table-card {
       padding: 0.8rem 0.5rem;
       text-align: left;
       border: 0 solid #dddddd;
-      border-width: 0 0.1rem;
+      border-color: #d6d6d6 #eeeeee;
+      border-width: 0.1rem 0.1rem;
+      vertical-align: top;
 
       &:first-child {
         border-left-width: 0;

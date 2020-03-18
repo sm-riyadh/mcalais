@@ -6,18 +6,28 @@ import { saveCompany } from '../actions'
 
 function* HandleFetchCompany() {
   try {
-    const company = yield call(API.fetchCompany)
-    yield put(saveCompany(company))
+    yield put({ type: COMPANY.STATUS.REQUEST })
+    const { data, error } = yield call(API.fetchCompany)
+
+    if (!error) {
+      yield put(saveCompany(data))
+      yield put({ type: COMPANY.STATUS.SUCCESS })
+    } else throw error
   } catch (err) {
-    yield put({ type: 'COMPANY.SAVE', message: err.message })
+    yield put({ type: COMPANY.STATUS.FAILED, payload: err.toString() })
   }
 }
 function* HandleSendCompany({ payload }) {
   try {
-    const company = yield call(API.sendCompany, [payload])
-    yield put(saveCompany(company))
+    yield put({ type: COMPANY.STATUS.REQUEST })
+    const { data, error } = yield call(API.sendCompany, [ payload ])
+
+    if (!error) {
+      yield put(saveCompany(data))
+      yield put({ type: COMPANY.STATUS.SUCCESS })
+    } else throw error
   } catch (err) {
-    yield put({ type: 'COMPANY.SAVE', message: err.message })
+    yield put({ type: COMPANY.STATUS.FAILED, payload: err.toString() })
   }
 }
 

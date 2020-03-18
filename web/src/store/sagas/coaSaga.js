@@ -6,26 +6,41 @@ import { saveCoa, saveCoaList } from '../actions'
 
 function* handleCoaFetch({ payload }) {
   try {
-    const coa = yield call(API.fetchCoa, [payload])
-    yield put(saveCoa(coa))
+    yield put({ type: COA.STATUS.REQUEST })
+    const { data, error } = yield call(API.fetchCoa, [ payload ])
+
+    if (!error) {
+      yield put(saveCoa(data))
+      yield put({ type: COA.STATUS.SUCCESS })
+    } else throw error
   } catch (err) {
-    yield put({ type: 'COA.SAVE', message: err.message })
+    yield put({ type: COA.STATUS.FAILED, payload: err.toString() })
   }
 }
 function* handleCoaListFetch({ payload }) {
   try {
-    const coa = yield call(API.fetchCoaList, [payload])
-    yield put(saveCoaList(coa))
+    yield put({ type: COA.STATUS.REQUEST })
+    const { data, error } = yield call(API.fetchCoaList, [ payload ])
+
+    if (!error) {
+      yield put(saveCoaList(data))
+      yield put({ type: COA.STATUS.SUCCESS })
+    } else throw error
   } catch (err) {
-    yield put({ type: 'COA.SAVE', message: err.message })
+    yield put({ type: COA.STATUS.FAILED, payload: err.toString() })
   }
 }
 function* handleCoaSend({ payload }) {
   try {
-    const coa = yield call(API.sendCoa, [payload])
-    yield put(saveCoa(coa))
+    yield put({ type: COA.STATUS.REQUEST })
+    const { data, error } = yield call(API.sendCoa, [ payload ])
+
+    if (!error) {
+      yield put(saveCoa(data))
+      yield put({ type: COA.STATUS.SUCCESS })
+    } else throw error
   } catch (err) {
-    yield put({ type: 'COA.SAVE', message: err.message })
+    yield put({ type: COA.STATUS.FAILED, payload: err.toString() })
   }
 }
 function* watchCoa() {

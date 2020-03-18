@@ -7,9 +7,9 @@ const fetchJournal = async payload => {
     const { company, size, page, coa, start_date, end_date } = payload
 
     const { data } = await Axios({
-      method: 'get',
-      url: '/journal',
-      params: {
+      method : 'get',
+      url    : '/journal',
+      params : {
         company,
         size,
         page,
@@ -19,33 +19,36 @@ const fetchJournal = async payload => {
       },
     })
 
-    return data
+    return { data }
   } catch (err) {
-    return { ERROR: err }
+    return { error: err }
   }
 }
 const sendJournal = async payload => {
   try {
     if (payload[0]) payload = payload[0]
 
-    const { company, credit, debit, description, amount, comment } = payload
+    const { date, company, credit, credit_note, debit, debit_note, description, amount, comment } = payload
 
     const { data } = await Axios({
-      method: 'post',
-      url: '/journal',
-      data: {
+      method : 'post',
+      url    : '/journal',
+      data   : {
+        date,
         company,
         credit,
+        credit_note,
         debit,
+        debit_note,
         description,
         amount,
         comment,
       },
     })
 
-    return data
+    return { data }
   } catch (err) {
-    return { ERROR: err }
+    return { error: err }
   }
 }
 export default { fetchJournal, sendJournal }

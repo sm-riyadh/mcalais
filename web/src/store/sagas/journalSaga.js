@@ -1,4 +1,4 @@
-import { call, put, takeLatest } from 'redux-saga/effects'
+import { call, put, putResolve, takeLatest } from 'redux-saga/effects'
 import API from './api/journal'
 
 import { JOURNAL } from '../index'
@@ -6,26 +6,42 @@ import { saveJournal, saveJournalOnBottom, saveJournalOnTop } from '../actions'
 
 function* HandleFetchJournal({ payload }) {
   try {
-    const journal = yield call(API.fetchJournal, [payload])
-    yield put(saveJournal(journal))
+    yield put({ type: JOURNAL.STATUS.REQUEST })
+    const { data, error } = yield call(API.fetchJournal, [ payload ])
+
+    if (!error) {
+      yield put(saveJournal(data))
+      yield put({ type: JOURNAL.STATUS.SUCCESS })
+    } else throw error
   } catch (err) {
-    yield put({ type: 'JOURNAL.SAVE', message: err.message })
+    yield put({ type: JOURNAL.STATUS.FAILED, payload: err.toString() })
   }
 }
 function* HandleFetchJournalMore({ payload }) {
   try {
-    const journal = yield call(API.fetchJournal, [payload])
-    yield put(saveJournalOnBottom(journal))
+    yield put({ type: JOURNAL.STATUS.REQUEST })
+    const { data, error } = yield call(API.fetchJournal, [ payload ])
+
+    if (!error) {
+      yield put(saveJournalOnBottom(data))
+      yield put({ type: JOURNAL.STATUS.SUCCESS })
+    } else throw error
   } catch (err) {
-    yield put({ type: 'JOURNAL.SAVE', message: err.message })
+    yield put({ type: JOURNAL.STATUS.FAILED, payload: err.toString() })
   }
 }
 function* HandleSendJournal({ payload }) {
   try {
-    const journal = yield call(API.sendJournal, [payload])
-    yield put(saveJournalOnTop([journal]))
+    yield put({ type: JOURNAL.STATUS.REQUEST })
+    const { data, error } = yield call(API.sendJournal, [ payload ])
+
+    if (!error) {
+      yield put(saveJournalOnTop(data))
+      yield put({ type: JOURNAL.STATUS.SUCCESS })
+    } else throw error
   } catch (err) {
-    yield put({ type: 'JOURNAL.SAVE', message: err.message })
+    console.log(err)
+    yield put({ type: JOURNAL.STATUS.FAILED, payload: err.toString() })
   }
 }
 

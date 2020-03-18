@@ -2,68 +2,68 @@ import mongoose from 'mongoose'
 import Coa from './coa'
 import { subDays, endOfDay } from 'date-fns'
 
-const ObjectIdDate = date =>
-  mongoose.Types.ObjectId(
-    Math.floor(date / 1000).toString(16) + '0000000000000000'
-  )
+const ObjectIdDate = date => mongoose.Types.ObjectId(Math.floor(date / 1000).toString(16) + '0000000000000000')
 
 const JournalSchema = new mongoose.Schema({
-  company: {
-    type: String,
-    required: true
+  date        : {
+    type     : Date,
+    default  : Date.now,
+    required : true,
   },
-  debit: {
-    code: {
-      type: Number,
-      min: 100001,
-      max: 999999,
-      required: true
+  company     : {
+    type     : String,
+    required : true,
+  },
+  debit       : {
+    code : {
+      type     : Number,
+      min      : 100001,
+      max      : 999999,
+      required : true,
     },
-    name: {
-      type: String,
-      trim: true,
-      required: true
-    }
-  },
-  credit: {
-    code: {
-      type: Number,
-      min: 100001,
-      max: 999999,
-      required: true
+    name : {
+      type     : String,
+      trim     : true,
+      required : true,
     },
-    name: {
-      type: String,
-      trim: true,
-      required: true
-    }
+    note : {
+      type : String,
+    },
   },
-  amount: {
-    type: Number,
-    min: 1,
-    required: true
+  credit      : {
+    code : {
+      type     : Number,
+      min      : 100001,
+      max      : 999999,
+      required : true,
+    },
+    name : {
+      type     : String,
+      trim     : true,
+      required : true,
+    },
+    note : {
+      type : String,
+    },
   },
-  description: {
-    type: String,
-    trim: true
+  amount      : {
+    type     : Number,
+    min      : 1,
+    required : true,
   },
-  comment: {
-    type: String,
-    trim: true
-  }
+  description : {
+    type : String,
+    trim : true,
+  },
+  comment     : {
+    type : String,
+    trim : true,
+  },
 })
-JournalSchema.methods.toJSON = function () {
-  const {
-    _id,
-    company,
-    credit,
-    debit,
-    description,
-    amount,
-    comment
-  } = this.toObject()
-  const date = _id.getTimestamp()
-  return { id: _id, company, date, credit, debit, description, amount, comment }
+JournalSchema.methods.toJSON = function() {
+  const { _id, date, company, credit, debit, description, amount, comment } = this.toObject()
+  const entry_date = _id.getTimestamp()
+  return { id: _id, date, company, entry_date, credit, debit, description, amount, comment }
 }
 // FETCH
 JournalSchema.statics.fetch = (
@@ -71,7 +71,7 @@ JournalSchema.statics.fetch = (
   coa,
   size = 100,
   page = 0,
-  startDate = subDays(new Date(), 50),
+  startDate = subDays(new Date(), 2000),
   endDate = endOfDay(new Date())
 ) => {
   if (startDate) startDate = new Date(startDate)
@@ -80,14 +80,26 @@ JournalSchema.statics.fetch = (
   if (!coa) {
     const journal = Journal.find({
       company,
-      _id: {
-        $gte: ObjectIdDate(startDate),
-        $lt: ObjectIdDate(endDate)
-      }
+      date    : {
+        $gte : startDate.getTime(),
+        $lt  : endDate.getTime(),
+      },
     })
       .skip(+size * +page)
       .limit(+size)
-      .sort({ _id: -1 })
+      .sort({ date: -1 })
+    // .sort({ _id: -1 })
+    // const journal = Journal.find({
+    //   company,
+    //   _id     : {
+    //     $gte : ObjectIdDate(startDate),
+    //     $lt  : ObjectIdDate(endDate),
+    //   },
+    // })
+    //   .skip(+size * +page)
+    //   .limit(+size)
+    //   .sort({ date: -1 })
+    // // .sort({ _id: -1 })
 
     return journal
   } else {
@@ -98,16 +110,13 @@ JournalSchema.statics.fetch = (
     let journalID = transaction.map(({ journalId }) => {
       if (journalId >= ObjectIdDate(startDate)) return journalId
 
-      if (
-        journalId >= ObjectIdDate(startDate) &&
-        journalId <= ObjectIdDate(endDate)
-      ) { return journalId }
+      if (journalId >= ObjectIdDate(startDate) && journalId <= ObjectIdDate(endDate)) {
+        return journalId
+      }
     })
     journalID = journalID.filter(id => id != null)
 
-    const journal = Promise.all(
-      journalID.map(id => Journal.fetchOne(id))
-    )
+    const journal = Promise.all(journalID.map(id => Journal.fetchOne(id)))
 
     return journal
   }
@@ -116,42 +125,34 @@ JournalSchema.statics.fetchOne = id => Journal.findById(id)
 
 // TODO: Please change out we store credit. just take the code not the name
 JournalSchema.statics.create = async payload => {
-  const {
-    _id,
-    company,
-    credit,
-    debit,
-    description,
-    amount,
-    comment
-  } = await Journal(payload).save()
+  const { _id, date, company, credit, debit, description, amount, comment } = await Journal(payload).save()
 
   await Coa.addJournal(company, _id, credit.code, debit.code, amount)
 
   const account = await Coa.checkInterCompany(company, debit.code)
 
   if (account.length !== 0) {
-    const { toCompany, deposit, due } = account[0].intercompany
+    const { to_company, deposit, due } = account[0].intercompany
 
-    interCompanyJournalCreator(toCompany, deposit, due, payload)
+    interCompanyJournalCreator(to_company, deposit, due, payload)
   }
 
-  return { _id, company, credit, debit, description, amount, comment }
+  return { _id, date, company, credit, debit, description, amount, comment }
 }
 const interCompanyJournalCreator = async (company, deposit, due, account) => {
   const { _id, credit, debit, amount } = await Journal({
     company,
-    credit: {
-      name: `${due}`,
-      code: due
+    credit      : {
+      name : `${due}`,
+      code : due,
     },
-    debit: {
-      name: `${deposit}`,
-      code: deposit
+    debit       : {
+      name : `${deposit}`,
+      code : deposit,
     },
-    description: `From: ${account.credit.name}, to: ${account.debit.name}`,
-    amount: account.amount,
-    comment: '...'
+    description : `From: ${account.credit.name}, to: ${account.debit.name}`,
+    amount      : account.amount,
+    comment     : '...',
   }).save()
 
   await Coa.addJournal(company, _id, credit.code, debit.code, amount)
@@ -163,17 +164,17 @@ JournalSchema.statics.remove = id => {
   Coa.update(
     { code: journal.destination },
     {
-      $pull: {
-        transaction: { journalId: id }
-      }
+      $pull : {
+        transaction : { journalId: id },
+      },
     }
   )
   Coa.update(
     { code: journal.source },
     {
-      $pull: {
-        transaction: { journalId: id }
-      }
+      $pull : {
+        transaction : { journalId: id },
+      },
     }
   )
   Journal.findByIdAndRemove(id)
