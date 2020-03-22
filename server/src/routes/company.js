@@ -15,7 +15,7 @@ app.get(`/${url}`, async (req, res) => {
 
     return res.send(company)
   } catch (err) {
-    return res.send('Error: ' + err)
+    return res.send('error: ' + err)
   }
 })
 
@@ -160,7 +160,7 @@ app.post(`/${url}`, async (req, res) => {
 
     return res.send(company)
   } catch (err) {
-    return res.send('Error: ' + err)
+    return res.send('error: ' + err)
   }
 })
 

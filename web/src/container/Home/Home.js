@@ -30,7 +30,7 @@ export class Home extends Component {
       () => {}
     )
     KeyboardJS.bind(
-      'backspace',
+      'ctrl + backspace',
       e => {
         this.props.history.goBack()
       },
@@ -68,29 +68,15 @@ export class Home extends Component {
           <SideBar collapsed={this.props.collapsed}>
             <section className='navbar'>
               <NavBar title='Dashboard' path='/home' icon='poll' collapsed={this.props.collapsed} />
-              <NavBar title='Journal' path='/journal' icon='class' collapsed={this.props.collapsed} />
-              <NavBar title='Chart of Accounts' path='/coa' icon='account_tree' collapsed={this.props.collapsed} />
-              <NavBar title='Company' path='/company' icon='storage' collapsed={this.props.collapsed} />
+              <NavBar title='Book Keeping' path='/journal' icon='class' collapsed={this.props.collapsed} />
+              <NavBar title='Inventory' path='/inventory' icon='storage' collapsed={this.props.collapsed} />
+              <NavBar title='Employee' path='/employee' icon='supervisor_account' collapsed={this.props.collapsed} />
+              <NavBar title='Report' path='/report' icon='assignment' collapsed={this.props.collapsed} />
             </section>
 
-            <section className='widget-footer'>
-              hello
-              {/* <ReactToPrint
-              trigger={() => (
-                <button className='btn m-bottom-2'>
-                  Print This <i className='material-icons'>print</i>
-                </button>
-              )}
-              content={() => this.testRef}
-            />
-            <button
-              className='btn primary'
-              onClick={() => {
-                this.props.toggleModal('modal_journal_entry', true)
-              }}
-            >
-              New Voucher <i className='material-icons'>add</i>
-            </button> */}
+            <section className='navbar widget-footer'>
+              <NavBar title='Chart of Accounts' path='/coa' icon='account_tree' collapsed={this.props.collapsed} />
+              <NavBar title='Company' path='/company' icon='storage' collapsed={this.props.collapsed} />
             </section>
           </SideBar>
 

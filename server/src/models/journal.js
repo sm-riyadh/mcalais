@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 import Coa from './coa'
-import { subDays, endOfDay } from 'date-fns'
+import { subDays, startOfDay, endOfDay } from 'date-fns'
 
 const ObjectIdDate = date => mongoose.Types.ObjectId(Math.floor(date / 1000).toString(16) + '0000000000000000')
 
@@ -68,18 +68,67 @@ JournalSchema.methods.toJSON = function() {
 // FETCH
 JournalSchema.statics.fetch = (
   company,
+  type = 'journal',
   coa,
-  size = 100,
+  size = 1000,
   page = 0,
   startDate = subDays(new Date(), 2000),
-  endDate = endOfDay(new Date())
+  endDate = new Date()
 ) => {
-  if (startDate) startDate = new Date(startDate)
-  if (endDate) endDate = new Date(endDate)
+  if (startDate) startDate = startOfDay(new Date(startDate))
+  if (endDate) endDate = endOfDay(new Date(endDate))
+
+  let lowerRangeCode, higherRangeCode
+
+  switch (type) {
+    case 'journal': {
+      lowerRangeCode = 100000
+      higherRangeCode = 500000
+      break
+    }
+    case 'liabilities': {
+      lowerRangeCode = 200000
+      higherRangeCode = 300000
+      break
+    }
+    case 'equities': {
+      lowerRangeCode = 300000
+      higherRangeCode = 400000
+      break
+    }
+    case 'expenses': {
+      lowerRangeCode = 400000
+      higherRangeCode = 500000
+      break
+    }
+    case 'incomes': {
+      lowerRangeCode = 500000
+      higherRangeCode = 600000
+      break
+    }
+    default: {
+      lowerRangeCode = 100000
+      higherRangeCode = 500000
+    }
+  }
 
   if (!coa) {
     const journal = Journal.find({
       company,
+      $or     : [
+        {
+          'debit.code' : {
+            $gte : lowerRangeCode,
+            $lt  : higherRangeCode,
+          },
+        },
+        {
+          'credit.code' : {
+            $gte : lowerRangeCode,
+            $lt  : higherRangeCode,
+          },
+        },
+      ],
       date    : {
         $gte : startDate.getTime(),
         $lt  : endDate.getTime(),
@@ -137,7 +186,7 @@ JournalSchema.statics.create = async payload => {
     interCompanyJournalCreator(to_company, deposit, due, payload)
   }
 
-  return { _id, date, company, credit, debit, description, amount, comment }
+  return { id: _id, date, company, credit, debit, description, amount, comment }
 }
 const interCompanyJournalCreator = async (company, deposit, due, account) => {
   const { _id, credit, debit, amount } = await Journal({

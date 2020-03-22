@@ -10,19 +10,19 @@ const app = Router()
 // Route
 const url = 'api/journal'
 
-app.get(`/${url}`, async (req, res) => {
+app.get(`/${url}`, async (req, res, next) => {
   try {
-    const { company, size, page, coa, startDate, endDate } = req.query
+    const { company, size, page, coa, type, start_date, end_date } = req.query
 
     if (!coa) {
-      const journal = await Journal.fetch(company, null, size, page, startDate, endDate)
+      const journal = await Journal.fetch(company, type, null, size, page, start_date, end_date)
       return res.send(journal)
     } else {
-      const journal = await Journal.fetch(company, coa, size, page, startDate, endDate)
+      const journal = await Journal.fetch(company, type, coa, size, page, start_date, end_date)
       return res.send(journal)
     }
   } catch (err) {
-    return res.send('Error: ' + err)
+    return next(err)
   }
 })
 
@@ -37,7 +37,7 @@ app.post(`/${url}`, async (req, res) => {
 
   try {
     if (!await Coa.isExist(credit) || !await Coa.isExist(debit)) {
-      throw Error('Invilid coa code')
+      throw error('Invilid coa code')
     }
 
     const debitCoa = await Coa.fetchOneByCode(debit)
@@ -45,7 +45,6 @@ app.post(`/${url}`, async (req, res) => {
 
     // if ((liabilities(debit) && assets(credit)) || (equities(debit) && assets(credit))) {
     //   if (amount > debitCoa.balance && amount > creditCoa.balance) {
-    //     console.log('Balance Low')
 
     //     return res.send()
     //   }
@@ -56,20 +55,15 @@ app.post(`/${url}`, async (req, res) => {
     //   (assets(debit) && expenses(credit))
     // ) {
     //   if (debit.balance - amount < 0) {
-    //     console.log('Can not go minus')
 
     //     return res.send()
     //   }
     // }
 
     if (incomes(debit) && assets(credit)) {
-      console.log('You can not return income silly')
-
       return res.send()
     }
     if (assets(debit) && expenses(credit)) {
-      console.log('You can not take from expenses silly')
-
       return res.send()
     }
 
@@ -93,7 +87,7 @@ app.post(`/${url}`, async (req, res) => {
 
     return res.send(newJournal)
   } catch (err) {
-    return res.send('Error: ' + err)
+    return res.send('error: ' + err)
   }
 })
 

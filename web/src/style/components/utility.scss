@@ -309,6 +309,39 @@
 
 // Margin
 .m- {
+  &none {
+    margin: 0rem !important;
+  }
+  &0 {
+    margin: 0.5rem !important;
+  }
+  &1 {
+    margin: 0.8rem !important;
+  }
+  &2 {
+    margin: 1rem !important;
+  }
+  &3 {
+    margin: 1.5rem !important;
+  }
+  &4 {
+    margin: 2rem !important;
+  }
+  &5 {
+    margin: 2.5rem !important;
+  }
+  &6 {
+    margin: 3rem !important;
+  }
+  &7 {
+    margin: 3.5rem !important;
+  }
+  &8 {
+    margin: 4rem !important;
+  }
+  &9 {
+    margin: 5rem !important;
+  }
   &hor {
     & {
       margin-left: 0.5rem !important;

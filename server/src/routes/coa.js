@@ -34,7 +34,7 @@ app.get(`/${url}`, async (req, res) => {
 
     return res.send(sortedCoa)
   } catch (err) {
-    return res.send('Error: ' + err)
+    return res.send('error: ' + err)
   }
 })
 app.get(`/${url}/list`, async (req, res) => {
@@ -45,7 +45,7 @@ app.get(`/${url}/list`, async (req, res) => {
 
     return res.send(coaList)
   } catch (err) {
-    return res.send('Error: ' + err)
+    return res.send('error: ' + err)
   }
 })
 
@@ -100,7 +100,7 @@ app.post(`/${url}`, async (req, res) => {
 
     return res.send(sortedCoa)
   } catch (err) {
-    return res.send('Error: ' + err)
+    return res.send('error: ' + err)
   }
 })
 // Delete
@@ -113,7 +113,7 @@ app.delete(`/${url}`, async (req, res) => {
     await Coa.remove(id)
     return res.send()
   } catch (err) {
-    return res.send('Error: ' + err)
+    return res.send('error: ' + err)
   }
 })
 

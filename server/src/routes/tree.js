@@ -15,7 +15,7 @@ app.get(`/${url}`, async (req, res) => {
 
     return res.send(tree)
   } catch (err) {
-    return res.send('Error: ' + err)
+    return res.send('error: ' + err)
   }
 })
 
@@ -26,7 +26,7 @@ app.post(`/${url}`, async (req, res) => {
 
     return res.send(updatedTree)
   } catch (err) {
-    return res.send('Error: ' + err)
+    return res.send('error: ' + err)
   }
 })
 

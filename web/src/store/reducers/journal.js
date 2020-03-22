@@ -1,7 +1,7 @@
 import { JOURNAL } from '..'
 
 const initialState = {
-  journal : [],
+  journal : '',
   input   : {
     date          : '',
     debit         : '',
