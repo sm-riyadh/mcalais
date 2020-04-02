@@ -6,7 +6,7 @@ import Company from './company'
 //     Math.floor(date / 1000).toString(16) + '0000000000000000'
 //   )
 
-const CoaSchema = new mongoose.Schema(
+const AccountSchema = new mongoose.Schema(
   {
     company      : {
       type     : String,
@@ -56,15 +56,25 @@ const CoaSchema = new mongoose.Schema(
         required : false,
       },
     },
+    canDisable   : {
+      type     : Boolean,
+      default  : true,
+      required : true,
+    },
+    isDisabled   : {
+      type     : Boolean,
+      default  : false,
+      required : true,
+    },
     transaction  : [
       {
         journal_id : mongoose.Schema.ObjectId,
       },
     ],
   },
-  { collection: 'coa' }
+  { collection: 'account' }
 )
-CoaSchema.methods.toJSON = function() {
+AccountSchema.methods.toJSON = function() {
   const { _id, company, name, type, code, path, balance, intercompany, transaction } = this.toObject()
   return {
     id           : _id,
@@ -79,22 +89,24 @@ CoaSchema.methods.toJSON = function() {
   }
 }
 
-CoaSchema.statics.fetchOneByCode = code =>
-  Coa.findOne({
+AccountSchema.statics.fetch = (company, code) =>
+  Account.findOne({
+    company,
     code,
   })
 
-CoaSchema.statics.fetchList = company => Coa.find({ company, transaction: { $exists: true, $ne: [] } })
+AccountSchema.statics.fetchList = company => Account.find({ company, transaction: { $exists: true, $ne: [] } })
 
-CoaSchema.statics.fetchAll = company => Coa.find({ company })
+AccountSchema.statics.fetchAll = company => Account.find({ company })
 
-CoaSchema.statics.checkInterCompany = (company, code) => Coa.find({ company, code, intercompany: { $exists: true } })
+AccountSchema.statics.checkInterCompany = (company, code) =>
+  Account.find({ company, code, intercompany: { $exists: true } })
 
-CoaSchema.statics.create = payload => Coa(payload).save()
+AccountSchema.statics.create = payload => Account(payload).save()
 
-CoaSchema.statics.insertPreset = payload =>
-  Coa.findOneAndUpdate(
-    { id: payload.coa_id },
+AccountSchema.statics.insertPreset = payload =>
+  Account.findOneAndUpdate(
+    { id: payload.account_id },
     {
       $push : {
         preset : { preset_id: payload.preset_id },
@@ -122,8 +134,8 @@ const typeFinder = code => {
       return 'incomes'
   }
 }
-CoaSchema.statics.addJournal = async (company, journalID, credit, debit, amount) => {
-  await Coa.findOneAndUpdate(
+AccountSchema.statics.addJournal = async (company, journalID, credit, debit, amount) => {
+  await Account.findOneAndUpdate(
     { company, code: credit },
     {
       $push : {
@@ -131,7 +143,7 @@ CoaSchema.statics.addJournal = async (company, journalID, credit, debit, amount)
       },
     }
   )
-  await Coa.update(
+  await Account.update(
     { company, code: debit },
     {
       $push : {
@@ -146,14 +158,14 @@ CoaSchema.statics.addJournal = async (company, journalID, credit, debit, amount)
     (assets(debit) && equities(credit)) ||
     (expenses(debit) && liabilities(credit))
   ) {
-    await Coa.findOneAndUpdate({ company, code: credit }, { $inc: { balance: amount } })
-    await Coa.findOneAndUpdate({ company, code: debit }, { $inc: { balance: amount } })
+    await Account.findOneAndUpdate({ company, code: credit }, { $inc: { balance: amount } })
+    await Account.findOneAndUpdate({ company, code: debit }, { $inc: { balance: amount } })
 
     await Company.updateAccountBalance(company, typeFinder(credit), +amount)
     await Company.updateAccountBalance(company, typeFinder(debit), +amount)
   } else if ((liabilities(debit) && assets(credit)) || (equities(debit) && assets(credit))) {
-    await Coa.findOneAndUpdate({ company, code: credit }, { $inc: { balance: -amount } })
-    await Coa.findOneAndUpdate({ company, code: debit }, { $inc: { balance: -amount } })
+    await Account.findOneAndUpdate({ company, code: credit }, { $inc: { balance: -amount } })
+    await Account.findOneAndUpdate({ company, code: debit }, { $inc: { balance: -amount } })
 
     await Company.updateAccountBalance(company, typeFinder(credit), -amount)
     await Company.updateAccountBalance(company, typeFinder(debit), -amount)
@@ -164,15 +176,22 @@ CoaSchema.statics.addJournal = async (company, journalID, credit, debit, amount)
     (assets(debit) && incomes(credit)) ||
     (incomes(debit) && assets(credit))
   ) {
-    await Coa.findOneAndUpdate({ company, code: credit }, { $inc: { balance: -amount } })
-    await Coa.findOneAndUpdate({ company, code: debit }, { $inc: { balance: +amount } })
+    await Account.findOneAndUpdate({ company, code: credit }, { $inc: { balance: -amount } })
+    await Account.findOneAndUpdate({ company, code: debit }, { $inc: { balance: +amount } })
 
     await Company.updateAccountBalance(company, typeFinder(credit), -amount)
     await Company.updateAccountBalance(company, typeFinder(debit), +amount)
   }
 }
-CoaSchema.statics.isExist = code => Coa.exists({ code })
+AccountSchema.statics.isExist = code => Account.exists({ code })
+AccountSchema.statics.remove = async (company, code) => {
+  const { transaction } = await Account.fetch(company, code)
 
-const Coa = mongoose.model('Coa', CoaSchema)
+  if (transaction.length === 0) await Account.deleteOne({ company, code })
+  else await Account.updateOne({ company, code }, { $set: { isDisabled: true } })
+}
+AccountSchema.statics.disable = (company, code) => Account.updateOne({ company, code }, { $set: { isDisabled: true } })
 
-export default Coa
+const Account = mongoose.model('Account', AccountSchema)
+
+export default Account
