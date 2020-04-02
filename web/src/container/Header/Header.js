@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import { fetchCoa, updateMain } from '../../store/actions'
+import { fetchAccount, updateMain } from '../../store/actions'
 // import Click from '../../res/audio/click.mp3'
 // import UIfx from 'uifx'
 
@@ -46,35 +46,27 @@ export class Header extends Component {
           <Container vPos='middle' noPad>
             <button
               onClick={() => this.props.updateMain('sidebar_collapse', !this.props.sidebar_collapse)}
-              className='btn btn-icon-large btn-transparent m-left-2'
+              className='button button-icon m-left-2'
             >
               <i className='material-icons'>menu</i>
             </button>
-            <button onClick={() => this.props.history.push('/')} className='btn btn-icon-large btn-transparent m-right'>
+            <button onClick={() => this.props.history.push('/')} className='button button-icon m-right'>
               <i className='material-icons'>home</i>
             </button>
-            <button
-              onClick={this.props.history.goBack}
-              className='btn btn-header-nav btn-icon-large white p-left-0'
-              style={{ marginRight: '0.2rem', width: '3rem' }}
-            >
+            <button onClick={this.props.history.goBack} className='button button-icon button-light p-left-0'>
               {/* onMouseEnter={() => click.play() */}
               <i className='material-icons' style={{ transform: 'rotate(180deg)' }}>
                 arrow_forward_ios
               </i>
             </button>
-            <button
-              onClick={this.props.history.goForward}
-              className='btn btn-header-nav btn-icon-large white p-left-0'
-              style={{ marginLeft: '0.2rem', width: '3rem' }}
-            >
+            <button onClick={this.props.history.goForward} className='button button-icon button-light p-left-0'>
               {/* onMouseEnter={() => click.play() */}
               <i className='material-icons'>arrow_forward_ios</i>
             </button>
             {this.props.company.length > 1 ? (
               <select
                 name='company'
-                className={`btn btn-header-select white${this.state.company_btn_active ? ' active' : ''}`}
+                className={`button button-icon button-light white${this.state.company_btn_active ? ' active' : ''}`}
                 onClick={() => this.setState({ company_btn_active: !this.state.company_btn_active })}
                 onChange={this.mainChangeHandler}
                 value={this.props.currentCompany}
@@ -97,12 +89,12 @@ export class Header extends Component {
             </button>
             <button
               onClick={() => this.setState({ notifications_btn_active: !this.state.notifications_btn_active })}
-              className={`btn btn-header-nav white${this.state.notifications_btn_active ? ' active' : ''}`}
+              className={`button button-icon button-light${this.state.notifications_btn_active ? ' active' : ''}`}
             >
               {/* onMouseEnter={() => click.play()} */}
               <i className='material-icons'>notifications</i>
             </button>
-            <button className='btn btn-header-nav white'>
+            <button className='button button-icon button-light'>
               {/* onMouseEnter={() => click.play() */}
               <i className='material-icons'>settings</i>
             </button>
@@ -121,7 +113,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   fetchCompany : () => dispatch(fetchCompany()),
   updateMain   : (name, payload) => dispatch(updateMain(name, payload)),
-  fetchCoa     : payload => dispatch(fetchCoa(payload)),
+  fetchAccount : payload => dispatch(fetchAccount(payload)),
 })
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Header))

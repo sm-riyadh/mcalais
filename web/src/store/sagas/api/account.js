@@ -1,6 +1,6 @@
 import Axios from './axios-instance'
 
-const fetchCoa = async payload => {
+const fetchAccount = async payload => {
   try {
     if (payload[0]) payload = payload[0]
 
@@ -8,7 +8,7 @@ const fetchCoa = async payload => {
 
     const { data } = await Axios({
       method : 'get',
-      url    : '/coa',
+      url    : '/account',
       params : {
         company,
       },
@@ -19,7 +19,7 @@ const fetchCoa = async payload => {
     return { error: err }
   }
 }
-const fetchCoaList = async payload => {
+const fetchAccountList = async payload => {
   try {
     if (payload[0]) payload = payload[0]
 
@@ -27,7 +27,7 @@ const fetchCoaList = async payload => {
 
     const { data } = await Axios({
       method : 'get',
-      url    : '/coa/list',
+      url    : '/account/list',
       params : {
         company,
       },
@@ -38,7 +38,7 @@ const fetchCoaList = async payload => {
     return { error: err }
   }
 }
-const sendCoa = async payload => {
+const sendAccount = async payload => {
   try {
     if (payload[0]) payload = payload[0]
 
@@ -46,7 +46,7 @@ const sendCoa = async payload => {
 
     const { data } = await Axios({
       method : 'post',
-      url    : '/coa',
+      url    : '/account',
       data   : {
         company,
         name,
@@ -60,5 +60,25 @@ const sendCoa = async payload => {
     return { error: err }
   }
 }
+const removeAccount = async payload => {
+  try {
+    if (payload[0]) payload = payload[0]
 
-export default { fetchCoa, fetchCoaList, sendCoa }
+    const { company, code } = payload
+
+    const { data } = await Axios({
+      method : 'delete',
+      url    : '/account',
+      data   : {
+        company,
+        code,
+      },
+    })
+
+    return { data }
+  } catch (err) {
+    return { error: err }
+  }
+}
+
+export default { fetchAccount, fetchAccountList, sendAccount, removeAccount }

@@ -113,16 +113,17 @@
 }
 
 table.table-entry {
+  width: 100%;
+  margin: 0 1rem;
+  font-size: 80%;
   border-width: 0;
   border-collapse: collapse;
 
   thead {
     th {
-      background-color: #dddddd;
       position: sticky;
       top: -2.65rem;
       padding: 0.6rem;
-      border: 0.11rem solid #dddddd;
       text-align: left;
 
       &:first-child {

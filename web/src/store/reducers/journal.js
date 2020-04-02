@@ -1,9 +1,10 @@
+import moment from 'moment'
 import { JOURNAL } from '..'
 
 const initialState = {
   journal : '',
   input   : {
-    date          : '',
+    date          : moment(),
     debit         : '',
     debit_note    : '',
     credit        : '',

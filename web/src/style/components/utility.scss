@@ -1,3 +1,55 @@
+.grid {
+  width: 100%;
+  height: 100%;
+  display: grid;
+
+  &-1-2_1 {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr;
+    grid-template-areas: "aside main";
+    grid-column-gap: 1rem;
+
+    .main {
+      width: 100%;
+      grid-area: main;
+    }
+    .aside {
+      width: 100%;
+      grid-area: aside;
+    }
+  }
+  &-2-1_1 {
+    grid-template-columns: 2fr 1fr;
+    grid-template-rows: 1fr;
+    grid-template-areas: "main aside";
+    grid-column-gap: 1rem;
+
+    .main {
+      width: 100%;
+      grid-area: main;
+    }
+    .aside {
+      width: 100%;
+      grid-area: aside;
+    }
+  }
+  &-3-1_1 {
+    grid-template-columns: 3fr 1fr;
+    grid-template-rows: 1fr;
+    grid-template-areas: "main aside";
+    grid-column-gap: 1rem;
+
+    .main {
+      width: 100%;
+      grid-area: main;
+    }
+    .aside {
+      width: 100%;
+      grid-area: aside;
+    }
+  }
+}
+
 // Text
 
 .txtRight {
@@ -12,9 +64,14 @@
 
 // Flex
 .flex-d-col {
-  flex-direction: column !important;
+  flex-direction: column;
 }
-
+.flex-d-row {
+  flex-direction: row;
+}
+.flex {
+  display: flex;
+}
 .flex-pos- {
   &between {
     justify-content: space-between !important;

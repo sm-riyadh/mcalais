@@ -2,15 +2,15 @@ import React, { Fragment, useState } from 'react'
 
 import { Modal } from '../../../component'
 
-const CoaManager = props => {
-  const [type, setType] = useState('')
-  const [name, setName] = useState('')
+const AccountManager = props => {
+  const [ type, setType ] = useState('')
+  const [ name, setName ] = useState('')
 
   const newAccount = e => {
     e.preventDefault()
 
     props.sendAccount({
-      company: props.company,
+      company : props.company,
       type,
       name,
     })
@@ -26,11 +26,7 @@ const CoaManager = props => {
           <form style={{ width: '100%' }} onSubmit={newAccount}>
             <section>
               From
-              <select
-                name='type'
-                onChange={e => setType(e.target.value)}
-                value={type}
-              >
+              <select name='type' onChange={e => setType(e.target.value)} value={type}>
                 <option value='' disabled>
                   Choose a catagory
                 </option>
@@ -43,13 +39,7 @@ const CoaManager = props => {
             </section>
             <br />
             <br />
-            Name:{' '}
-            <input
-              type='text'
-              name='description'
-              onChange={e => setName(e.target.value)}
-              value={name}
-            />
+            Name: <input type='text' name='description' onChange={e => setName(e.target.value)} value={name} />
             <br />
             <br />
             <input type='submit' input='ADD' />
@@ -60,4 +50,4 @@ const CoaManager = props => {
   )
 }
 
-export default CoaManager
+export default AccountManager

@@ -10,17 +10,17 @@ import {
 } from '../../component'
 import { ActivityBar } from '../../component/layout'
 
-import { fetchCoa, sendCoa } from '../../store/actions'
+import { fetchAccount, sendAccount, removeAccount } from '../../store/actions'
 import API from '../../store/sagas/api/tree'
 
-import CoaTableRows from './components/CoaTableRows'
-// import CoaManagerLegacy from './components/CoaManagerLegacy'
+import AccountTableRows from './components/AccountTableRows'
+// import AccountManagerLegacy from './components/AccountManagerLegacy'
 import AccountModal from './components/AccountModal'
 import FolderModal from './components/FolderModal'
 
-const TreeViewer = ({ branch, accountType, creationModal, nested = [], coa }) =>
+const TreeViewer = ({ branch, accountType, creationModal, removeAccount, removeFolder, nested = [], account }) =>
   branch.map(({ type, location, path, name, children }, index) => {
-    const account = coa.length != 0 && coa.filter(e => e.name === name && e.type === accountType)[0]
+    const account = account.length != 0 && account.filter(e => e.name === name && e.type === accountType)[0]
 
     return (
       <Fragment key={index}>
@@ -67,6 +67,11 @@ const TreeViewer = ({ branch, accountType, creationModal, nested = [], coa }) =>
               className='txtRight'
             >
               {account ? account.balance : '0'}
+              {account && (
+                <button className='btn btn-small btn-rounded grey' onClick={() => removeAccount(accountType, account)}>
+                  <i className='material-icons p-right-1'>{account.balance === 0 ? 'delete' : 'lock'}</i>
+                </button>
+              )}
             </td>
           )}
           {type == 'folder' && (
@@ -101,6 +106,12 @@ const TreeViewer = ({ branch, accountType, creationModal, nested = [], coa }) =>
                 >
                   <i className='material-icons p-right-1'>fiber_new</i>
                 </button>
+                <button
+                  className='btn btn-small btn-rounded grey'
+                  onClick={() => removeFolder(accountType, name, location)}
+                >
+                  <i className='material-icons p-right-1'>delete</i>
+                </button>
               </Fragment>
             </td>
           )}
@@ -110,7 +121,9 @@ const TreeViewer = ({ branch, accountType, creationModal, nested = [], coa }) =>
             accountType={accountType}
             branch={children}
             creationModal={creationModal}
-            coa={coa}
+            removeAccount={removeAccount}
+            removeFolder={removeFolder}
+            account={account}
             nested={[ ...nested, null ]}
           />
         )}
@@ -118,11 +131,11 @@ const TreeViewer = ({ branch, accountType, creationModal, nested = [], coa }) =>
     )
   })
 
-export class Coa extends Component {
+export class Account extends Component {
   async componentDidMount() {
-    this.props.fetchCoa({ company: this.props.company })
+    this.props.fetchAccount({ company: this.props.company })
     const tree = await API.fetchTree({ company: this.props.company })
-    tree && this.setState({ tree })
+    tree && this.setState({ tree: tree.data })
   }
 
   state = {
@@ -136,11 +149,11 @@ export class Coa extends Component {
     modal_account  : false,
     modal_folder   : false,
     tree           : {
-      assets      : [],
-      liabilities : [],
-      equities    : [],
-      expenses    : [],
-      incomes     : [],
+      assets      : '',
+      liabilities : '',
+      equities    : '',
+      expenses    : '',
+      incomes     : '',
     },
   }
   changeHandler = ({ target }) => {
@@ -228,7 +241,7 @@ export class Coa extends Component {
     }
 
     this.setState({ tree, account: '' }, () => {
-      this.props.sendCoa({
+      this.props.sendAccount({
         company : this.props.company,
         type    : this.state.accountType,
         name,
@@ -237,6 +250,80 @@ export class Coa extends Component {
       API.sendTree({ company: this.props.company, tree })
     })
   }
+  removeAccount = (accountType, { code }) => {
+    let tree = { ...this.state.tree }
+    let selectedBranch = tree[accountType]
+
+    this.state.location.length !== 0 &&
+      this.state.location.map(
+        depth =>
+          selectedBranch.children
+            ? (selectedBranch = selectedBranch.children[depth])
+            : (selectedBranch = selectedBranch[depth])
+      )
+
+    const account = this.props.account[accountType] && this.props.account[accountType].filter(e => e.code === code)[0]
+    selectedBranch = selectedBranch.filter(({ type, name }) => type === 'account' && name !== account.name)
+
+    if (this.state.location.length !== 0) {
+      selectedBranch.children = [
+        ...selectedBranch.children,
+        {
+          type     : 'folder',
+          path     : [ ...this.state.path, selectedBranch.name.toLowerCase() ],
+          location : [ ...this.state.location, selectedBranch.children.length ],
+          name     : this.state.folder,
+          children : [],
+        },
+      ]
+    } else {
+      selectedBranch = [
+        ...selectedBranch,
+        {
+          type     : 'folder',
+          path     : [ ...this.state.path ],
+          location : [ selectedBranch.length ],
+          name     : this.state.folder,
+          children : [],
+        },
+      ]
+
+      tree[this.state.accountType] = selectedBranch
+    }
+
+    this.setState({ tree }, async () => {
+      this.props.removeAccount({
+        company : this.props.company,
+        code,
+      })
+      await API.fetchTree({ company: this.props.company })
+    })
+  }
+  removeFolder = (accountType, folderName, location) => {
+    let tree = { ...this.state.tree }
+    let selectedBranch = tree[accountType]
+
+    const prevLocation = [ ...location ]
+
+    prevLocation.splice(prevLocation.length - 1, 1)
+
+    prevLocation.length !== 0 &&
+      prevLocation.map(depth => selectedBranch.children && (selectedBranch = selectedBranch[depth]))
+
+    let folder = selectedBranch.children.filter(({ type, name }) => type === 'folder' && name === folderName)[0]
+
+    console.log('removeFolder -> folder', folder)
+    // if (folder.children.length === 0) {
+    //   if (prevLocation.length !== 0) {
+    //     console.log(selectedBranch)
+    //     selectedBranch.children = selectedBranch.filter(({ type, name }) => type === 'folder' && name !== folderName)
+    //   } else {
+    //     selectedBranch.splice(location[0], 1)
+    //   }
+    // }
+
+    // this.setState({ tree }, async () => console.log(await API.sendTree({ company: this.props.company, tree })))
+  }
   creationModal = (type, accountType, location, path) => {
     this.setState({ accountType, location, path }, this.toggleModal(`modal_${type}`, true))
   }
@@ -244,7 +331,7 @@ export class Coa extends Component {
   render() {
     return (
       <Fragment>
-        {this.props.status.success ? (
+        {this.props.account && !this.props.status.failed ? (
           <Container vertical className='scrollable p-hor-8 p-top-5'>
             <Container className='flex-pos-between p-hor-4 p-bottom-4'>
               <select
@@ -296,18 +383,26 @@ export class Coa extends Component {
                   </tr>
                 </thead>
                 <tbody>
-                  <TreeViewer
-                    accountType='assets'
-                    branch={this.state.tree.assets}
-                    creationModal={this.creationModal}
-                    coa={this.props.coa['assets']}
-                  />
+                  {this.props.account['assets'] && this.state.tree['assets'] ? (
+                    <TreeViewer
+                      accountType='assets'
+                      branch={this.state.tree.assets}
+                      creationModal={this.creationModal}
+                      removeAccount={this.removeAccount}
+                      removeFolder={this.removeFolder}
+                      account={this.props.account['assets']}
+                    />
+                  ) : (
+                    <tr>
+                      <td colSpan='2'>loading</td>
+                    </tr>
+                  )}
                   <tr>
                     <td className='txtRight' style={{ backgroundColor: '#eeeeee' }}>
                       <b>Total</b>
                     </td>
                     <td className='txtRight' style={{ backgroundColor: '#eeeeee' }}>
-                      <span>৳</span> {this.props.coa.balance && this.props.coa.balance.assets}
+                      <span>৳</span> {this.props.account.balance && this.props.account.balance.assets}
                     </td>
                   </tr>
                 </tbody>
@@ -338,18 +433,26 @@ export class Coa extends Component {
                   </tr>
                 </thead>
                 <tbody>
-                  <TreeViewer
-                    accountType='liabilities'
-                    branch={this.state.tree.liabilities}
-                    creationModal={this.creationModal}
-                    coa={this.props.coa['liabilities']}
-                  />
+                  {this.props.account['liabilities'] && this.state.tree['liabilities'] ? (
+                    <TreeViewer
+                      accountType='liabilities'
+                      branch={this.state.tree.liabilities}
+                      creationModal={this.creationModal}
+                      removeAccount={this.removeAccount}
+                      removeFolder={this.removeFolder}
+                      account={this.props.account['liabilities']}
+                    />
+                  ) : (
+                    <tr>
+                      <td colSpan='2'>loading</td>
+                    </tr>
+                  )}
                   <tr>
                     <td className='txtRight' style={{ backgroundColor: '#eeeeee' }}>
                       <b>Total</b>
                     </td>
                     <td className='txtRight' style={{ backgroundColor: '#eeeeee' }}>
-                      <span>৳</span> {this.props.coa.balance && this.props.coa.balance.liabilities}
+                      <span>৳</span> {this.props.account.balance && this.props.account.balance.liabilities}
                     </td>
                   </tr>
                 </tbody>
@@ -380,18 +483,26 @@ export class Coa extends Component {
                   </tr>
                 </thead>
                 <tbody>
-                  <TreeViewer
-                    accountType='equities'
-                    branch={this.state.tree.equities}
-                    creationModal={this.creationModal}
-                    coa={this.props.coa['equities']}
-                  />
+                  {this.props.account['equities'] && this.state.tree['equities'] ? (
+                    <TreeViewer
+                      accountType='equities'
+                      branch={this.state.tree.equities}
+                      creationModal={this.creationModal}
+                      removeAccount={this.removeAccount}
+                      removeFolder={this.removeFolder}
+                      account={this.props.account['equities']}
+                    />
+                  ) : (
+                    <tr>
+                      <td colSpan='2'>loading</td>
+                    </tr>
+                  )}
                   <tr>
                     <td className='txtRight' style={{ backgroundColor: '#eeeeee' }}>
                       <b>Total</b>
                     </td>
                     <td className='txtRight' style={{ backgroundColor: '#eeeeee' }}>
-                      <span>৳</span> {this.props.coa.balance && this.props.coa.balance.equities}
+                      <span>৳</span> {this.props.account.balance && this.props.account.balance.equities}
                     </td>
                   </tr>
                 </tbody>
@@ -422,18 +533,26 @@ export class Coa extends Component {
                   </tr>
                 </thead>
                 <tbody>
-                  <TreeViewer
-                    accountType='expenses'
-                    branch={this.state.tree.expenses}
-                    creationModal={this.creationModal}
-                    coa={this.props.coa['expenses']}
-                  />
+                  {this.props.account['expenses'] && this.state.tree['expenses'] ? (
+                    <TreeViewer
+                      accountType='expenses'
+                      branch={this.state.tree.expenses}
+                      creationModal={this.creationModal}
+                      removeAccount={this.removeAccount}
+                      removeFolder={this.removeFolder}
+                      account={this.props.account['expenses']}
+                    />
+                  ) : (
+                    <tr>
+                      <td colSpan='2'>loading</td>
+                    </tr>
+                  )}
                   <tr>
                     <td className='txtRight' style={{ backgroundColor: '#eeeeee' }}>
                       <b>Total</b>
                     </td>
                     <td className='txtRight' style={{ backgroundColor: '#eeeeee' }}>
-                      <span>৳</span> {this.props.coa.balance && this.props.coa.balance.expenses}
+                      <span>৳</span> {this.props.account.balance && this.props.account.balance.expenses}
                     </td>
                   </tr>
                 </tbody>
@@ -464,18 +583,26 @@ export class Coa extends Component {
                   </tr>
                 </thead>
                 <tbody>
-                  <TreeViewer
-                    accountType='incomes'
-                    branch={this.state.tree.incomes}
-                    creationModal={this.creationModal}
-                    coa={this.props.coa['incomes']}
-                  />
+                  {this.props.account['incomes'] && this.state.tree['incomes'] ? (
+                    <TreeViewer
+                      accountType='incomes'
+                      branch={this.state.tree.incomes}
+                      creationModal={this.creationModal}
+                      removeAccount={this.removeAccount}
+                      removeFolder={this.removeFolder}
+                      account={this.props.account['incomes']}
+                    />
+                  ) : (
+                    <tr>
+                      <td colSpan='2'>loading</td>
+                    </tr>
+                  )}
                   <tr>
                     <td className='txtRight' style={{ backgroundColor: '#eeeeee' }}>
                       <b>Total</b>
                     </td>
                     <td className='txtRight' style={{ backgroundColor: '#eeeeee' }}>
-                      <span>৳</span> {this.props.coa.balance && this.props.coa.balance.incomes}
+                      <span>৳</span> {this.props.account.balance && this.props.account.balance.incomes}
                     </td>
                   </tr>
                 </tbody>
@@ -523,12 +650,13 @@ export class Coa extends Component {
 
 const mapStateToProps = state => ({
   company : state.main.company,
-  status  : state.coa.status,
-  coa     : state.coa.coa,
+  status  : state.account.status,
+  account : state.account.account,
 })
 const mapDispatchToProps = dispatch => ({
-  fetchCoa : payload => dispatch(fetchCoa(payload)),
-  sendCoa  : payload => dispatch(sendCoa(payload)),
+  fetchAccount  : payload => dispatch(fetchAccount(payload)),
+  removeAccount : payload => dispatch(removeAccount(payload)),
+  sendAccount   : payload => dispatch(sendAccount(payload)),
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(Coa)
+export default connect(mapStateToProps, mapDispatchToProps)(Account)

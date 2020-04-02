@@ -23,20 +23,21 @@ const JOURNAL = {
     FAILED  : 'JOURNAL_STATUS_FAILED',
   },
 }
-const COA = {
-  SEND    : 'COA_SEND',
+const ACCOUNT = {
+  SEND    : 'ACCOUNT_SEND',
+  REMOVE  : 'ACCOUNT_REMOVE',
   FETCH   : {
-    _    : 'COA_FETCH',
-    LIST : 'COA_FETCH_LIST',
+    _    : 'ACCOUNT_FETCH',
+    LIST : 'ACCOUNT_FETCH_LIST',
   },
   REPLACE : {
-    _    : 'COA_REPLACE',
-    LIST : 'COA_REPLACE_LIST',
+    _    : 'ACCOUNT_REPLACE',
+    LIST : 'ACCOUNT_REPLACE_LIST',
   },
   STATUS  : {
-    SUCCESS : 'COA_STATUS_SUCCESS',
-    REQUEST : 'COA_STATUS_REQUEST',
-    FAILED  : 'COA_STATUS_FAILED',
+    SUCCESS : 'ACCOUNT_STATUS_SUCCESS',
+    REQUEST : 'ACCOUNT_STATUS_REQUEST',
+    FAILED  : 'ACCOUNT_STATUS_FAILED',
   },
 }
 
@@ -52,4 +53,4 @@ const COMPANY = {
   },
 }
 
-export { MAIN, JOURNAL, COA, COMPANY }
+export { MAIN, JOURNAL, ACCOUNT, COMPANY }

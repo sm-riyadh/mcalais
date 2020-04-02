@@ -1,6 +1,6 @@
 import React from 'react'
 
-const CoaTableRows = props =>
+const AccountTableRows = props =>
   props.data[props.accountOf].map(({ id, name, balance }, index) => (
     <tr
       key={index}
@@ -17,7 +17,7 @@ const CoaTableRows = props =>
     </tr>
   ))
 
-// const CoaTableRows = props =>
+// const AccountTableRows = props =>
 //   props.data.length !== 0 ? (
 //     props.data.map(
 //       ({ description, date, debit, credit, amount, comment }, index) => (
@@ -59,4 +59,4 @@ const CoaTableRows = props =>
 //     </tr>
 //   )
 
-export default CoaTableRows
+export default AccountTableRows

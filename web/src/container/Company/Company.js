@@ -19,7 +19,7 @@ export class Journal extends Component {
     journal_index         : '',
 
     page                  : 0,
-    coa_filter            : '',
+    account_filter        : '',
   }
 
   toggleModal = (name, action) => this.setState({ [name]: action })
@@ -101,7 +101,7 @@ export class Journal extends Component {
               isModalOpen={this.state.modal_company_entry}
               modalClose={() => this.toggleModal('modal_company_entry', false)}
               sendCompany={this.props.sendCompany}
-              // coa={this.props.coa}
+              // account={this.props.account}
               company={this.props.company}
             />
           </Fragment>

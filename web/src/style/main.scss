@@ -16,6 +16,51 @@ main {
   // overflow-x: hidden;
 }
 
+.journal-entry-shadow {
+  .title {
+    font-size: 120%;
+    color: #c7c7c7;
+    font-weight: 600;
+    margin: 2.6rem;
+  }
+
+  height: 100%;
+}
+.journal-entry-form {
+  height: 100%;
+  background-color: #eeeeee;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 0.4rem;
+
+  .input,
+  .select {
+    width: 100%;
+  }
+  .label {
+    p {
+      padding: 0.5rem 0.8rem;
+    }
+  }
+
+  .journal-entry-form-footer {
+    justify-self: flex-end;
+    background-color: #f3f3f3;
+    padding: 0.8rem;
+
+    .btn-journal-entry-custom {
+      width: 100%;
+      padding: 1rem;
+      border-radius: 0.4rem;
+
+      &.grey {
+        background-color: #c9c9c9;
+        color: #777777;
+      }
+    }
+  }
+}
+
 .container {
   display: flex;
   padding: 0.5rem;

@@ -9,6 +9,7 @@
 
 # misc
 .env
+.code-workspace
 /.vscode
 /deploy
 /backup

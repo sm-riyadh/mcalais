@@ -1,4 +1,4 @@
-import { MAIN, JOURNAL, COA, COMPANY } from './index'
+import { MAIN, JOURNAL, ACCOUNT, COMPANY } from './index'
 
 /*
  * Main
@@ -44,27 +44,31 @@ const saveJournalOnBottom = payload => ({
 })
 
 /*
- * COA
+ * ACCOUNT
  */
-const fetchCoa = payload => ({
-  type    : COA.FETCH._,
+const fetchAccount = payload => ({
+  type    : ACCOUNT.FETCH._,
   payload,
 })
-const fetchCoaList = payload => ({
-  type    : COA.FETCH.LIST,
+const fetchAccountList = payload => ({
+  type    : ACCOUNT.FETCH.LIST,
   payload,
 })
-const sendCoa = payload => ({
-  type    : COA.SEND,
+const sendAccount = payload => ({
+  type    : ACCOUNT.SEND,
+  payload,
+})
+const removeAccount = payload => ({
+  type    : ACCOUNT.REMOVE,
   payload,
 })
 
-const saveCoa = payload => ({
-  type    : COA.REPLACE._,
+const saveAccount = payload => ({
+  type    : ACCOUNT.REPLACE._,
   payload,
 })
-const saveCoaList = payload => ({
-  type    : COA.REPLACE.LIST,
+const saveAccountList = payload => ({
+  type    : ACCOUNT.REPLACE.LIST,
   payload,
 })
 
@@ -91,15 +95,16 @@ export {
   fetchJournalMore,
   sendJournal,
   saveJournal,
+  removeAccount,
   updateJournal,
   saveJournalOnTop,
   saveJournalOnBottom,
-  // COA
-  fetchCoa,
-  saveCoa,
-  fetchCoaList,
-  sendCoa,
-  saveCoaList,
+  // ACCOUNT
+  fetchAccount,
+  saveAccount,
+  fetchAccountList,
+  sendAccount,
+  saveAccountList,
   // COMPANY
   fetchCompany,
   sendCompany,

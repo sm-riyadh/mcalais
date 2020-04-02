@@ -1,0 +1,91 @@
+$color-light: #f6f6f6;
+$color-dark: #504f4d;
+$color-primary: #1f44e6;
+$button-margin: 0.2rem 0.4rem;
+$style-roundness: 0.8rem;
+
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  background-color: inherit;
+  color: inherit;
+  border: 0 solid transparent;
+  font-size: 110%;
+  letter-spacing: 0.08rem;
+  padding: 0.8rem 1.4rem;
+  border-radius: $style-roundness;
+  margin: $button-margin;
+
+  box-shadow: -0.6rem -0.6rem 2.6rem rgba(255, 255, 255, 0.5), 0.6rem 0.6rem 1.6rem rgba(217, 210, 200, 0.5);
+  transition: all 180ms;
+
+  &:hover {
+    box-shadow: -0.2rem -0.2rem 1.8rem rgba(255, 255, 255, 0.8), 0.2rem 0.2rem 0.8rem rgba(128, 125, 121, 0.3);
+    transition: all 220ms;
+  }
+  &:active {
+    background-color: transparentize(lighten($color-light, $amount: 15%), $amount: 0.65);
+    box-shadow: -0.2rem -0.2rem 0.6rem rgba(255, 255, 255, 0.2), 0.2rem 0.2rem 0.2rem rgba(217, 210, 200, 0.2);
+  }
+
+  &-icon {
+    padding: 0.55rem 0.88rem;
+  }
+  &-chip {
+    padding: 0.8rem 2rem;
+    border-radius: 99rem;
+  }
+  &-light {
+    box-shadow: -0.6rem -0.6rem 2.6rem rgba(255, 255, 255, 0.5), 0.6rem 0.6rem 1.6rem rgba(217, 210, 200, 0.5),
+      inset 0 0 0 0.3rem lighten($color-light, 1%);
+
+    &:hover {
+      box-shadow: -0.2rem -0.2rem 1.8rem rgba(255, 255, 255, 0.8), 0.2rem 0.2rem 0.8rem rgba(128, 125, 121, 0.3),
+        inset 0 0 0 0.25rem lighten($color-light, 3%);
+    }
+    &:active {
+      background-color: transparentize(darken($color-light, $amount: 10%), $amount: 0.65);
+      box-shadow: -0.2rem -0.2rem 0.6rem rgba(255, 255, 255, 0.2), 0.2rem 0.2rem 0.2rem rgba(217, 210, 200, 0.2),
+        inset 0 0 0 0.35rem lighten($color-light, 25%);
+    }
+  }
+  &.active {
+    background-color: transparentize(darken($color-light, $amount: 10%), $amount: 0.65);
+    box-shadow: -0.2rem -0.2rem 0.6rem rgba(255, 255, 255, 0.2), 0.2rem 0.2rem 0.2rem rgba(217, 210, 200, 0.2),
+      inset 0 0 0 0.35rem lighten($color-light, 25%);
+  }
+  &-primary {
+    background-color: $color-primary;
+    color: $color-light;
+
+    box-shadow: 0 0 0 rgba(255, 255, 255, 0);
+
+    &:hover {
+      background-color: desaturate(lighten($color-primary, 2%), 3%);
+      box-shadow: 0.1rem 0.1rem 0.2rem transparentize(desaturate($color-primary, 20%), $amount: 0.7),
+        0.2rem 0.2rem 0.8rem transparentize(desaturate($color-primary, 20%), $amount: 0.8),
+        0.3rem 0.3rem 1.4rem transparentize(desaturate($color-primary, 40%), $amount: 0.9),
+        0 0 0.6rem transparentize(desaturate($color-primary, 10), $amount: 0.8);
+    }
+    &:active {
+      background-color: desaturate(darken($color-primary, 4%), 3%);
+      box-shadow: 0.1rem 0.1rem 0.1rem transparentize(desaturate($color-primary, 20%), $amount: 0.85),
+        0.15rem 0.15rem 0.2rem transparentize(desaturate($color-primary, 20%), $amount: 0.9);
+    }
+  }
+  &-secondary {
+    border: 0.1rem dashed lighten($color-dark, $amount: 25);
+    box-shadow: 0 0 0 rgba(255, 255, 255, 0);
+
+    &:hover {
+      background-color: darken($color-light, $amount: 8);
+      box-shadow: 0 0 0 rgba(255, 255, 255, 0);
+    }
+    &:active {
+      background-color: darken($color-light, $amount: 15);
+      box-shadow: 0 0 0 rgba(255, 255, 255, 0);
+    }
+  }
+}

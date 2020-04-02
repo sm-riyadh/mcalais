@@ -25,7 +25,7 @@ const TreeViewer = ({ setCurrentBranch, branch }) => (
   </ul>
 )
 
-const CoaManager = props => {
+const AccountManager = props => {
   const [tree, setTree] = useState([
     {
       type: 'folder',
@@ -87,7 +87,7 @@ const CoaManager = props => {
   }
   return (
     props.isModalOpen && (
-      <Modal title='COA Manager' modalClose={props.modalClose}>
+      <Modal title='ACCOUNT Manager' modalClose={props.modalClose}>
         <form onSubmit={e => addFolder(e)}>
           <input
             type='text'
@@ -108,4 +108,4 @@ const CoaManager = props => {
   )
 }
 
-export default CoaManager
+export default AccountManager

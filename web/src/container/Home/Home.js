@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { Switch, Route } from 'react-router-dom'
 import KeyboardJS from 'keyboardjs'
 
-import { fetchCoaList, sendJournal, fetchCoa, updateJournal } from '../../store/actions'
+import { fetchAccountList, sendJournal, fetchAccount, updateJournal } from '../../store/actions'
 import { SideBar } from '../../component'
 import { NavBar } from '../../component/layout'
 
@@ -11,15 +11,16 @@ import JournalEntry from '../Global/JournalEntry'
 
 import Header from '../Header/Header'
 import Journal from '../Journal/Journal'
-import Coa from '../Coa/Coa'
+import Account from '../Account/Account'
 import Company from '../Company/Company'
+import TestGround from '../TestGround/TestGround'
 
 // import container from '../../component/container/container'
 
 export class Home extends Component {
   componentDidMount() {
-    this.props.fetchCoa({ company: this.props.company })
-    this.props.fetchCoaList({ company: this.props.company })
+    this.props.fetchAccount({ company: this.props.company })
+    this.props.fetchAccountList({ company: this.props.company })
 
     KeyboardJS.bind(
       'ctrl + enter',
@@ -46,7 +47,7 @@ export class Home extends Component {
     KeyboardJS.bind(
       'shift + a',
       e => {
-        this.props.history.push('/coa')
+        this.props.history.push('/account')
       },
       () => {}
     )
@@ -72,10 +73,11 @@ export class Home extends Component {
               <NavBar title='Inventory' path='/inventory' icon='storage' collapsed={this.props.collapsed} />
               <NavBar title='Employee' path='/employee' icon='supervisor_account' collapsed={this.props.collapsed} />
               <NavBar title='Report' path='/report' icon='assignment' collapsed={this.props.collapsed} />
+              <NavBar title='TESTING GROUND' path='/test' icon='lock' collapsed={this.props.collapsed} />
             </section>
 
             <section className='navbar widget-footer'>
-              <NavBar title='Chart of Accounts' path='/coa' icon='account_tree' collapsed={this.props.collapsed} />
+              <NavBar title='Chart of Accounts' path='/account' icon='account_tree' collapsed={this.props.collapsed} />
               <NavBar title='Company' path='/company' icon='storage' collapsed={this.props.collapsed} />
             </section>
           </SideBar>
@@ -92,19 +94,20 @@ export class Home extends Component {
               render={props => <Journal {...props} toggleModal={this.toggleModal} />}
               key={this.props.company}
             />
-            <Route path='/coa' component={Coa} key={this.props.company} />
+            <Route path='/account' component={Account} key={this.props.company} />
             <Route path='/company' component={Company} key={this.props.company} />
+            <Route path='/test' component={TestGround} key={this.props.company} />
           </Switch>
           <JournalEntry
             isModalOpen={this.state.modal_journal_entry}
             modalClose={() => this.toggleModal('modal_journal_entry', false)}
             sendJournal={payload => {
               this.props.sendJournal(payload)
-              this.props.fetchCoaList({ company: this.props.company })
+              this.props.fetchAccountList({ company: this.props.company })
             }}
             input={this.props.journal.input}
             inputHandler={this.props.updateJournal}
-            coa={this.props.coa}
+            account={this.props.account}
             company={this.props.company}
           />
         </main>
@@ -116,15 +119,15 @@ export class Home extends Component {
 
 const mapStateToProps = state => ({
   sidebar_collapse : state.main.sidebar_collapse,
-  coa              : state.coa.coa,
+  account          : state.account.account,
   journal          : state.journal,
   company          : state.main.company,
 })
 const mapDispatchToProps = dispatch => ({
-  updateJournal : payload => dispatch(updateJournal(payload)),
-  fetchCoa      : payload => dispatch(fetchCoa(payload)),
-  fetchCoaList  : payload => dispatch(fetchCoaList(payload)),
-  sendJournal   : payload => dispatch(sendJournal(payload)),
+  updateJournal    : payload => dispatch(updateJournal(payload)),
+  fetchAccount     : payload => dispatch(fetchAccount(payload)),
+  fetchAccountList : payload => dispatch(fetchAccountList(payload)),
+  sendJournal      : payload => dispatch(sendJournal(payload)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home)

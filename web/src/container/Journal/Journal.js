@@ -10,7 +10,7 @@ import 'react-dates/lib/css/_datepicker.css'
 import { DayPickerSingleDateController, DayPickerRangeController } from 'react-dates'
 
 import { Modal, Container, Card, Text, Placeholder } from '../../component'
-import { fetchCoa, fetchCoaList, fetchJournal, fetchJournalMore, sendJournal } from '../../store/actions'
+import { fetchAccount, fetchAccountList, fetchJournal, fetchJournalMore, sendJournal } from '../../store/actions'
 import { ActivityBar } from '../../component/layout'
 
 import JournalTableRows from './components/JournalTableRows'
@@ -18,8 +18,8 @@ import JournalDetailModal from './components/JournalDetailModal'
 
 export class Journal extends Component {
   componentDidMount() {
-    this.props.fetchCoa({ company: this.props.company })
-    this.props.fetchCoaList({ company: this.props.company })
+    this.props.fetchAccount({ company: this.props.company })
+    this.props.fetchAccountList({ company: this.props.company })
     this.props.fetchJournal({
       company    : this.props.company,
       start_date : moment().subtract(24, 'hours').toDate(),
@@ -36,7 +36,7 @@ export class Journal extends Component {
     focused_input         : 'startDate',
     filter_type           : 'journal',
     filter_date           : '3_days',
-    filter_coa            : '',
+    filter_account        : '',
     filter_voucher_id     : '',
     start_date            : moment().subtract(2, 'days'),
     end_date              : moment(),
@@ -149,7 +149,7 @@ export class Journal extends Component {
         this.props.fetchJournalMore({
           company : 'HQ',
           page    : this.state.page,
-          coa     : this.state.filter_coa,
+          account : this.state.filter_account,
         })
     )
   }
@@ -171,9 +171,9 @@ export class Journal extends Component {
                     onChange={this.onChangeHandler}
                     value={this.state.voucher_id_filter}
                   />
-                  <select name='filter_coa' className='btn btn-chip grey m-hor' onChange={this.onChangeHandler}>
+                  <select name='filter_account' className='btn btn-chip grey m-hor' onChange={this.onChangeHandler}>
                     <option value=''>All Accounts</option>
-                    {this.props.coa_list.map(coa => <option value={coa.code}>{coa.name}</option>)}
+                    {this.props.account_list.map(account => <option value={account.code}>{account.name}</option>)}
                   </select>
                 </Container>
               </Container>
@@ -197,7 +197,7 @@ export class Journal extends Component {
                       data={this.props.journal}
                       modalOpen={() => this.toggleModal('modal_journal_details', true)}
                       setJournalIndex={this.setJournalIndex}
-                      filterAccount={this.state.filter_coa}
+                      filterAccount={this.state.filter_account}
                       filterVoucherId={this.state.filter_voucher_id}
                     />
                   </tbody>
@@ -279,7 +279,7 @@ export class Journal extends Component {
                     </div>
                   </label>
                 </div>
-                <div className='widget'>
+                <div className='widget widget-calendar'>
                   {this.state.filter_date === 'today' || this.state.filter_date === 'custom_single' ? (
                     <DayPickerSingleDateController
                       date={this.state.end_date}
@@ -290,6 +290,7 @@ export class Journal extends Component {
                       small
                       noBorder
                       isOutsideRange={() => false}
+                      transitionDuration={0}
                       initialVisibleMonth={() => this.state.end_date}
                       isDayHighlighted={date =>
                         date.year() === moment().year() &&
@@ -316,6 +317,7 @@ export class Journal extends Component {
                         this.setState({ focused_input: focusedInput ? focusedInput : 'startDate' })}
                       displayFormat='D MMM'
                       maxDate={moment()}
+                      transitionDuration={0}
                       initialVisibleMonth={() => this.state.end_date}
                       isDayHighlighted={date =>
                         date.year() === moment().year() &&
@@ -402,16 +404,16 @@ export class Journal extends Component {
   }
 }
 const mapStateToProps = state => ({
-  company    : state.main.company,
-  journal    : state.journal.journal,
-  status     : state.journal.status,
-  coa        : state.coa.coa,
-  coa_list   : state.coa.coa_list,
-  coa_status : state.coa.status,
+  company        : state.main.company,
+  journal        : state.journal.journal,
+  status         : state.journal.status,
+  account        : state.account.account,
+  account_list   : state.account.account_list,
+  account_status : state.account.status,
 })
 const mapDispatchToProps = dispatch => ({
-  fetchCoa         : payload => dispatch(fetchCoa(payload)),
-  fetchCoaList     : payload => dispatch(fetchCoaList(payload)),
+  fetchAccount     : payload => dispatch(fetchAccount(payload)),
+  fetchAccountList : payload => dispatch(fetchAccountList(payload)),
   fetchJournal     : payload => dispatch(fetchJournal(payload)),
   fetchJournalMore : payload => dispatch(fetchJournalMore(payload)),
   sendJournal      : payload => dispatch(sendJournal(payload)),

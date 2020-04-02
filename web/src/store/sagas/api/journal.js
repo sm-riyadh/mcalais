@@ -4,7 +4,7 @@ const fetchJournal = async payload => {
   try {
     if (payload[0]) payload = payload[0]
 
-    const { company, size, page, coa, type, start_date, end_date } = payload
+    const { company, size, page, account, type, start_date, end_date } = payload
 
     const { data } = await Axios({
       method : 'get',
@@ -14,7 +14,7 @@ const fetchJournal = async payload => {
         type,
         size,
         page,
-        coa,
+        account,
         start_date,
         end_date,
       },

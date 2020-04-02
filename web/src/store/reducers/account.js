@@ -1,12 +1,12 @@
-import { COA } from '..'
+import { ACCOUNT } from '..'
 
 const initialState = {
-  coa      : {
-    assets      : [],
-    liabilities : [],
-    equities    : [],
-    expenses    : [],
-    incomes     : [],
+  account      : {
+    assets      : '',
+    liabilities : '',
+    equities    : '',
+    expenses    : '',
+    incomes     : '',
 
     balance     : {
       assets      : '',
@@ -16,8 +16,8 @@ const initialState = {
       incomes     : '',
     },
   },
-  coa_list : [],
-  status   : {
+  account_list : '',
+  status       : {
     success : false,
     request : false,
     failed  : false,
@@ -25,32 +25,32 @@ const initialState = {
   },
 }
 
-const coa = (state = initialState, { type, payload }) => {
+const account = (state = initialState, { type, payload }) => {
   switch (type) {
-    case COA.REPLACE._: {
+    case ACCOUNT.REPLACE._: {
       const newState = { ...state }
-      newState.coa = payload
+      newState.account = payload
       return newState
     }
-    case COA.REPLACE.LIST: {
+    case ACCOUNT.REPLACE.LIST: {
       const newState = { ...state }
-      newState.coa_list = payload
+      newState.account_list = payload
       return newState
     }
-    case COA.STATUS.SUCCESS: {
+    case ACCOUNT.STATUS.SUCCESS: {
       const newState = { ...state }
       newState.status.request = false
       newState.status.success = true
       return newState
     }
-    case COA.STATUS.REQUEST: {
+    case ACCOUNT.STATUS.REQUEST: {
       const newState = { ...state }
       newState.status.success = false
       newState.status.failed = false
       newState.status.request = true
       return newState
     }
-    case COA.STATUS.FAILED: {
+    case ACCOUNT.STATUS.FAILED: {
       const newState = { ...state }
       newState.status.request = false
       newState.status.failed = true
@@ -62,4 +62,4 @@ const coa = (state = initialState, { type, payload }) => {
   }
 }
 
-export default coa
+export default account

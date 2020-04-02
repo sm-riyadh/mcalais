@@ -1,15 +1,16 @@
 import React, { Fragment } from 'react'
-import { Card, Container } from '../'
+import { Card, Container } from '..'
 
 const modal = props => {
   return (
-    <Container>
+    <Fragment>
       <div className='modal-conatiner' noPad>
         <div className='backdrop' onClick={props.modalClose} />
         <Card className='modal' noPad>
           <div className='modal-header'>
-            <button className='btn btn-close' onClick={props.modalClose}>
-              <i className='material-icons'>close</i>
+            {props.title}
+            <button className='btn' onClick={props.modalClose}>
+              Close
             </button>
           </div>
           <Container className='modal-body' style={props.style}>
@@ -18,7 +19,7 @@ const modal = props => {
           <Container className='modal-bottom-pad' />
         </Card>
       </div>
-    </Container>
+    </Fragment>
   )
 }
 

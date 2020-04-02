@@ -1,17 +1,19 @@
 import React, { Fragment, useState, useEffect } from 'react'
 
-import { Modal, Text } from '../../component'
+import { Modal, Text, Container } from '../../component'
 import dateFormat from 'dateformat'
+import { SingleDatePicker } from 'react-dates'
+import moment from 'moment'
 import fmt from 'indian-number-format'
 
-const CoaSelection = ({ coa }) =>
+const AccountSelection = ({ account }) =>
   [ 'assets', 'liabilities', 'equities', 'expenses', 'incomes' ].map(type => (
     <Fragment>
       <option value='' disabled />
       <option value='' disabled>
         {type.toUpperCase()}
       </option>
-      {coa[type].map(({ code, name, balance }) => (
+      {account[type].map(({ code, name, balance }) => (
         <option value={code}>
           &nbsp;{name} - ৳ {fmt.format(balance, 2)}
         </option>
@@ -21,6 +23,8 @@ const CoaSelection = ({ coa }) =>
 
 const JournalEntryModal = props => {
   let accountSelect
+
+  const [ isFocused, setIsFocused ] = useState(false)
 
   const { date, debit, debit_note, credit, credit_note, description, amount, comment, shadowEntries } = props.input
   const inputHandler = props.inputHandler
@@ -40,7 +44,7 @@ const JournalEntryModal = props => {
       comment,
     })
 
-    const { balance, ...accounts } = props.coa
+    const { balance, ...accounts } = props.account
 
     let creditName, debitName
     Object.values(accounts).map(a => {
@@ -84,85 +88,154 @@ const JournalEntryModal = props => {
     props.isModalOpen && (
       <Modal title='Transaction' style={{ padding: '0' }} modalClose={props.modalClose}>
         <Fragment>
-          <form style={{ width: '100%' }} onSubmit={newJournal}>
-            <table className='table-entry'>
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>To</th>
-                  <th>From</th>
-                  <th>Description</th>
-                  <th>Amount</th>
-                  <th>Comment</th>
-                  <th />
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>
-                    <input type='date' name='date' onChange={onChangeHandler} value={date} />
-                  </td>
-                  <td>
-                    <select
-                      name='debit'
-                      // inputRef={accountSelect}
-                      ref={select => {
-                        accountSelect = select
-                      }}
-                      onChange={onChangeHandler}
-                      value={debit}
-                    >
-                      <option value=''>Choose a catagory</option>
-                      <CoaSelection coa={props.coa} />
-                    </select>
-                    <input
-                      type='text'
-                      placeholder='🗒 Note'
-                      name='debit_note'
-                      onChange={onChangeHandler}
-                      value={debit_note}
-                    />
-                  </td>
-                  <td>
-                    <select name='credit' onChange={onChangeHandler} value={credit}>
-                      <option value=''>Choose a catagory</option>
-                      <CoaSelection coa={props.coa} />
-                    </select>
-                    <input
-                      type='text'
-                      placeholder='🗒 Note'
-                      name='credit_note'
-                      onChange={onChangeHandler}
-                      value={credit_note}
-                    />
-                  </td>
-                  <td>
-                    <input type='text' name='description' onChange={onChangeHandler} value={description} />
-                  </td>
-                  <td>
-                    <input type='number' name='amount' onChange={onChangeHandler} value={amount} />
-                  </td>
-                  <td>
-                    <input type='text' name='comment' onChange={onChangeHandler} value={comment} />
-                  </td>
-                  <td>
-                    <input type='submit' input='ADD' />
-                  </td>
-                </tr>
-                {shadowEntries.map(({ credit, debit, description, amount, comment, progress }) => (
-                  <tr className='shadow'>
-                    <td>{dateFormat(date, 'ddd, dS mmm')}</td>
-                    <td>{debit}</td>
-                    <td>{credit}</td>
-                    <td>{description}</td>
-                    <td>{amount}</td>
-                    <td>{comment}</td>
-                    <td>{progress}</td>
+          <div className='grid grid-3-1_1'>
+            <Container className='main journal-entry-shadow flex-d-col' noPad>
+              <p className='title'>Your Today's Entry</p>
+              <table className='table-entry'>
+                <thead>
+                  <tr>
+                    <th>No</th>
+                    <th>Voucher ID</th>
+                    <th>Date</th>
+                    <th>To</th>
+                    <th>From</th>
+                    <th>Description</th>
+                    <th>Amount</th>
+                    <th>Comment</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </form>
+                </thead>
+                <tbody>
+                  {shadowEntries.map(({ credit, debit, description, amount, comment, progress }, index) => (
+                    <tr className='shadow'>
+                      <td>{index}</td>
+                      <td>{dateFormat(date, 'ddd, dS mmm')}</td>
+                      <td>{debit}</td>
+                      <td>{credit}</td>
+                      <td>{description}</td>
+                      <td>{amount}</td>
+                      <td>{comment}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </Container>
+            <form className='aside' onSubmit={newJournal}>
+              <Container className='journal-entry-form'>
+                <div className='flex flex-d-col'>
+                  <div>
+                    <label className='label'>
+                      <p>Date</p>
+                    </label>
+
+                    <SingleDatePicker
+                      date={date}
+                      autoFocus={true}
+                      focused={isFocused}
+                      onFocusChange={({ focused }) => setIsFocused(focused)}
+                      onDateChange={value => onChangeHandler({ target: { name: 'date', value } })}
+                      id='date'
+                      initialDate={moment()}
+                      displayFormat='D MMM YYYY'
+                      monthFormat='MMMM YYYY'
+                      numberOfMonths={1}
+                      isOutsideRange={() => false}
+                      daySize={30}
+                      isDayHighlighted={date =>
+                        date.year() === moment().year() &&
+                        date.month() === moment().month() &&
+                        date.date() === moment().date()}
+                      isDayBlocked={date =>
+                        date.year() > moment().year() ||
+                        (date.year() >= moment().year() && date.month() > moment().month()) ||
+                        (date.year() >= moment().year() &&
+                          date.month() >= moment().month() &&
+                          date.date() > moment().date())}
+                      firstDayOfWeek={6}
+                      required={true}
+                      small
+                      block
+                      hideKeyboardShortcutsPanel
+                    />
+                  </div>
+                  <div className='grid grid-2-1_1'>
+                    <label className='label'>
+                      <p>To</p>
+                      <select
+                        className='main select'
+                        name='debit'
+                        ref={select => {
+                          accountSelect = select
+                        }}
+                        onChange={onChangeHandler}
+                        value={debit}
+                      >
+                        <option value=''>Choose a catagory</option>
+                        <AccountSelection account={props.account} />
+                      </select>
+                    </label>
+                    <label className='label'>
+                      <p>Memo</p>
+                      <input
+                        className='aside input'
+                        type='text'
+                        placeholder='🗒 Note'
+                        name='debit_note'
+                        onChange={onChangeHandler}
+                        value={debit_note}
+                        tabindex='-1'
+                      />
+                    </label>
+                  </div>
+                  <div className='grid grid-2-1_1'>
+                    <label className='label'>
+                      <p>From</p>
+                      <select className='main select' name='credit' onChange={onChangeHandler} value={credit}>
+                        <option value=''>Choose a catagory</option>
+                        <AccountSelection account={props.account} />
+                      </select>
+                    </label>
+                    <label className='label'>
+                      <p>Memo</p>
+                      <input
+                        className='aside input'
+                        type='text'
+                        placeholder='🗒 Note'
+                        name='credit_note'
+                        onChange={onChangeHandler}
+                        value={credit_note}
+                        tabindex='-1'
+                      />
+                    </label>
+                  </div>
+                  <label className='label'>
+                    <p>Description</p>
+                    <input
+                      className='input'
+                      type='text'
+                      name='description'
+                      onChange={onChangeHandler}
+                      value={description}
+                    />
+                  </label>
+                  <label className='label'>
+                    <p>Amount</p>
+                    <input className='input' type='number' name='amount' onChange={onChangeHandler} value={amount} />
+                  </label>
+                  <label className='label'>
+                    <p>Comment</p>
+                    <textarea className='input' type='text' name='comment' onChange={onChangeHandler} value={comment} />
+                    {/* <input className='input' type='text' name='comment' onChange={onChangeHandler} value={comment} /> */}
+                  </label>
+                </div>
+                <Container className='journal-entry-form-footer'>
+                  <div className='grid grid-1-2_1'>
+                    <input type='submit' className='btn btn-journal-entry-custom grey' tabindex='-1' value='Clear' />
+                    <input type='submit' className='btn btn-journal-entry-custom primary main' value='Done' />
+                  </div>
+                </Container>
+              </Container>
+            </form>
+          </div>
         </Fragment>
       </Modal>
     )
