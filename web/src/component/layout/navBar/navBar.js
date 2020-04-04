@@ -5,7 +5,7 @@ import { SideBar } from '../../'
 
 const navBar = ({ title, path, icon, collapsed }) => {
   return (
-    <NavLink to={path} activeClassName='active'>
+    <NavLink to={path} activateClassName='activate'>
       <div className='links'>
         <i className='material-icons p-right-1'>{icon}</i>
         {!collapsed && title}

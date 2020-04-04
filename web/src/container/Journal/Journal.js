@@ -224,35 +224,35 @@ export class Journal extends Component {
                     <option>Incomes</option>
                   </select>
                   {/*  <div
-                  className={`option${this.state.filter_type === 'journal' ? ' active' : ''}`}
+                  className={`option${this.state.filter_type === 'journal' ? ' activate' : ''}`}
                   onClick={() => this.onFilterChangeHandler('filter_type', 'journal')}
                 >
                   <i className='material-icons p-right-1'>collections_bookmark</i>
                   Journal
                 </div>
                 <div
-                  className={`option${this.state.filter_type === 'expenses' ? ' active' : ''}`}
+                  className={`option${this.state.filter_type === 'expenses' ? ' activate' : ''}`}
                   onClick={() => this.onFilterChangeHandler('filter_type', 'expenses')}
                 >
                   <i className='material-icons p-right-1'>local_grocery_store</i>
                   Expresses
                 </div>
                 <div
-                  className={`option${this.state.filter_type === 'assets' ? ' active' : ''}`}
+                  className={`option${this.state.filter_type === 'assets' ? ' activate' : ''}`}
                   onClick={() => this.onFilterChangeHandler('filter_type', 'assets')}
                 >
                   <i className='material-icons p-right-1'>money</i>
                   Cash n Bank
                 </div>
                 <div
-                  className={`option${this.state.filter_type === 'liabilities' ? ' active' : ''}`}
+                  className={`option${this.state.filter_type === 'liabilities' ? ' activate' : ''}`}
                   onClick={() => this.onFilterChangeHandler('filter_type', 'liabilities')}
                 >
                   <i className='material-icons p-right-1'>receipt</i>
                   Payrolls
                 </div>
                 <div
-                  className={`option${this.state.filter_type === 'incomes' ? ' active' : ''}`}
+                  className={`option${this.state.filter_type === 'incomes' ? ' activate' : ''}`}
                   onClick={() => this.onFilterChangeHandler('filter_type', 'incomes')}
                 >
                   <i className='material-icons p-right-1'>score</i>
@@ -340,33 +340,41 @@ export class Journal extends Component {
                 </div>
                 <div className='p-hor-2'>
                   <button
-                    className={`btn btn-chip btn-chip-custom m-0${this.state.filter_date === 'today' ? ' active' : ''}`}
+                    className={`btn btn-chip btn-chip-custom m-0${this.state.filter_date === 'today'
+                      ? ' activate'
+                      : ''}`}
                     onClick={() => this.onDateFilterHandler('today')}
                   >
                     Today
                   </button>
                   <button
                     className={`btn btn-chip btn-chip-custom m-0${this.state.filter_date === '3_days'
-                      ? ' active'
+                      ? ' activate'
                       : ''}`}
                     onClick={() => this.onDateFilterHandler('3_days')}
                   >
                     3 Days
                   </button>
                   <button
-                    className={`btn btn-chip btn-chip-custom m-0${this.state.filter_date === 'week' ? ' active' : ''}`}
+                    className={`btn btn-chip btn-chip-custom m-0${this.state.filter_date === 'week'
+                      ? ' activate'
+                      : ''}`}
                     onClick={() => this.onDateFilterHandler('week')}
                   >
                     Week
                   </button>
                   <button
-                    className={`btn btn-chip btn-chip-custom m-0${this.state.filter_date === 'month' ? ' active' : ''}`}
+                    className={`btn btn-chip btn-chip-custom m-0${this.state.filter_date === 'month'
+                      ? ' activate'
+                      : ''}`}
                     onClick={() => this.onDateFilterHandler('month')}
                   >
                     Month
                   </button>
                   <button
-                    className={`btn btn-chip btn-chip-custom m-0${this.state.filter_date === 'year' ? ' active' : ''}`}
+                    className={`btn btn-chip btn-chip-custom m-0${this.state.filter_date === 'year'
+                      ? ' activate'
+                      : ''}`}
                     onClick={() => this.onDateFilterHandler('year')}
                   >
                     Year

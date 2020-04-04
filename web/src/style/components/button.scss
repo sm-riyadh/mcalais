@@ -13,7 +13,7 @@
   &:hover {
     box-shadow: 0 0 0 0.3rem #1613df6c;
   }
-  &:active {
+  &:activate {
     box-shadow: 0 0 0.1rem #1613df6c;
   }
   &-small {
@@ -37,7 +37,7 @@
       width: auto;
       position: relative;
       z-index: 59;
-      &.active {
+      &.activate {
         background-color: #458bcc;
         color: #e1eaf1;
       }
@@ -55,7 +55,7 @@
       background-color: #0000000e;
       box-shadow: 0 0 0 transparent;
     }
-    &:active {
+    &:activate {
       box-shadow: 0 0 0 transparent;
       background-color: #0000001c;
     }
@@ -93,10 +93,10 @@
     &:hover {
       box-shadow: 0 0rem 0.1rem #00000059, inset 0 0.05rem 0rem #00000031;
     }
-    &:active {
+    &:activate {
       box-shadow: 0 0.1rem 0 #00000012, inset 0 0.05rem 0.2rem #00000031;
     }
-    &.active {
+    &.activate {
       box-shadow: 0 0.1rem 0 #00000012, inset 0 0.05rem 0.2rem #00000031;
 
       &:hover {
@@ -125,10 +125,10 @@
     &:hover {
       box-shadow: 0 0.1rem 0.2rem #00000016, inset 0 0.05rem 0rem #00000031;
     }
-    &:active {
+    &:activate {
       box-shadow: 0 0.1rem 0 #00000012, inset 0 0.05rem 0.2rem #00000031;
     }
-    &.active {
+    &.activate {
       box-shadow: 0 0.1rem 0 #00000012, inset 0 0.05rem 0.2rem #00000031;
 
       &:hover {
@@ -152,10 +152,10 @@
     background-color: #ffffff;
     color: #585858;
 
-    &:active {
+    &:activate {
       background-color: #f0f0f0;
     }
-    &.active {
+    &.activate {
       background-color: #f0f0f0;
     }
   }

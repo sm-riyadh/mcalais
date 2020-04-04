@@ -16,8 +16,8 @@ export class Header extends Component {
     this.props.fetchCompany()
   }
   state = {
-    notifications_btn_active : false,
-    company_btn_active       : false,
+    notifications_btn_activate : false,
+    company_btn_activate       : false,
   }
 
   mainChangeHandler = ({ target }) => {
@@ -66,8 +66,8 @@ export class Header extends Component {
             {this.props.company.length > 1 ? (
               <select
                 name='company'
-                className={`button button-icon button-light white${this.state.company_btn_active ? ' active' : ''}`}
-                onClick={() => this.setState({ company_btn_active: !this.state.company_btn_active })}
+                className={`button button-icon button-light white${this.state.company_btn_activate ? ' activate' : ''}`}
+                onClick={() => this.setState({ company_btn_activate: !this.state.company_btn_activate })}
                 onChange={this.mainChangeHandler}
                 value={this.props.currentCompany}
               >
@@ -88,8 +88,8 @@ export class Header extends Component {
               <img src={PikachuAvator} />
             </button>
             <button
-              onClick={() => this.setState({ notifications_btn_active: !this.state.notifications_btn_active })}
-              className={`button button-icon button-light${this.state.notifications_btn_active ? ' active' : ''}`}
+              onClick={() => this.setState({ notifications_btn_activate: !this.state.notifications_btn_activate })}
+              className={`button button-icon button-light${this.state.notifications_btn_activate ? ' activate' : ''}`}
             >
               {/* onMouseEnter={() => click.play()} */}
               <i className='material-icons'>notifications</i>

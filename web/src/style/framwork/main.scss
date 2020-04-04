@@ -25,7 +25,7 @@ $style-roundness: 0.8rem;
     box-shadow: -0.2rem -0.2rem 1.8rem rgba(255, 255, 255, 0.8), 0.2rem 0.2rem 0.8rem rgba(128, 125, 121, 0.3);
     transition: all 220ms;
   }
-  &:active {
+  &:activate {
     background-color: transparentize(lighten($color-light, $amount: 15%), $amount: 0.65);
     box-shadow: -0.2rem -0.2rem 0.6rem rgba(255, 255, 255, 0.2), 0.2rem 0.2rem 0.2rem rgba(217, 210, 200, 0.2);
   }
@@ -45,13 +45,13 @@ $style-roundness: 0.8rem;
       box-shadow: -0.2rem -0.2rem 1.8rem rgba(255, 255, 255, 0.8), 0.2rem 0.2rem 0.8rem rgba(128, 125, 121, 0.3),
         inset 0 0 0 0.25rem lighten($color-light, 3%);
     }
-    &:active {
+    &:activate {
       background-color: transparentize(darken($color-light, $amount: 10%), $amount: 0.65);
       box-shadow: -0.2rem -0.2rem 0.6rem rgba(255, 255, 255, 0.2), 0.2rem 0.2rem 0.2rem rgba(217, 210, 200, 0.2),
         inset 0 0 0 0.35rem lighten($color-light, 25%);
     }
   }
-  &.active {
+  &.activate {
     background-color: transparentize(darken($color-light, $amount: 10%), $amount: 0.65);
     box-shadow: -0.2rem -0.2rem 0.6rem rgba(255, 255, 255, 0.2), 0.2rem 0.2rem 0.2rem rgba(217, 210, 200, 0.2),
       inset 0 0 0 0.35rem lighten($color-light, 25%);
@@ -69,7 +69,7 @@ $style-roundness: 0.8rem;
         0.3rem 0.3rem 1.4rem transparentize(desaturate($color-primary, 40%), $amount: 0.9),
         0 0 0.6rem transparentize(desaturate($color-primary, 10), $amount: 0.8);
     }
-    &:active {
+    &:activate {
       background-color: desaturate(darken($color-primary, 4%), 3%);
       box-shadow: 0.1rem 0.1rem 0.1rem transparentize(desaturate($color-primary, 20%), $amount: 0.85),
         0.15rem 0.15rem 0.2rem transparentize(desaturate($color-primary, 20%), $amount: 0.9);
@@ -83,7 +83,7 @@ $style-roundness: 0.8rem;
       background-color: darken($color-light, $amount: 8);
       box-shadow: 0 0 0 rgba(255, 255, 255, 0);
     }
-    &:active {
+    &:activate {
       background-color: darken($color-light, $amount: 15);
       box-shadow: 0 0 0 rgba(255, 255, 255, 0);
     }
