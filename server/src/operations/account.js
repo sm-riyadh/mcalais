@@ -1,7 +1,12 @@
 import Account from '../models/account'
 
-const fetch = async ({ company, nonempty }) => {
-  const account = await Account.fetch(company, nonempty)
+// CODE: Fetch
+
+const fetch = async ({ company, nonempty } = {}) => {
+  let account
+
+  if (nonempty) account = await Account.fetch(company)
+  else account = await Account.fetchNonEmpty(company)
 
   const { balance } = await Company.fetchOne(company)
 
@@ -9,7 +14,16 @@ const fetch = async ({ company, nonempty }) => {
 
   return sortedAccount
 }
-const create = async ({ company, type, name, path, intercompany }) => {
+
+const fetchDetail = async ({ id }) => {
+  const account = await Account.fetchOne(id)
+
+  return account
+}
+
+//  CODE: Create
+
+const create = async ({ company, type, name, path, intercompany } = {}) => {
   //  Generate Account Code
   const { accountCount } = await Company.fetchOne(company)
   const code = codeGen(type, accountCount[type])
@@ -21,15 +35,39 @@ const create = async ({ company, type, name, path, intercompany }) => {
 
   return newAccount
 }
-const modify = async ({ id, name, path, intercompany }) => {
+
+// CODE: Modify
+
+const modify = async ({ id, name, path, intercompany } = {}) => {
   const modifiedAccount = await Account.modify({ id, name, path, intercompany })
 
   return modifiedAccount
 }
-const remove = async ({ company, id }) => {
-  const removedAccount = await removedAccount.remove(company, id)
 
-  return removedAccount
+// CODE: State
+
+const activate = async ({ id }) => {
+  const activatedAccount = await Account.enable(id)
+
+  return activatedAccount
+}
+
+const deactivate = async ({ id }) => {
+  const deactivatedAccount = await Account.disable(id)
+
+  return deactivatedAccount
+}
+
+// CODE: Remove
+
+const remove = async id => {
+  if (!await Account.fetchNonEmpty(id)) {
+    const removedAccount = await removedAccount.remove(id)
+
+    return removedAccount
+  } else {
+    state(id, 'deactivate')
+  }
 }
 
 /* -------------------------------- Utilities ------------------------------- */
@@ -64,4 +102,5 @@ const accountSorter = () => {
 
   return sortedAccount
 }
-export { fetch, create, modify, remove }
+
+export { fetch, fetchDetail, create, modify, activate, deactivate, remove }

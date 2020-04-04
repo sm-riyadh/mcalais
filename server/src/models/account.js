@@ -1,10 +1,4 @@
 import mongoose from 'mongoose'
-import Company from './company'
-
-// const ObjectIdDate = date =>
-//   mongoose.Types.ObjectId(
-//     Math.floor(date / 1000).toString(16) + '0000000000000000'
-//   )
 
 const AccountSchema = new mongoose.Schema(
   {
@@ -74,6 +68,7 @@ const AccountSchema = new mongoose.Schema(
   },
   { collection: 'account' }
 )
+
 AccountSchema.methods.toJSON = function() {
   const { _id, company, name, type, code, path, balance, intercompany, transaction } = this.toObject()
   return {
@@ -89,108 +84,60 @@ AccountSchema.methods.toJSON = function() {
   }
 }
 
-AccountSchema.statics.fetch = (company, code) =>
+/* --------------------------------- METHODS -------------------------------- */
+
+// CODE: Check
+
+AccountSchema.statics.isInterCompany = id => Account.findById(id, { intercompany: { $exists: true } })
+
+AccountSchema.statics.isExist = code => Account.exists({ code })
+
+// CODE: Fetch
+
+AccountSchema.statics.fetchOne = id => Account.findById(id)
+
+AccountSchema.statics.fetch = (company, payload) =>
   Account.findOne({
     company,
-    code,
+    payload,
   })
 
-AccountSchema.statics.fetchList = company => Account.find({ company, transaction: { $exists: true, $ne: [] } })
+AccountSchema.statics.fetchNonEmpty = (company, payload) =>
+  Account.find({ company, payload, transaction: { $exists: true, $ne: [] } })
 
-AccountSchema.statics.fetchAll = company => Account.find({ company })
+// CODE: Create
 
-AccountSchema.statics.checkInterCompany = (company, code) =>
-  Account.find({ company, code, intercompany: { $exists: true } })
+AccountSchema.statics.create = ({ company, type, name, code, path, intercompany }) =>
+  Account({ company, type, name, code, path, intercompany }).save()
 
-AccountSchema.statics.create = payload => Account(payload).save()
+// CODE: Modify
 
-AccountSchema.statics.insertPreset = payload =>
-  Account.findOneAndUpdate(
-    { id: payload.account_id },
-    {
-      $push : {
-        preset : { preset_id: payload.preset_id },
-      },
-    }
-  )
+JournalSchema.statics.modify = (id, { name, path, intercompany }) =>
+  Journal.findByIdAndUpdate(id, {
+    $set : {
+      name,
+      path,
+      intercompany,
+    },
+  })
 
-const assets = type => type > 100000 && type < 200000
-const liabilities = type => type > 200000 && type < 300000
-const equities = type => type > 300000 && type < 400000
-const expenses = type => type > 400000 && type < 500000
-const incomes = type => type > 500000 && type < 600000
+AccountSchema.statics.disable = id =>
+  Account.findByIdAndUpdate(id, {
+    $set : {
+      isDisabled : true,
+    },
+  })
 
-const typeFinder = code => {
-  switch (+('' + code)[0]) {
-    case 1:
-      return 'assets'
-    case 2:
-      return 'liabilities'
-    case 3:
-      return 'equities'
-    case 4:
-      return 'expenses'
-    case 5:
-      return 'incomes'
-  }
-}
-AccountSchema.statics.addJournal = async (company, journalID, credit, debit, amount) => {
-  await Account.findOneAndUpdate(
-    { company, code: credit },
-    {
-      $push : {
-        transaction : { journal_id: journalID },
-      },
-    }
-  )
-  await Account.update(
-    { company, code: debit },
-    {
-      $push : {
-        transaction : { journal_id: journalID },
-      },
-    }
-  )
+AccountSchema.statics.enable = id =>
+  Account.findByIdAndUpdate(id, {
+    $set : {
+      isDisabled : true,
+    },
+  })
 
-  if (
-    (assets(debit) && liabilities(credit)) ||
-    (assets(debit) && incomes(credit)) ||
-    (assets(debit) && equities(credit)) ||
-    (expenses(debit) && liabilities(credit))
-  ) {
-    await Account.findOneAndUpdate({ company, code: credit }, { $inc: { balance: amount } })
-    await Account.findOneAndUpdate({ company, code: debit }, { $inc: { balance: amount } })
+// CODE: Remove
 
-    await Company.updateAccountBalance(company, typeFinder(credit), +amount)
-    await Company.updateAccountBalance(company, typeFinder(debit), +amount)
-  } else if ((liabilities(debit) && assets(credit)) || (equities(debit) && assets(credit))) {
-    await Account.findOneAndUpdate({ company, code: credit }, { $inc: { balance: -amount } })
-    await Account.findOneAndUpdate({ company, code: debit }, { $inc: { balance: -amount } })
-
-    await Company.updateAccountBalance(company, typeFinder(credit), -amount)
-    await Company.updateAccountBalance(company, typeFinder(debit), -amount)
-  } else if (
-    (assets(debit) && assets(credit)) ||
-    (expenses(debit) && assets(credit)) ||
-    (assets(debit) && expenses(credit)) ||
-    (assets(debit) && incomes(credit)) ||
-    (incomes(debit) && assets(credit))
-  ) {
-    await Account.findOneAndUpdate({ company, code: credit }, { $inc: { balance: -amount } })
-    await Account.findOneAndUpdate({ company, code: debit }, { $inc: { balance: +amount } })
-
-    await Company.updateAccountBalance(company, typeFinder(credit), -amount)
-    await Company.updateAccountBalance(company, typeFinder(debit), +amount)
-  }
-}
-AccountSchema.statics.isExist = code => Account.exists({ code })
-AccountSchema.statics.remove = async (company, code) => {
-  const { transaction } = await Account.fetch(company, code)
-
-  if (transaction.length === 0) await Account.deleteOne({ company, code })
-  else await Account.updateOne({ company, code }, { $set: { isDisabled: true } })
-}
-AccountSchema.statics.disable = (company, code) => Account.updateOne({ company, code }, { $set: { isDisabled: true } })
+AccountSchema.statics.remove = id => Account.findByIdAndRemove(id)
 
 const Account = mongoose.model('Account', AccountSchema)
 

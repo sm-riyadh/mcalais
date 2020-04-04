@@ -1,6 +1,6 @@
 import Router from 'express'
-import Tree from '../models/tree'
-// import { Types } from 'mongoose'
+import Validator from './validator/tree'
+import Ops from '../operations/tree'
 
 // Express > Router
 const app = Router()
@@ -8,25 +8,35 @@ const app = Router()
 // Route
 const url = 'api/tree'
 
-app.get(`/${url}`, async (req, res) => {
+// CODE: Fetch
+
+app.get(`/${url}`, async (req, res, next) => {
   try {
     const { company } = req.query
-    const tree = await Tree.fetchOne(company)
 
-    return res.send(tree)
+    Validator.fetch({ company })
+
+    const data = Ops.fetch({ company })
+
+    return res.send(data)
   } catch (err) {
-    return res.send('error: ' + err)
+    return next(err)
   }
 })
 
-app.post(`/${url}`, async (req, res) => {
+/* ---------------------------------- REPLACE --------------------------------- */
+
+app.put(`/${url}`, async (req, res, next) => {
   try {
     const { company, tree } = req.body
-    const updatedTree = await Tree.update(company, tree)
 
-    return res.send(updatedTree)
+    Validator.put({ company, tree })
+
+    const data = Ops.put({ company, tree })
+
+    return res.send(data)
   } catch (err) {
-    return res.send('error: ' + err)
+    return next(err)
   }
 })
 

@@ -1,7 +1,7 @@
 import Router from 'express'
 
 import Validator from './validator/company'
-import Func from '../func/company'
+import Ops from '../operations/company'
 
 // Express > Router
 const app = Router()
@@ -9,15 +9,11 @@ const app = Router()
 // Route
 const url = 'api/company'
 
-/* ---------------------------------- FETCH --------------------------------- */
+// CODE: Fetch
 
 app.get(`/${url}`, async (req, res) => {
   try {
-    // const { } = req.query
-
-    // Validator.fetch({})
-
-    const data = Func.fetch()
+    const data = Ops.fetch()
 
     return res.send(data)
   } catch (err) {
@@ -25,7 +21,21 @@ app.get(`/${url}`, async (req, res) => {
   }
 })
 
-/* ---------------------------------- CRATE --------------------------------- */
+app.get(`/${url}/:id`, async (req, res) => {
+  try {
+    const { id } = req.params
+
+    Validator.fetchDetails({ id })
+
+    const data = Ops.fetchfetchDetails({ id })
+
+    return res.send(data)
+  } catch (err) {
+    return next(err)
+  }
+})
+
+// CODE: Create
 
 app.post(`/${url}`, async (req, res) => {
   try {
@@ -33,7 +43,7 @@ app.post(`/${url}`, async (req, res) => {
 
     Validator.create({ name })
 
-    const data = Func.create({ name })
+    const data = Ops.create({ name })
 
     return res.send(data)
   } catch (err) {
@@ -41,15 +51,16 @@ app.post(`/${url}`, async (req, res) => {
   }
 })
 
-/* ---------------------------------- MODIFY --------------------------------- */
+// CODE: Modify
 
-app.patch(`/${url}`, async (req, res) => {
+app.patch(`/${url}/:id`, async (req, res) => {
   try {
-    const { id, name } = req.body
+    const { id } = req.params
+    const { name } = req.body
 
     Validator.modify({ id, name })
 
-    const data = Func.modify({ id, name })
+    const data = Ops.modify({ id, name })
 
     return res.send(data)
   } catch (err) {
@@ -57,7 +68,34 @@ app.patch(`/${url}`, async (req, res) => {
   }
 })
 
-/* ---------------------------------- REMOVE --------------------------------- */
+app.patch(`/${url}/:id/activate`, async (req, res) => {
+  try {
+    const { id } = req.params
+
+    Validator.activate({ id })
+
+    const data = Ops.activate({ id, action })
+
+    return res.send(data)
+  } catch (err) {
+    return next(err)
+  }
+})
+app.patch(`/${url}/:id/deactivate`, async (req, res) => {
+  try {
+    const { id } = req.params
+
+    Validator.deactivate({ id })
+
+    const data = Ops.deactivate({ id })
+
+    return res.send(data)
+  } catch (err) {
+    return next(err)
+  }
+})
+
+// CODE: Remove
 
 app.delete(`/${url}`, async (req, res) => {
   try {
@@ -65,7 +103,7 @@ app.delete(`/${url}`, async (req, res) => {
 
     Validator.remove({ id })
 
-    const data = Func.remove({ id })
+    const data = Ops.remove({ id })
 
     return res.send(data)
   } catch (err) {

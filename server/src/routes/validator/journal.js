@@ -2,7 +2,9 @@ import Validator from 'validator'
 
 import Account from '../../models/account'
 
-const fetch = async ({ company, size, page, type, start_date, end_date }) => {
+// CODE: Fetch
+
+const fetch = async ({ company, size, page, type, start_date, end_date } = {}) => {
   // if (!Validator.isMongoId(company_id)) throw 'Wrong company ID'
 
   if (size && !Validator.isNumeric(size)) throw 'Invalid date'
@@ -16,7 +18,12 @@ const fetch = async ({ company, size, page, type, start_date, end_date }) => {
   if (!company) throw 'Company is required'
 }
 
-const create = async ({ date, company, credit, credit_note, debit, debit_note, description, amount, comment }) => {
+const fetchDetails = async ({ id } = {}) => {
+  if (!Validator.isMongoId(id)) throw 'Wrong ID'
+}
+// CODE: Create
+
+const create = async ({ date, company, credit, credit_note, debit, debit_note, description, amount, comment } = {}) => {
   // if (!Validator.isMongoId(company_id)) throw 'Wrong company ID'
   if (!Validator.isISO8601(date)) throw 'Invalid date'
   if (!Validator.isNumeric(amount)) throw 'Invalid date'
@@ -65,7 +72,9 @@ const create = async ({ date, company, credit, credit_note, debit, debit_note, d
   }
 }
 
-const modify = async ({ id, date, credit_note, debit_note, description, comment }) => {
+// CODE: Modify
+
+const modify = async ({ id, date, credit_note, debit_note, description, comment } = {}) => {
   if (!Validator.isMongoId(id)) throw 'Wrong ID'
   if (!Validator.isISO8601(date)) throw 'Invalid date'
   if (!Validator.isAlphanumeric(credit_note)) throw 'Only letters and numbers are allowed for credit note'
@@ -74,8 +83,18 @@ const modify = async ({ id, date, credit_note, debit_note, description, comment 
   if (!Validator.isAlphanumeric(comment)) throw 'Only letters and numbers are allowed for comment'
 }
 
-const remove = async ({ id }) => {
+const activate = async ({ id } = {}) => {
   if (!Validator.isMongoId(id)) throw 'Wrong ID'
 }
 
-export { fetch, create, modify, remove }
+const deactivate = async ({ id } = {}) => {
+  if (!Validator.isMongoId(id)) throw 'Wrong ID'
+}
+
+// CODE: Remove
+
+const remove = async ({ id } = {}) => {
+  if (!Validator.isMongoId(id)) throw 'Wrong ID'
+}
+
+export { fetch, fetchDetails, create, modify, activate, deactivate, remove }
