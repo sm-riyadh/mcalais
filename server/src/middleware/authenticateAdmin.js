@@ -9,15 +9,15 @@ const authenticateAdmin = async (req, res, next) => {
     if (user.power !== 'admin') throw 'You do not have the perm permission'
 
     req.userData = {
-      id: user.id,
-      username: user.username,
-      name: user.name,
-      company: user.company,
-      power: user.power,
+      id       : user.id,
+      username : user.username,
+      name     : user.name,
+      company  : user.company,
+      power    : user.power,
     }
     return next()
-  } catch (err) {
-    return res.status(401).send(err)
+  } catch (error) {
+    return res.status(401).send(error)
   }
 }
 

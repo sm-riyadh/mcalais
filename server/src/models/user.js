@@ -95,7 +95,7 @@ UserSchema.statics.findByToken = function (token) {
 
   try {
     decoded = jwt.verify(token, 'secret')
-  } catch (err) {
+  } catch (error) {
     return Promise.reject()
   }
 
@@ -125,8 +125,8 @@ UserSchema.statics.findByCredentials = function (username, password) {
 UserSchema.pre('save', function (next) {
   const user = this
 
-  user.isModified('password') ? bcrypt.genSalt(10, (err, salt) => {
-    bcrypt.hash(user.password, salt, (err, hash) => {
+  user.isModified('password') ? bcrypt.genSalt(10, (error, salt) => {
+    bcrypt.hash(user.password, salt, (error, hash) => {
       user.password = hash
       next()
     })

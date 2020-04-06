@@ -12,7 +12,7 @@ const replace = async ({ company, tree }) => {
   return updatedTree
 }
 const modify = async ({}) => {}
+
 const remove = async ({}) => {}
 
-const replace = async ({}) => {}
-export { fetch, create, replace, modify, remove }
+export default { fetch, create, replace, modify, remove }

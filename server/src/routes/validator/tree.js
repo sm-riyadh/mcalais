@@ -6,4 +6,4 @@ const replace = async ({ company, tree } = {}) => {
   // if (!Validator.isMongoId(company_id)) throw 'Wrong company ID'
 }
 
-export { fetch, replace }
+export default { fetch, replace }

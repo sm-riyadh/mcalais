@@ -2,30 +2,27 @@ import mongoose from 'mongoose'
 
 const TreeSchema = new mongoose.Schema([
   {
-    company: {
-      type: String,
-      required: true
+    company : {
+      type     : String,
+      required : true,
     },
-    tree: {
-      assets: [],
-      liabilities: [],
-      equities: [],
-      expenses: [],
-      incomes: []
-    }
-  }
+    tree    : {
+      assets      : [],
+      liabilities : [],
+      equities    : [],
+      expenses    : [],
+      incomes     : [],
+    },
+  },
 ])
-TreeSchema.methods.toJSON = function () {
+TreeSchema.methods.toJSON = function() {
   const { tree } = this.toObject()
   return tree
 }
 TreeSchema.statics.fetchOne = company => Tree.findOne({ company })
 
-TreeSchema.statics.update = (company, tree) => Tree.replaceOne(
-  { company },
-  { company, tree },
-  { upsert: true }
-)
+TreeSchema.statics.update = (company, payload) =>
+  Tree.replaceOne({ company }, { company, tree: payload }, { upsert: true })
 
 const Tree = mongoose.model('Tree', TreeSchema)
 

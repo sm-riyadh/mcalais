@@ -6,16 +6,23 @@ import Account from '../../models/account'
 
 const fetch = async ({ company, size, page, type, start_date, end_date } = {}) => {
   // if (!Validator.isMongoId(company_id)) throw 'Wrong company ID'
+  if (!company) throw 'Company is required'
 
   if (size && !Validator.isNumeric(size)) throw 'Invalid date'
   if (page && !Validator.isNumeric(page)) throw 'Invalid date'
   if (start_date && !Validator.isISO8601(start_date)) throw 'Invalid starting date'
   if (end_date && !Validator.isISO8601(end_date)) throw 'Invalid ending date'
 
-  if (type !== 'assets' || type !== 'liabilities' || type !== 'equities' || type !== 'expenses' || type !== 'incomes')
-    throw 'Account type must be one of this: assets, liabilities, equities, expenses or incomes'
-
-  if (!company) throw 'Company is required'
+  if (
+    type &&
+    type !== 'journal' &&
+    type !== 'assets' &&
+    type !== 'liabilities' &&
+    type !== 'equities' &&
+    type !== 'expenses' &&
+    type !== 'incomes'
+  )
+    throw 'Account type must be one of this: journal, assets, liabilities, equities, expenses or incomes'
 }
 
 const fetchDetails = async ({ id } = {}) => {
@@ -25,6 +32,8 @@ const fetchDetails = async ({ id } = {}) => {
 
 const create = async ({ date, company, credit, credit_note, debit, debit_note, description, amount, comment } = {}) => {
   // if (!Validator.isMongoId(company_id)) throw 'Wrong company ID'
+  if (!company) throw 'Company is required'
+
   if (!Validator.isISO8601(date)) throw 'Invalid date'
   if (!Validator.isNumeric(amount)) throw 'Invalid date'
   if (!Validator.isAlphanumeric(credit_note)) throw 'Only letters and numbers are allowed for credit note'
@@ -97,4 +106,4 @@ const remove = async ({ id } = {}) => {
   if (!Validator.isMongoId(id)) throw 'Wrong ID'
 }
 
-export { fetch, fetchDetails, create, modify, activate, deactivate, remove }
+export default { fetch, fetchDetails, create, modify, activate, deactivate, remove }

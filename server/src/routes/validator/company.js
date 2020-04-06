@@ -16,7 +16,7 @@ const create = async ({ name } = {}) => {
 
 const modify = async ({ id, name } = {}) => {
   if (!Validator.isMongoId(id)) throw 'Wrong ID'
-  if (!Validator.isAlphanumeric(name)) throw 'Only letters and numbers are allowed for name'
+  if (!Validator.isAlphanumeric(name.replace(' ', ''))) throw 'Only letters and numbers are allowed for name'
 }
 
 const activate = async ({ id } = {}) => {
@@ -33,4 +33,4 @@ const remove = async ({ id } = {}) => {
   if (!Validator.isMongoId(id)) throw 'Wrong ID'
 }
 
-export { fetchDetails, create, modify, activate, deactivate, remove }
+export default { fetchDetails, create, modify, activate, deactivate, remove }

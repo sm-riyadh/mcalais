@@ -4,7 +4,7 @@ import Validator from 'validator'
 
 const fetch = async ({ company, nonempty = false } = {}) => {
   // if (!Validator.isMongoId(company_id)) throw 'Wrong company ID'
-  if (nonempty && !Validator.isBoolean(nonempty)) throw 'Non-Empty must be a boolean or empty'
+  if (nonempty && !Validator.isBoolean(nonempty)) throw 'Non-Empty must be a boolean'
 }
 
 const fetchDetails = async ({ id } = {}) => {
@@ -17,7 +17,7 @@ const create = async ({ company, type, name, path, intercompany } = {}) => {
   // if (!Validator.isMongoId(company_id)) throw 'Wrong company ID'
   if (!Validator.isAlphanumeric(name)) throw 'Only letters and numbers are allowed for name'
 
-  if (type !== 'assets' || type !== 'liabilities' || type !== 'equities' || type !== 'expenses' || type !== 'incomes')
+  if (type !== 'assets' && type !== 'liabilities' && type !== 'equities' && type !== 'expenses' && type !== 'incomes')
     throw 'Account type must be one of this: assets, liabilities, equities, expenses or incomes'
 }
 
@@ -25,7 +25,7 @@ const create = async ({ company, type, name, path, intercompany } = {}) => {
 
 const modify = async ({ id, name, path, intercompany } = {}) => {
   if (!Validator.isMongoId(id)) throw 'Wrong ID'
-  if (!Validator.isAlphanumeric(name)) throw 'Only letters and numbers are allowed for name'
+  if (!Validator.isAlphanumeric(name.replace(' ', ''))) throw 'Only letters and numbers are allowed for name'
 }
 
 const activate = async ({ id } = {}) => {
@@ -38,9 +38,9 @@ const deactivate = async ({ id } = {}) => {
 
 // CODE: Remove
 
-const remove = async ({ company, id } = {}) => {
+const remove = async ({ id } = {}) => {
   // if (!Validator.isMongoId(company_id)) throw 'Wrong company ID'
   if (!Validator.isMongoId(id)) throw 'Wrong ID'
 }
 
-export { fetch, fetchDetails, create, modify, activate, deactivate, remove }
+export default { fetch, fetchDetails, create, modify, activate, deactivate, remove }
