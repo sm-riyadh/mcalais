@@ -10,5 +10,7 @@
 # misc
 .env
 /.vscode
+/server_template
+/web_template
 /deploy
 /backup
