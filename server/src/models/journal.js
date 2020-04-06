@@ -1,5 +1,4 @@
 import mongoose from 'mongoose'
-import Account from './account'
 import { subDays, startOfDay, endOfDay } from 'date-fns'
 
 const ObjectIdDate = date => mongoose.Types.ObjectId(Math.floor(date / 1000).toString(16) + '0000000000000000')
@@ -67,9 +66,9 @@ const JournalSchema = new mongoose.Schema({
 })
 
 JournalSchema.methods.toJSON = function() {
-  const { _id, date, company, credit, debit, description, amount, comment } = this.toObject()
+  const { _id, date, company, credit, debit, description, amount, comment, isDisabled } = this.toObject()
   const entry_date = _id.getTimestamp()
-  return { id: _id, date, company, entry_date, credit, debit, description, amount, comment }
+  return { id: _id, date, company, entry_date, credit, debit, description, amount, comment, isDisabled }
 }
 
 /* --------------------------------- METHODS -------------------------------- */
@@ -85,7 +84,7 @@ JournalSchema.statics.fetch = (
     page = 0,
     lowerRangeCode = 100000,
     higherRangeCode = 500000,
-    startDate = startOfDay(subDays(new Date(), 2000)),
+    startDate = startOfDay(subDays(new Date(), 1)),
     endDate = endOfDay(new Date()),
   }
 ) =>
@@ -145,11 +144,15 @@ JournalSchema.statics.create = (
 // CODE: Modify
 
 JournalSchema.statics.modify = (id, payload) =>
-  Journal.findByIdAndUpdate(id, {
-    $set : {
-      payload,
+  Journal.findByIdAndUpdate(
+    id,
+    {
+      $set : {
+        ...payload,
+      },
     },
-  })
+    { upsert: true }
+  )
 
 JournalSchema.statics.disable = id =>
   Journal.findByIdAndUpdate(id, {

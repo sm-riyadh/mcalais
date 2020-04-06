@@ -16,11 +16,11 @@ app.get(`/${url}`, async (req, res, next) => {
 
     Validator.fetch({ company })
 
-    const data = Ops.fetch({ company })
+    const data = await Ops.fetch({ company })
 
     return res.send(data)
-  } catch (err) {
-    return next(err)
+  } catch (error) {
+    return next(error)
   }
 })
 
@@ -32,11 +32,11 @@ app.put(`/${url}`, async (req, res, next) => {
 
     Validator.put({ company, tree })
 
-    const data = Ops.put({ company, tree })
+    const data = await Ops.put({ company, tree })
 
     return res.send(data)
-  } catch (err) {
-    return next(err)
+  } catch (error) {
+    return next(error)
   }
 })
 

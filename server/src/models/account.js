@@ -1,76 +1,69 @@
 import mongoose from 'mongoose'
 
-const AccountSchema = new mongoose.Schema(
-  {
-    company      : {
-      type     : String,
-      required : true,
+const AccountSchema = new mongoose.Schema({
+  company      : {
+    type     : String,
+    required : true,
+  },
+  name         : {
+    type     : String,
+    trim     : true,
+    required : true,
+  },
+  type         : {
+    type     : String,
+    required : true,
+  },
+  code         : {
+    type     : Number,
+    min      : 100000,
+    max      : 999999,
+    required : true,
+  },
+  balance      : {
+    type     : Number,
+    default  : 0,
+    required : true,
+  },
+  path         : [
+    {
+      type : String,
     },
-    name         : {
+  ],
+  intercompany : {
+    to_company : {
       type     : String,
       trim     : true,
-      required : true,
+      required : false,
     },
-    type         : {
-      type     : String,
-      required : true,
-    },
-    code         : {
+    deposit    : {
       type     : Number,
       min      : 100000,
       max      : 999999,
-      required : true,
+      required : false,
     },
-    balance      : {
+    due        : {
       type     : Number,
-      default  : 0,
-      required : true,
+      min      : 100000,
+      max      : 999999,
+      required : false,
     },
-    path         : [
-      {
-        type : String,
-      },
-    ],
-    intercompany : {
-      to_company : {
-        type     : String,
-        trim     : true,
-        required : false,
-      },
-      deposit    : {
-        type     : Number,
-        min      : 100000,
-        max      : 999999,
-        required : false,
-      },
-      due        : {
-        type     : Number,
-        min      : 100000,
-        max      : 999999,
-        required : false,
-      },
-    },
-    canDisable   : {
-      type     : Boolean,
-      default  : true,
-      required : true,
-    },
-    isDisabled   : {
-      type     : Boolean,
-      default  : false,
-      required : true,
-    },
-    transaction  : [
-      {
-        journal_id : mongoose.Schema.ObjectId,
-      },
-    ],
   },
-  { collection: 'account' }
-)
+  isDisabled   : {
+    type     : Boolean,
+    default  : false,
+    required : true,
+  },
+  transaction  : [
+    {
+      journal_id : mongoose.Schema.ObjectId,
+    },
+  ],
+})
 
 AccountSchema.methods.toJSON = function() {
-  const { _id, company, name, type, code, path, balance, intercompany, transaction } = this.toObject()
+  const { _id, company, name, type, code, path, balance, intercompany, isDisabled, transaction } = this.toObject()
+
   return {
     id           : _id,
     company,
@@ -80,6 +73,7 @@ AccountSchema.methods.toJSON = function() {
     path,
     balance,
     intercompany,
+    isDisabled,
     transaction,
   }
 }
@@ -88,7 +82,7 @@ AccountSchema.methods.toJSON = function() {
 
 // CODE: Check
 
-AccountSchema.statics.isInterCompany = id => Account.findById(id, { intercompany: { $exists: true } })
+AccountSchema.statics.isInterCompany = id => Account.findById({ _id: id, intercompany: { $exists: true } })
 
 AccountSchema.statics.isExist = code => Account.exists({ code })
 
@@ -96,30 +90,46 @@ AccountSchema.statics.isExist = code => Account.exists({ code })
 
 AccountSchema.statics.fetchOne = id => Account.findById(id)
 
-AccountSchema.statics.fetch = (company, payload) =>
-  Account.findOne({
-    company,
-    payload,
-  })
+AccountSchema.statics.fetch = (company, payload) => Account.find({ company, ...payload })
 
 AccountSchema.statics.fetchNonEmpty = (company, payload) =>
-  Account.find({ company, payload, transaction: { $exists: true, $ne: [] } })
+  Account.find({ company, ...payload, transaction: { $exists: true, $ne: [] } })
 
 // CODE: Create
 
 AccountSchema.statics.create = ({ company, type, name, code, path, intercompany }) =>
   Account({ company, type, name, code, path, intercompany }).save()
 
+AccountSchema.statics.addJournal = (company, code, journal_id) =>
+  Account.findOneAndUpdate(
+    { company, code },
+    {
+      $push : {
+        transaction : { journal_id },
+      },
+    }
+  )
+// AccountSchema.statics.addJournal = (id, journal_id) =>
+//   Account.findByIdAndUpdate(id, {
+//     $push : {
+//       transaction : { journal_id },
+//     },
+//   })
+
 // CODE: Modify
 
-JournalSchema.statics.modify = (id, { name, path, intercompany }) =>
-  Journal.findByIdAndUpdate(id, {
+AccountSchema.statics.modify = (id, payload) =>
+  Account.findByIdAndUpdate(id, {
     $set : {
-      name,
-      path,
-      intercompany,
+      ...payload,
     },
   })
+
+AccountSchema.statics.modifyBalance = (company, code, amount) =>
+  Account.findOneAndUpdate({ company, code }, { $inc: { balance: amount } })
+
+// AccountSchema.statics.modifyBalance = (id, amount) =>
+// Account.findByIdAndUpdate(id, { $inc: { balance: amount } })
 
 AccountSchema.statics.disable = id =>
   Account.findByIdAndUpdate(id, {
@@ -131,7 +141,7 @@ AccountSchema.statics.disable = id =>
 AccountSchema.statics.enable = id =>
   Account.findByIdAndUpdate(id, {
     $set : {
-      isDisabled : true,
+      isDisabled : false,
     },
   })
 

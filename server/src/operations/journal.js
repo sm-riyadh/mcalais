@@ -1,10 +1,14 @@
-import { startOfDay, endOfDay } from 'date-fns'
+import { subDays, startOfDay, endOfDay } from 'date-fns'
+
+import Journal from '../models/journal'
+import Account from '../models/account'
+import Company from '../models/company'
 
 // CODE: Fetch
 
 const fetch = async ({ company, size, page, type = 'journal', start_date, end_date } = {}) => {
-  startDate = startOfDay(new Date(startDate))
-  endDate = endOfDay(new Date(endDate))
+  const startDate = start_date && startOfDay(new Date(start_date))
+  const endDate = end_date && endOfDay(new Date(end_date))
 
   let lowerRangeCode, higherRangeCode
 
@@ -40,12 +44,12 @@ const fetch = async ({ company, size, page, type = 'journal', start_date, end_da
     }
   }
 
-  const journal = await Journal.fetch(company, { size, page, lowerRangeCode, higherRangeCode, start_date, end_date })
+  const journal = await Journal.fetch(company, { size, page, lowerRangeCode, higherRangeCode, startDate, endDate })
 
   return journal
 }
 
-const fetchDetail = async ({ id }) => {
+const fetchDetails = async ({ id }) => {
   const journal = await Journal.fetchOne(id)
 
   return journal
@@ -54,8 +58,8 @@ const fetchDetail = async ({ id }) => {
 // CODE: Create
 
 const create = async ({ date, company, credit, credit_note, debit, debit_note, description, amount, comment } = {}) => {
-  const debitAccount = await Account.fetchOneByCode(debit)
-  const creditAccount = await Account.fetchOneByCode(credit)
+  const debitAccount = (await Account.fetch(company, { code: debit }))[0]
+  const creditAccount = (await Account.fetch(company, { code: credit }))[0]
 
   const newJournal = await Journal.create({
     date,
@@ -68,27 +72,14 @@ const create = async ({ date, company, credit, credit_note, debit, debit_note, d
     amount,
     comment,
   })
+
   const { id } = newJournal
 
-  await Account.addJournal(company, id, { credit: creditAccount.code, debit: debitAccount.code, amount })
+  // await Account.addJournal(company, id, { credit: creditAccount.code, debit: debitAccount.code, amount )
 
   // CAVEAT: Adds journal entry in account collection
-  await Account.findOneAndUpdate(
-    { company, code: creditAccount.code },
-    {
-      $push : {
-        transaction : { journal_id: id },
-      },
-    }
-  )
-  await Account.update(
-    { company, code: debitAccount.code },
-    {
-      $push : {
-        transaction : { journal_id: id },
-      },
-    }
-  )
+  await Account.addJournal(company, creditAccount.code, id)
+  await Account.addJournal(company, debitAccount.code, id)
 
   // CAVEAT: Adjusts balance according to transaction type
   if (
@@ -97,17 +88,17 @@ const create = async ({ date, company, credit, credit_note, debit, debit_note, d
     (assets(debit) && equities(credit)) ||
     (expenses(debit) && liabilities(credit))
   ) {
-    await Account.findOneAndUpdate({ company, code: credit }, { $inc: { balance: amount } })
-    await Account.findOneAndUpdate({ company, code: debit }, { $inc: { balance: amount } })
+    await Account.modifyBalance(company, credit, amount)
+    await Account.modifyBalance(company, debit, amount)
 
-    await Company.updateAccountBalance(company, typeFinder(credit), +amount)
-    await Company.updateAccountBalance(company, typeFinder(debit), +amount)
+    await Company.modifyBalance(company, typeFinder(credit), +amount)
+    await Company.modifyBalance(company, typeFinder(debit), +amount)
   } else if ((liabilities(debit) && assets(credit)) || (equities(debit) && assets(credit))) {
-    await Account.findOneAndUpdate({ company, code: credit }, { $inc: { balance: -amount } })
-    await Account.findOneAndUpdate({ company, code: debit }, { $inc: { balance: -amount } })
+    await Account.modifyBalance(company, credit, -amount)
+    await Account.modifyBalance(company, debit, -amount)
 
-    await Company.updateAccountBalance(company, typeFinder(credit), -amount)
-    await Company.updateAccountBalance(company, typeFinder(debit), -amount)
+    await Company.modifyBalance(company, typeFinder(credit), -amount)
+    await Company.modifyBalance(company, typeFinder(debit), -amount)
   } else if (
     (assets(debit) && assets(credit)) ||
     (expenses(debit) && assets(credit)) ||
@@ -115,11 +106,11 @@ const create = async ({ date, company, credit, credit_note, debit, debit_note, d
     (assets(debit) && incomes(credit)) ||
     (incomes(debit) && assets(credit))
   ) {
-    await Account.findOneAndUpdate({ company, code: credit }, { $inc: { balance: -amount } })
-    await Account.findOneAndUpdate({ company, code: debit }, { $inc: { balance: +amount } })
+    await Account.modifyBalance(company, credit, -amount)
+    await Account.modifyBalance(company, debit, +amount)
 
-    await Company.updateAccountBalance(company, typeFinder(credit), -amount)
-    await Company.updateAccountBalance(company, typeFinder(debit), +amount)
+    await Company.modifyBalance(company, typeFinder(credit), -amount)
+    await Company.modifyBalance(company, typeFinder(debit), +amount)
   }
 
   // CAVEAT: Checks for inter company capability
@@ -128,7 +119,16 @@ const create = async ({ date, company, credit, credit_note, debit, debit_note, d
   if (interCompanyAccount) {
     const { to_company, deposit, due } = interCompanyAccount.intercompany
 
-    interCompanyJournalCreator(to_company, deposit, due, payload)
+    interCompanyJournalCreator({
+      date,
+      company,
+      to_company,
+      deposit,
+      due,
+      amount,
+      credit     : creditAccount,
+      debit      : debitAccount,
+    })
   }
 
   return newJournal
@@ -136,7 +136,7 @@ const create = async ({ date, company, credit, credit_note, debit, debit_note, d
 
 // CODE: Modify
 
-const modify = async (id, { date, credit_note, debit_note, description, comment } = {}) => {
+const modify = async ({ id, date, credit_note, debit_note, description, comment } = {}) => {
   const modifiedJournal = await Journal.modify(id, {
     date,
     credit_note,
@@ -162,23 +162,32 @@ const deactivate = async ({ id }) => {
 
 /* -------------------------------- UTILITIES ------------------------------- */
 
-const interCompanyJournalCreator = async (company, deposit, due, account) => {
-  const { _id, credit, debit, amount } = await Journal({
-    company,
-    credit      : {
-      name : `${due}`,
-      code : due,
-    },
-    debit       : {
-      name : `${deposit}`,
-      code : deposit,
-    },
-    description : `From: ${account.credit.name}, to: ${account.debit.name}`,
-    amount      : account.amount,
-    comment     : '...',
-  }).save()
+const interCompanyJournalCreator = async ({
+  date,
+  company,
+  debit = deposit,
+  credit = due,
+  amount,
+  dueAccountCredit,
+  dueAccountDebit,
+}) => {
+  const creditAccount = (await Account.fetch(company, { code: credit }))[0]
+  const debitAccount = (await Account.fetch(company, { code: debit }))[0]
 
-  await Account.addJournal(company, _id, credit.code, debit.code, amount)
+  const { id } = await Journal.create({
+    date,
+    company,
+    creditAccount,
+    // credit_note   : '',
+    debitAccount,
+    // debit_note    : '',
+    description   : `From: ${dueAccountCredit.name}, to: ${dueAccountDebit.name}`,
+    amount,
+    // comment,
+  })
+
+  await Account.addJournal(company, creditAccount.code, id)
+  await Account.addJournal(company, debitAccount.code, id)
 }
 
 const assets = type => type > 100000 && type < 200000
@@ -202,4 +211,4 @@ const typeFinder = code => {
   }
 }
 
-export { fetch, fetchDetail, create, modify, activate, deactivate }
+export default { fetch, fetchDetails, create, modify, activate, deactivate }

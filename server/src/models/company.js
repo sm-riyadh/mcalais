@@ -66,13 +66,17 @@ const CompanySchema = new mongoose.Schema({
     default  : false,
   },
 })
+
+/* --------------------------------- PARSING --------------------------------- */
+
 CompanySchema.methods.toJSON = function() {
-  const { _id, name, balance, accountCount } = this.toObject()
+  const { _id, name, balance, accountCount, isDisabled } = this.toObject()
   return {
     id           : _id,
     name,
     balance,
     accountCount,
+    isDisabled,
   }
 }
 
@@ -82,25 +86,30 @@ CompanySchema.methods.toJSON = function() {
 
 CompanySchema.statics.fetchOne = id => Company.findById(id)
 
-CompanySchema.statics.fetch = payload => Company.find({ payload })
+CompanySchema.statics.fetch = payload => Company.find({ ...payload })
 
 // CODE: Create
 
-CompanySchema.statics.create = async ({ name }) => await Company({ name }).save()
+CompanySchema.statics.create = ({ name }) => Company({ name }).save()
 
 // CODE: Modify
 
-CompanySchema.statics.modify = (id, { name }) =>
+CompanySchema.statics.modify = (id, payload) =>
   Company.findByIdAndUpdate(id, {
-    $set : { name },
+    $set : { ...payload },
   })
 
-CompanySchema.statics.updateCompanyCount = (id, account) =>
-  Company.findByIdAndUpdate(id, { $inc: { ['accountCount.' + account]: 1 } })
+CompanySchema.statics.modifyBalance = (name, account, amount) =>
+  Company.findOneAndUpdate({ name }, { $inc: { ['balance.' + account]: amount } })
 
-CompanySchema.statics.updateCompanyBalance = (id, account, amount) =>
-  Company.findByIdAndUpdate(id, { $inc: { ['balance.' + account]: amount } })
-const Company = mongoose.model('Company', CompanySchema)
+// CompanySchema.statics.modifyBalance = (id, amount) =>
+// Company.findByIdAndUpdate(id, { $inc: { ['balance.' + account]: amount } })
+
+CompanySchema.statics.modifyCount = (name, account) =>
+  Company.findOneAndUpdate({ name }, { $inc: { ['accountCount.' + account]: 1 } })
+
+// CompanySchema.statics.modifyCount = (id, account) =>
+//   Company.findByIdAndUpdate(id, { $inc: { ['accountCount.' + account]: 1 } })
 
 CompanySchema.statics.disable = id =>
   Company.findByIdAndUpdate(id, {
@@ -111,12 +120,14 @@ CompanySchema.statics.disable = id =>
 CompanySchema.statics.enable = id =>
   Company.findByIdAndUpdate(id, {
     $set : {
-      isDisabled : true,
+      isDisabled : false,
     },
   })
 
 // CODE: Remove
 
 CompanySchema.statics.remove = id => Company.findByIdAndRemove(id)
+
+const Company = mongoose.model('Company', CompanySchema)
 
 export default Company

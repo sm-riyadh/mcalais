@@ -1,21 +1,23 @@
 import Account from '../models/account'
+import Company from '../models/company'
 
 // CODE: Fetch
 
 const fetch = async ({ company, nonempty } = {}) => {
   let account
 
-  if (nonempty) account = await Account.fetch(company)
-  else account = await Account.fetchNonEmpty(company)
+  if (nonempty) account = await Account.fetchNonEmpty(company)
+  else account = await Account.fetch(company)
 
-  const { balance } = await Company.fetchOne(company)
+  // const { balance } = await Company.fetchOne(company)
+  const { balance } = 0
 
   const sortedAccount = { balance, ...accountSorter(account) }
 
   return sortedAccount
 }
 
-const fetchDetail = async ({ id }) => {
+const fetchDetails = async ({ id }) => {
   const account = await Account.fetchOne(id)
 
   return account
@@ -25,13 +27,14 @@ const fetchDetail = async ({ id }) => {
 
 const create = async ({ company, type, name, path, intercompany } = {}) => {
   //  Generate Account Code
-  const { accountCount } = await Company.fetchOne(company)
+  const { accountCount } = (await Company.fetch({ name: company }))[0]
+
   const code = codeGen(type, accountCount[type])
 
   const newAccount = await Account.create({ company, type, name, code, path, intercompany })
 
   // Increase Account Count
-  await Company.updateAccountCount(company, type)
+  await Company.modifyCount(company, type)
 
   return newAccount
 }
@@ -39,12 +42,10 @@ const create = async ({ company, type, name, path, intercompany } = {}) => {
 // CODE: Modify
 
 const modify = async ({ id, name, path, intercompany } = {}) => {
-  const modifiedAccount = await Account.modify({ id, name, path, intercompany })
+  const modifiedAccount = await Account.modify(id, { name, path, intercompany })
 
   return modifiedAccount
 }
-
-// CODE: State
 
 const activate = async ({ id }) => {
   const activatedAccount = await Account.enable(id)
@@ -60,13 +61,17 @@ const deactivate = async ({ id }) => {
 
 // CODE: Remove
 
-const remove = async id => {
-  if (!await Account.fetchNonEmpty(id)) {
-    const removedAccount = await removedAccount.remove(id)
+const remove = async ({ id }) => {
+  const { transaction } = await Account.fetchOne(id)
+
+  if (transaction.length === 0) {
+    const removedAccount = await Account.remove(id)
 
     return removedAccount
   } else {
-    state(id, 'deactivate')
+    const deactivatedAccount = await deactivate(id)
+
+    return deactivatedAccount
   }
 }
 
@@ -86,7 +91,7 @@ const codeGen = (name, count = 0) => {
       return 500000 + count + 1
   }
 }
-const accountSorter = () => {
+const accountSorter = account => {
   const sortedAccount = {
     assets      : [],
     liabilities : [],
@@ -103,4 +108,4 @@ const accountSorter = () => {
   return sortedAccount
 }
 
-export { fetch, fetchDetail, create, modify, activate, deactivate, remove }
+export default { fetch, fetchDetails, create, modify, activate, deactivate, remove }
