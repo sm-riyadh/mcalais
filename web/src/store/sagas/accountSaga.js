@@ -1,66 +1,148 @@
 import { call, put, takeLatest } from 'redux-saga/effects'
-import API from './api/account'
+import { API } from './api/api'
 
 import { ACCOUNT } from '../index'
-import { saveAccount, saveAccountList } from '../actions'
+import { account } from '../actions'
 
-function* handleAccountFetch({ payload }) {
+const { replace, addTop, addBottom, modify, remove } = account.save
+const { request, success, failed } = account.status
+
+const url = 'account'
+
+/* --------------------------------- SAGA middleware --------------------------------- */
+
+// CODE: FETCH
+
+function* handleFetch({ payload }) {
   try {
-    yield put({ type: ACCOUNT.STATUS.REQUEST })
-    const { data, error } = yield call(API.fetchAccount, [ payload ])
+    const { id, company, nonempty } = payload
+
+    const params = { company, nonempty }
+    const query = { id }
+
+    yield put(request())
+    const { data, error } = yield call(API.fetch, [ url, { params, query } ])
 
     if (!error) {
-      yield put(saveAccount(data))
-      yield put({ type: ACCOUNT.STATUS.SUCCESS })
+      yield put(replace(data))
+      yield put(success())
     } else throw error
-  } catch (err) {
-    yield put({ type: ACCOUNT.STATUS.FAILED, payload: err.toString() })
+  } catch (error) {
+    yield put(failed(error.toString()))
   }
 }
-function* handleAccountListFetch({ payload }) {
+
+// CODE: Create
+
+function* handleCreate({ payload }) {
   try {
-    yield put({ type: ACCOUNT.STATUS.REQUEST })
-    const { data, error } = yield call(API.fetchAccountList, [ payload ])
+    const { company, name, path, type } = payload
+
+    const body = { company, name, path, type }
+
+    yield put(request())
+    const { data, error } = yield call(API.create, [ url, { body } ])
 
     if (!error) {
-      yield put(saveAccountList(data))
-      yield put({ type: ACCOUNT.STATUS.SUCCESS })
+      // yield put(addTop(data))
+      yield put(addBottom(data))
+      yield put(success())
     } else throw error
-  } catch (err) {
-    yield put({ type: ACCOUNT.STATUS.FAILED, payload: err.toString() })
+  } catch (error) {
+    yield put(failed(error.toString()))
   }
 }
-function* handleAccountSend({ payload }) {
+
+// CODE: Modify
+
+function* handleModify({ payload }) {
   try {
-    yield put({ type: ACCOUNT.STATUS.REQUEST })
-    const { data, error } = yield call(API.sendAccount, [ payload ])
+    const { id, name } = payload
+
+    const params = { id }
+    const body = { name }
+
+    yield put(request())
+    const { data, error } = yield call(API.remove, [ url, { params, body } ])
 
     if (!error) {
-      yield put(saveAccount(data))
-      yield put({ type: ACCOUNT.STATUS.SUCCESS })
+      yield put(modify(data))
+      yield put(success())
     } else throw error
-  } catch (err) {
-    yield put({ type: ACCOUNT.STATUS.FAILED, payload: err.toString() })
+  } catch (error) {
+    yield put(failed(error.toString()))
   }
 }
-function* handleAccountRemove({ payload }) {
+
+// CODE: Activate
+
+function* handleActivate({ payload }) {
   try {
-    yield put({ type: ACCOUNT.STATUS.REQUEST })
-    const { data, error } = yield call(API.removeAccount, [ payload ])
+    const { id } = payload
+
+    const params = { id }
+
+    yield put(request())
+    const { data, error } = yield call(API.activate, [ url, { params } ])
 
     if (!error) {
-      yield put(saveAccount(data))
-      yield put({ type: ACCOUNT.STATUS.SUCCESS })
+      yield put(modify(data))
+      yield put(success())
     } else throw error
-  } catch (err) {
-    yield put({ type: ACCOUNT.STATUS.FAILED, payload: err.toString() })
+  } catch (error) {
+    yield put(failed(error.toString()))
   }
 }
-function* watchAccount() {
-  yield takeLatest(ACCOUNT.FETCH._, handleAccountFetch)
-  yield takeLatest(ACCOUNT.FETCH.LIST, handleAccountListFetch)
-  yield takeLatest(ACCOUNT.REMOVE, handleAccountRemove)
-  yield takeLatest(ACCOUNT.SEND, handleAccountSend)
+
+// CODE: Deactivate
+
+function* handleDeactivate({ payload }) {
+  try {
+    const { id } = payload
+
+    const params = { id }
+
+    yield put(request())
+    const { data, error } = yield call(API.deactivate, [ url, { params } ])
+
+    if (!error) {
+      yield put(modify(data))
+      yield put(success())
+    } else throw error
+  } catch (error) {
+    yield put(failed(error.toString()))
+  }
 }
 
-export default watchAccount
+// CODE: Remove
+
+function* handleRemove({ payload }) {
+  try {
+    const { id } = payload
+
+    const params = { id }
+
+    yield put(request())
+    const { data, error } = yield call(API.remove, [ url, { params } ])
+
+    if (!error) {
+      yield put(remove(data))
+      yield put(success())
+    } else throw error
+  } catch (error) {
+    yield put(failed(error.toString()))
+  }
+}
+
+/* --------------------------------- WATCHERS --------------------------------- */
+
+function* watch() {
+  yield takeLatest(ACCOUNT.SEND.FETCH._, handleFetch)
+  yield takeLatest(ACCOUNT.SEND.CREATE._, handleCreate)
+  yield takeLatest(ACCOUNT.SEND.MODIFY._, handleModify)
+  yield takeLatest(ACCOUNT.SEND.ACTIVATE._, handleActivate)
+  yield takeLatest(ACCOUNT.SEND.DEACTIVATE._, handleDeactivate)
+  yield takeLatest(ACCOUNT.SEND.REMOVE, handleRemove)
+}
+
+export default watch

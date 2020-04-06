@@ -1,39 +1,147 @@
 import { call, put, takeLatest } from 'redux-saga/effects'
-import API from './api/company'
+import { API } from './api/api'
 
 import { COMPANY } from '../index'
-import { saveCompany } from '../actions'
+import { account } from '../actions'
 
-function* HandleFetchCompany() {
+const { replace, addTop, addBottom, modify, remove } = account.save
+const { request, success, failed } = account.status
+
+const url = 'company'
+
+/* --------------------------------- SAGA middleware --------------------------------- */
+
+// CODE: FETCH
+
+function* handleFetch({ payload }) {
   try {
-    yield put({ type: COMPANY.STATUS.REQUEST })
-    const { data, error } = yield call(API.fetchCompany)
+    const { id } = payload
+
+    const query = { id }
+
+    yield put(request())
+    const { data, error } = yield call(API.fetch, [ url, { query } ])
 
     if (!error) {
-      yield put(saveCompany(data))
-      yield put({ type: COMPANY.STATUS.SUCCESS })
+      yield put(replace(data))
+      yield put(success())
     } else throw error
-  } catch (err) {
-    yield put({ type: COMPANY.STATUS.FAILED, payload: err.toString() })
+  } catch (error) {
+    yield put(failed(error.toString()))
   }
 }
-function* HandleSendCompany({ payload }) {
+
+// CODE: Create
+
+function* handleCreate({ payload }) {
   try {
-    yield put({ type: COMPANY.STATUS.REQUEST })
-    const { data, error } = yield call(API.sendCompany, [ payload ])
+    const { name } = payload
+
+    const body = { name }
+
+    yield put(request())
+    const { data, error } = yield call(API.create, [ url, { body } ])
 
     if (!error) {
-      yield put(saveCompany(data))
-      yield put({ type: COMPANY.STATUS.SUCCESS })
+      // yield put(addTop(data))
+      yield put(addBottom(data))
+      yield put(success())
     } else throw error
-  } catch (err) {
-    yield put({ type: COMPANY.STATUS.FAILED, payload: err.toString() })
+  } catch (error) {
+    yield put(failed(error.toString()))
   }
 }
 
-function* watchCompany() {
-  yield takeLatest(COMPANY.FETCH, HandleFetchCompany)
-  yield takeLatest(COMPANY.SEND, HandleSendCompany)
+// CODE: Modify
+
+function* handleModify({ payload }) {
+  try {
+    const { id, name } = payload
+
+    const params = { id }
+    const body = { name }
+
+    yield put(request())
+    const { data, error } = yield call(API.remove, [ url, { params, body } ])
+
+    if (!error) {
+      yield put(modify(data))
+      yield put(success())
+    } else throw error
+  } catch (error) {
+    yield put(failed(error.toString()))
+  }
 }
 
-export default watchCompany
+// CODE: Activate
+
+function* handleActivate({ payload }) {
+  try {
+    const { id } = payload
+
+    const params = { id }
+
+    yield put(request())
+    const { data, error } = yield call(API.activate, [ url, { params } ])
+
+    if (!error) {
+      yield put(modify(data))
+      yield put(success())
+    } else throw error
+  } catch (error) {
+    yield put(failed(error.toString()))
+  }
+}
+
+// CODE: Deactivate
+
+function* handleDeactivate({ payload }) {
+  try {
+    const { id } = payload
+
+    const params = { id }
+
+    yield put(request())
+    const { data, error } = yield call(API.deactivate, [ url, { params } ])
+
+    if (!error) {
+      yield put(modify(data))
+      yield put(success())
+    } else throw error
+  } catch (error) {
+    yield put(failed(error.toString()))
+  }
+}
+
+// CODE: Remove
+
+function* handleRemove({ payload }) {
+  try {
+    const { id } = payload
+
+    const params = { id }
+
+    yield put(request())
+    const { data, error } = yield call(API.remove, [ url, { params } ])
+
+    if (!error) {
+      yield put(remove(data))
+      yield put(success())
+    } else throw error
+  } catch (error) {
+    yield put(failed(error.toString()))
+  }
+}
+
+/* --------------------------------- WATCHERS --------------------------------- */
+
+function* watch() {
+  yield takeLatest(COMPANY.SEND.FETCH._, handleFetch)
+  yield takeLatest(COMPANY.SEND.CREATE._, handleCreate)
+  yield takeLatest(COMPANY.SEND.MODIFY._, handleModify)
+  yield takeLatest(COMPANY.SEND.ACTIVATE._, handleActivate)
+  yield takeLatest(COMPANY.SEND.DEACTIVATE._, handleDeactivate)
+  yield takeLatest(COMPANY.SEND.REMOVE, handleRemove)
+}
+
+export default watch
