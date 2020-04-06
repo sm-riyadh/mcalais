@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { Switch, Route } from 'react-router-dom'
 import KeyboardJS from 'keyboardjs'
 
-import { fetchAccountList, sendJournal, fetchAccount, updateJournal } from '../../store/actions'
+import { fetchAccountNonempty, sendJournal, fetchAccount, updateJournal } from '../../store/actions'
 import { SideBar } from '../../component'
 import { NavBar } from '../../component/layout'
 
@@ -20,7 +20,7 @@ import TestGround from '../TestGround/TestGround'
 export class Home extends Component {
   componentDidMount() {
     this.props.fetchAccount({ company: this.props.company })
-    this.props.fetchAccountList({ company: this.props.company })
+    this.props.fetchAccountNonempty({ company: this.props.company })
 
     KeyboardJS.bind(
       'ctrl + enter',
@@ -103,7 +103,7 @@ export class Home extends Component {
             modalClose={() => this.toggleModal('modal_journal_entry', false)}
             sendJournal={payload => {
               this.props.sendJournal(payload)
-              this.props.fetchAccountList({ company: this.props.company })
+              this.props.fetchAccountNonempty({ company: this.props.company })
             }}
             input={this.props.journal.input}
             inputHandler={this.props.updateJournal}
@@ -124,10 +124,10 @@ const mapStateToProps = state => ({
   company          : state.main.company,
 })
 const mapDispatchToProps = dispatch => ({
-  updateJournal    : payload => dispatch(updateJournal(payload)),
-  fetchAccount     : payload => dispatch(fetchAccount(payload)),
-  fetchAccountList : payload => dispatch(fetchAccountList(payload)),
-  sendJournal      : payload => dispatch(sendJournal(payload)),
+  updateJournal        : payload => dispatch(updateJournal(payload)),
+  fetchAccount         : payload => dispatch(fetchAccount(payload)),
+  fetchAccountNonempty : payload => dispatch(fetchAccountNonempty(payload)),
+  sendJournal          : payload => dispatch(sendJournal(payload)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home)

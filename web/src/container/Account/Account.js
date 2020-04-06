@@ -10,7 +10,7 @@ import {
 } from '../../component'
 import { ActivityBar } from '../../component/layout'
 
-import { fetchAccount, sendAccount, removeAccount } from '../../store/actions'
+import { fetchAccount, createAccount, removeAccount } from '../../store/actions'
 import API from '../../store/sagas/api/tree'
 
 import AccountTableRows from './components/AccountTableRows'
@@ -241,7 +241,7 @@ export class Account extends Component {
     }
 
     this.setState({ tree, account: '' }, () => {
-      this.props.sendAccount({
+      this.props.createAccount({
         company : this.props.company,
         type    : this.state.accountType,
         name,
@@ -656,7 +656,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   fetchAccount  : payload => dispatch(fetchAccount(payload)),
   removeAccount : payload => dispatch(removeAccount(payload)),
-  sendAccount   : payload => dispatch(sendAccount(payload)),
+  createAccount : payload => dispatch(createAccount(payload)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Account)

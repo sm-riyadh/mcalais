@@ -9,7 +9,7 @@ const AccountManager = props => {
   const newAccount = e => {
     e.preventDefault()
 
-    props.sendAccount({
+    props.createAccount({
       company : props.company,
       type,
       name,

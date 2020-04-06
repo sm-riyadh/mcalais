@@ -10,7 +10,7 @@ import 'react-dates/lib/css/_datepicker.css'
 import { DayPickerSingleDateController, DayPickerRangeController } from 'react-dates'
 
 import { Modal, Container, Card, Text, Placeholder } from '../../component'
-import { fetchAccount, fetchAccountList, fetchJournal, fetchJournalMore, sendJournal } from '../../store/actions'
+import { fetchAccount, fetchAccountNonempty, fetchJournal, fetchJournalMore, sendJournal } from '../../store/actions'
 import { ActivityBar } from '../../component/layout'
 
 import JournalTableRows from './components/JournalTableRows'
@@ -19,7 +19,7 @@ import JournalDetailModal from './components/JournalDetailModal'
 export class Journal extends Component {
   componentDidMount() {
     this.props.fetchAccount({ company: this.props.company })
-    this.props.fetchAccountList({ company: this.props.company })
+    this.props.fetchAccountNonempty({ company: this.props.company })
     this.props.fetchJournal({
       company    : this.props.company,
       start_date : moment().subtract(24, 'hours').toDate(),
@@ -420,11 +420,11 @@ const mapStateToProps = state => ({
   account_status : state.account.status,
 })
 const mapDispatchToProps = dispatch => ({
-  fetchAccount     : payload => dispatch(fetchAccount(payload)),
-  fetchAccountList : payload => dispatch(fetchAccountList(payload)),
-  fetchJournal     : payload => dispatch(fetchJournal(payload)),
-  fetchJournalMore : payload => dispatch(fetchJournalMore(payload)),
-  sendJournal      : payload => dispatch(sendJournal(payload)),
+  fetchAccount         : payload => dispatch(fetchAccount(payload)),
+  fetchAccountNonempty : payload => dispatch(fetchAccountNonempty(payload)),
+  fetchJournal         : payload => dispatch(fetchJournal(payload)),
+  fetchJournalMore     : payload => dispatch(fetchJournalMore(payload)),
+  sendJournal          : payload => dispatch(sendJournal(payload)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Journal)
