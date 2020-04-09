@@ -4,13 +4,13 @@ import { subDays, startOfDay, endOfDay } from 'date-fns'
 const ObjectIdDate = date => mongoose.Types.ObjectId(Math.floor(date / 1000).toString(16) + '0000000000000000')
 
 const JournalSchema = new mongoose.Schema({
+  company     : {
+    type     : String,
+    required : true,
+  },
   date        : {
     type     : Date,
     default  : Date.now,
-    required : true,
-  },
-  company     : {
-    type     : String,
     required : true,
   },
   debit       : {

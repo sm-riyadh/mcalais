@@ -9,8 +9,7 @@ const fetch = async ({ company, nonempty } = {}) => {
   if (nonempty) account = await Account.fetchNonEmpty(company)
   else account = await Account.fetch(company)
 
-  // const { balance } = await Company.fetchOne(company)
-  const { balance } = 0
+  const { balance } = await Company.fetchOne(company)
 
   const sortedAccount = { balance, ...accountSorter(account) }
 
@@ -27,7 +26,7 @@ const fetchDetails = async ({ id }) => {
 
 const create = async ({ company, type, name, path, intercompany } = {}) => {
   //  Generate Account Code
-  const { accountCount } = (await Company.fetch({ name: company }))[0]
+  const { accountCount } = await Company.fetchOne(company)
 
   const code = codeGen(type, accountCount[type])
 

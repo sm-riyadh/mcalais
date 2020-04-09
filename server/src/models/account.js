@@ -2,7 +2,7 @@ import mongoose from 'mongoose'
 
 const AccountSchema = new mongoose.Schema({
   company      : {
-    type     : String,
+    type     : mongoose.Schema.ObjectId,
     required : true,
   },
   name         : {
@@ -84,8 +84,6 @@ AccountSchema.methods.toJSON = function() {
 
 AccountSchema.statics.isInterCompany = id => Account.findById({ _id: id, intercompany: { $exists: true } })
 
-AccountSchema.statics.isExist = code => Account.exists({ code })
-
 // CODE: Fetch
 
 AccountSchema.statics.fetchOne = id => Account.findById(id)
@@ -100,22 +98,6 @@ AccountSchema.statics.fetchNonEmpty = (company, payload) =>
 AccountSchema.statics.create = ({ company, type, name, code, path, intercompany }) =>
   Account({ company, type, name, code, path, intercompany }).save()
 
-AccountSchema.statics.addJournal = (company, code, journal_id) =>
-  Account.findOneAndUpdate(
-    { company, code },
-    {
-      $push : {
-        transaction : { journal_id },
-      },
-    }
-  )
-// AccountSchema.statics.addJournal = (id, journal_id) =>
-//   Account.findByIdAndUpdate(id, {
-//     $push : {
-//       transaction : { journal_id },
-//     },
-//   })
-
 // CODE: Modify
 
 AccountSchema.statics.modify = (id, payload) =>
@@ -125,11 +107,14 @@ AccountSchema.statics.modify = (id, payload) =>
     },
   })
 
-AccountSchema.statics.modifyBalance = (company, code, amount) =>
-  Account.findOneAndUpdate({ company, code }, { $inc: { balance: amount } })
+AccountSchema.statics.modifyBalance = (id, amount) => Account.findByIdAndUpdate(id, { $inc: { balance: amount } })
 
-// AccountSchema.statics.modifyBalance = (id, amount) =>
-// Account.findByIdAndUpdate(id, { $inc: { balance: amount } })
+AccountSchema.statics.addJournal = (id, journal_id) =>
+  Account.findByIdAndUpdate(id, {
+    $push : {
+      transaction : { journal_id },
+    },
+  })
 
 AccountSchema.statics.disable = id =>
   Account.findByIdAndUpdate(id, {

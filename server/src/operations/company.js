@@ -21,49 +21,49 @@ const fetchDetails = async ({ id }) => {
 const create = async ({ name }) => {
   const newCompany = await Company.create({ name })
 
-  name = newCompany.name
+  const { id } = newCompany
   // Creates Pre-made Accounts
 
-  await accountOps.create({ company: name, type: 'assets', name: 'Cash', path: [ 'assets' ] })
-  await Tree.update(name, {
-    assets      : [
-      {
-        type     : 'account',
-        path     : [ 'assets' ],
-        location : [ 0 ],
-        name     : 'Cash',
-        children : [],
-      },
-      {
-        type     : 'folder',
-        path     : [ 'assets' ],
-        location : [ 1 ],
-        name     : 'Bank',
-        children : [],
-      },
-      {
-        type     : 'folder',
-        path     : [ 'assets' ],
-        location : [ 2 ],
-        name     : 'Due To',
-        children : [],
-      },
-    ],
-    liabilities : [
-      {
-        type     : 'folder',
-        path     : [ 'liabilities' ],
-        location : [ 0 ],
-        name     : 'Due From',
-        children : [],
-      },
-    ],
-    equities    : [],
-    expenses    : [],
-    incomes     : [],
-  })
+  await accountOps.create({ company: id, type: 'assets', name: 'Cash', path: [ 'assets' ] })
+  // await Tree.update(id, {
+  //   assets      : [
+  //     {
+  //       type     : 'account',
+  //       path     : [ 'assets' ],
+  //       location : [ 0 ],
+  //       name     : 'Cash',
+  //       children : [],
+  //     },
+  //     {
+  //       type     : 'folder',
+  //       path     : [ 'assets' ],
+  //       location : [ 1 ],
+  //       name     : 'Bank',
+  //       children : [],
+  //     },
+  //     {
+  //       type     : 'folder',
+  //       path     : [ 'assets' ],
+  //       location : [ 2 ],
+  //       name     : 'Due To',
+  //       children : [],
+  //     },
+  //   ],
+  //   liabilities : [
+  //     {
+  //       type     : 'folder',
+  //       path     : [ 'liabilities' ],
+  //       location : [ 0 ],
+  //       name     : 'Due From',
+  //       children : [],
+  //     },
+  //   ],
+  //   equities    : [],
+  //   expenses    : [],
+  //   incomes     : [],
+  // })
 
-  await interCompanyDueAccounts(name)
+  await interCompanyDueAccounts(id, name)
 
   return newCompany
 }
@@ -92,9 +92,9 @@ const remove = async ({ id }) => {
 
 /* -------------------------------- Utilities ------------------------------- */
 
-const interCompanyDueAccounts = async name => {
+const interCompanyDueAccounts = async (id, name) => {
   let companies = await Company.find()
-  companies = companies.filter(e => e.name != name)
+  companies = companies.filter(e => e.id != id)
 
   // HACK: Map is not waiting for await
   // let newTree = (await Tree.fetchOne(newCompany.name)).tree
@@ -103,7 +103,7 @@ const interCompanyDueAccounts = async name => {
     // let { tree } = await Tree.fetchOne(companies[i].name)
 
     const remoteDue = await accountOps.create({
-      company : name,
+      company : id,
       type    : 'liabilities',
       name    : companies[i].name,
       path    : [ 'liabilities', 'due from' ],
@@ -111,12 +111,12 @@ const interCompanyDueAccounts = async name => {
     // newTree = treeAccountInserter(newTree, 'liabilities', 'Due From', companies[i].name)
 
     await accountOps.create({
-      company      : companies[i].name,
+      company      : companies[i].id,
       type         : 'assets',
       name         : name,
       path         : [ 'assets', 'due to' ],
       intercompany : {
-        to_company : name,
+        to_company : id,
         deposit    : 100001,
         due        : remoteDue.code,
       },
@@ -124,7 +124,7 @@ const interCompanyDueAccounts = async name => {
     // tree = treeAccountInserter(tree, 'assets', 'Due To', name)
 
     const localDue = await accountOps.create({
-      company : companies[i].name,
+      company : companies[i].id,
       type    : 'liabilities',
       name    : name,
       path    : [ 'liabilities', 'due from' ],
@@ -132,12 +132,12 @@ const interCompanyDueAccounts = async name => {
     // tree = treeAccountInserter(tree, 'liabilities', 'Due From', name)
 
     await accountOps.create({
-      company      : name,
+      company      : id,
       type         : 'assets',
       name         : companies[i].name,
       path         : [ 'assets', 'due to' ],
       intercompany : {
-        to_company : companies[i].name,
+        to_company : companies[i].id,
         deposit    : 100001,
         due        : localDue.code,
       },

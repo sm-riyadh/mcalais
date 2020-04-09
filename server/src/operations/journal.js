@@ -58,8 +58,8 @@ const fetchDetails = async ({ id }) => {
 // CODE: Create
 
 const create = async ({ date, company, credit, credit_note, debit, debit_note, description, amount, comment } = {}) => {
-  const debitAccount = (await Account.fetch(company, { code: debit }))[0]
-  const creditAccount = (await Account.fetch(company, { code: credit }))[0]
+  const creditAccount = await Account.fetchOne(credit)
+  const debitAccount = await Account.fetchOne(debit)
 
   const newJournal = await Journal.create({
     date,
@@ -74,60 +74,68 @@ const create = async ({ date, company, credit, credit_note, debit, debit_note, d
   })
 
   const { id } = newJournal
+  const creditType = creditAccount.type
+  const debitType = debitAccount.type
 
   // CAVEAT: Adds journal entry in account collection
-  await Account.addJournal(company, creditAccount.code, id)
-  await Account.addJournal(company, debitAccount.code, id)
+  await Account.addJournal(credit, id)
+  await Account.addJournal(debit, id)
 
-  // CAVEAT: Adjusts balance according to transaction type
+  // NOTE: Adjusts balance according to transaction type
+
+  // CAVEAT: Liabilities, Equities, Incomes --> Asset, Expenses
   if (
-    (assets(debit) && liabilities(credit)) ||
-    (assets(debit) && incomes(credit)) ||
-    (assets(debit) && equities(credit)) ||
-    (expenses(debit) && liabilities(credit))
+    (assets(debitType) && liabilities(creditType)) ||
+    (assets(debitType) && incomes(creditType)) ||
+    (assets(debitType) && equities(creditType)) ||
+    (expenses(debitType) && liabilities(creditType))
   ) {
-    await Account.modifyBalance(company, credit, amount)
-    await Account.modifyBalance(company, debit, amount)
+    await Account.modifyBalance(company, amount)
+    await Account.modifyBalance(company, amount)
 
-    await Company.modifyBalance(company, typeFinder(credit), +amount)
-    await Company.modifyBalance(company, typeFinder(debit), +amount)
-  } else if ((liabilities(debit) && assets(credit)) || (equities(debit) && assets(credit))) {
-    await Account.modifyBalance(company, credit, -amount)
-    await Account.modifyBalance(company, debit, -amount)
+    await Company.modifyBalance(company, creditType, +amount)
+    await Company.modifyBalance(company, debitType, +amount)
 
-    await Company.modifyBalance(company, typeFinder(credit), -amount)
-    await Company.modifyBalance(company, typeFinder(debit), -amount)
+    // CAVEAT: Asset, Expenses --> Liabilities, Equities, Incomes
+  } else if ((liabilities(debitType) && assets(creditType)) || (equities(debitType) && assets(creditType))) {
+    await Account.modifyBalance(company, -amount)
+    await Account.modifyBalance(company, -amount)
+
+    await Company.modifyBalance(company, creditType, -amount)
+    await Company.modifyBalance(company, debitType, -amount)
+
+    // CAVEAT: Transaction between same type of account
   } else if (
-    (assets(debit) && assets(credit)) ||
-    (expenses(debit) && assets(credit)) ||
-    (assets(debit) && expenses(credit)) ||
-    (assets(debit) && incomes(credit)) ||
-    (incomes(debit) && assets(credit))
+    (assets(debitType) && assets(creditType)) ||
+    (expenses(debitType) && assets(creditType)) ||
+    (assets(debitType) && expenses(creditType)) ||
+    (assets(debitType) && incomes(creditType)) ||
+    (incomes(debitType) && assets(creditType))
   ) {
-    await Account.modifyBalance(company, credit, -amount)
-    await Account.modifyBalance(company, debit, +amount)
+    await Account.modifyBalance(company, -amount)
+    await Account.modifyBalance(company, +amount)
 
-    await Company.modifyBalance(company, typeFinder(credit), -amount)
-    await Company.modifyBalance(company, typeFinder(debit), +amount)
+    await Company.modifyBalance(company, creditType, -amount)
+    await Company.modifyBalance(company, debitType, +amount)
   }
 
-  // CAVEAT: Checks for inter company capability
-  const interCompanyAccount = await Account.isInterCompany(debitAccount.id)
+  // NOTE: Checks for inter company capability
+  // const interCompanyAccount = await Account.isInterCompany(debitAccount.id)
 
-  if (interCompanyAccount) {
-    const { to_company, deposit, due } = interCompanyAccount.intercompany
+  // if (interCompanyAccount) {
+  //   const { to_company, deposit, due } = interCompanyAccount.intercompany
 
-    interCompanyJournalCreator({
-      date,
-      company,
-      to_company,
-      deposit,
-      due,
-      amount,
-      credit     : creditAccount,
-      debit      : debitAccount,
-    })
-  }
+  //   interCompanyJournalCreator({
+  //     date,
+  //     company,
+  //     to_company,
+  //     deposit,
+  //     due,
+  //     amount,
+  //     credit     : creditAccount,
+  //     debit      : debitAccount,
+  //   })
+  // }
 
   return newJournal
 }
@@ -143,7 +151,7 @@ const modify = async ({ id, date, credit_note, debit_note, description, comment 
     comment,
   })
 
-  const modifiedJournal = await Journal.fetch(id)
+  const modifiedJournal = await Journal.fetchOne(id)
 
   return modifiedJournal
 }
@@ -167,8 +175,8 @@ const interCompanyJournalCreator = async ({
   dueAccountCredit,
   dueAccountDebit,
 }) => {
-  const creditAccount = (await Account.fetch(company, { code: credit }))[0]
-  const debitAccount = (await Account.fetch(company, { code: debit }))[0]
+  const creditAccount = await Account.fetch(credit)
+  const debitAccount = await Account.fetch(debit)
 
   const { id } = await Journal.create({
     date,
@@ -182,15 +190,15 @@ const interCompanyJournalCreator = async ({
     // comment,
   })
 
-  await Account.addJournal(company, creditAccount.code, id)
-  await Account.addJournal(company, debitAccount.code, id)
+  await Account.addJournal(credi, id)
+  await Account.addJournal(debit, id)
 }
 
-const assets = type => type > 100000 && type < 200000
-const liabilities = type => type > 200000 && type < 300000
-const equities = type => type > 300000 && type < 400000
-const expenses = type => type > 400000 && type < 500000
-const incomes = type => type > 500000 && type < 600000
+const assets = type => type === 'assets'
+const liabilities = type => type === 'liabilities'
+const equities = type => type === 'equities'
+const expenses = type => type === 'expenses'
+const incomes = type => type === 'incomes'
 
 const typeFinder = code => {
   switch (+('' + code)[0]) {

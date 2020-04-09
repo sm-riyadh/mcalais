@@ -2,9 +2,11 @@ import mongoose from 'mongoose'
 
 const CompanySchema = new mongoose.Schema({
   name         : {
-    type     : String,
-    trim     : true,
-    required : true,
+    type      : String,
+    minlength : 1,
+    unique    : true,
+    trim      : true,
+    required  : true,
   },
   balance      : {
     assets      : {
@@ -99,17 +101,11 @@ CompanySchema.statics.modify = (id, payload) =>
     $set : { ...payload },
   })
 
-CompanySchema.statics.modifyBalance = (name, account, amount) =>
-  Company.findOneAndUpdate({ name }, { $inc: { ['balance.' + account]: amount } })
+CompanySchema.statics.modifyBalance = (id, type, amount) =>
+  Company.findByIdAndUpdate(id, { $inc: { ['balance.' + type]: amount } })
 
-// CompanySchema.statics.modifyBalance = (id, amount) =>
-// Company.findByIdAndUpdate(id, { $inc: { ['balance.' + account]: amount } })
-
-CompanySchema.statics.modifyCount = (name, account) =>
-  Company.findOneAndUpdate({ name }, { $inc: { ['accountCount.' + account]: 1 } })
-
-// CompanySchema.statics.modifyCount = (id, account) =>
-//   Company.findByIdAndUpdate(id, { $inc: { ['accountCount.' + account]: 1 } })
+CompanySchema.statics.modifyCount = (id, type) =>
+  Company.findByIdAndUpdate(id, { $inc: { ['accountCount.' + type]: 1 } })
 
 CompanySchema.statics.enable = id =>
   Company.findByIdAndUpdate(id, {
@@ -124,6 +120,7 @@ CompanySchema.statics.disable = id =>
       isDisabled : true,
     },
   })
+
 // CODE: Remove
 
 CompanySchema.statics.remove = id => Company.findByIdAndRemove(id)
