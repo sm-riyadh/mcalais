@@ -24,7 +24,12 @@ const create = async ({ name }) => {
   const { id } = newCompany
   // Creates Pre-made Accounts
 
-  await accountOps.create({ company: id, type: 'assets', name: 'Cash', path: [ 'assets' ] })
+  const cashAccount = await accountOps.create({
+    company : id,
+    type    : 'assets',
+    name    : 'Cash',
+    path    : [ 'assets' ],
+  })
   // await Tree.update(id, {
   //   assets      : [
   //     {
@@ -63,7 +68,7 @@ const create = async ({ name }) => {
   //   incomes     : [],
   // })
 
-  await interCompanyDueAccounts(id, name)
+  await interCompanyDueAccounts(id, name, cashAccount.id)
 
   return newCompany
 }
@@ -92,7 +97,7 @@ const remove = async ({ id }) => {
 
 /* -------------------------------- Utilities ------------------------------- */
 
-const interCompanyDueAccounts = async (id, name) => {
+const interCompanyDueAccounts = async (id, name, cashAccountId) => {
   let companies = await Company.find()
   companies = companies.filter(e => e.id != id)
 
@@ -117,8 +122,8 @@ const interCompanyDueAccounts = async (id, name) => {
       path         : [ 'assets', 'due to' ],
       intercompany : {
         to_company : id,
-        deposit    : 100001,
-        due        : remoteDue.code,
+        deposit    : cashAccountId,
+        due        : remoteDue.id,
       },
     })
     // tree = treeAccountInserter(tree, 'assets', 'Due To', name)
@@ -138,8 +143,8 @@ const interCompanyDueAccounts = async (id, name) => {
       path         : [ 'assets', 'due to' ],
       intercompany : {
         to_company : companies[i].id,
-        deposit    : 100001,
-        due        : localDue.code,
+        deposit    : localDue.id,
+        due        : cashAccountId,
       },
     })
 

@@ -121,19 +121,19 @@ JournalSchema.statics.fetch = (
 // CODE: Create
 
 JournalSchema.statics.create = (
-  { date, company, creditAccount, credit_note, debitAccount, debit_note, description, amount, comment } = {}
+  { date, company, credit, credit_note, debit, debit_note, description, amount, comment } = {}
 ) =>
   Journal({
     date,
     company,
     credit      : {
-      code : creditAccount.code,
-      name : creditAccount.name,
+      code : credit.code,
+      name : credit.name,
       note : credit_note,
     },
     debit       : {
-      code : debitAccount.code,
-      name : debitAccount.name,
+      code : debit.code,
+      name : debit.name,
       note : debit_note,
     },
     description,

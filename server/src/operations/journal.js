@@ -64,9 +64,9 @@ const create = async ({ date, company, credit, credit_note, debit, debit_note, d
   const newJournal = await Journal.create({
     date,
     company,
-    creditAccount,
+    credit      : creditAccount,
     credit_note,
-    debitAccount,
+    debit       : debitAccount,
     debit_note,
     description,
     amount,
@@ -120,22 +120,26 @@ const create = async ({ date, company, credit, credit_note, debit, debit_note, d
   }
 
   // NOTE: Checks for inter company capability
-  // const interCompanyAccount = await Account.isInterCompany(debitAccount.id)
+  const interCompanyAccount = await Account.fetchInterCompany(debit)
 
-  // if (interCompanyAccount) {
-  //   const { to_company, deposit, due } = interCompanyAccount.intercompany
+  if (interCompanyAccount) {
+    const { to_company, due, deposit } = interCompanyAccount.intercompany
 
-  //   interCompanyJournalCreator({
-  //     date,
-  //     company,
-  //     to_company,
-  //     deposit,
-  //     due,
-  //     amount,
-  //     credit     : creditAccount,
-  //     debit      : debitAccount,
-  //   })
-  // }
+    const dueCreditAccout = await Account.fetchOne(due)
+    const dueDebitAccout = await Account.fetchOne(deposit)
+
+    const { id } = await Journal.create({
+      date,
+      company     : to_company,
+      credit      : dueCreditAccout,
+      debit       : dueDebitAccout,
+      description : `From: ${creditAccount.name}, to: ${debitAccount.name}`,
+      amount,
+    })
+
+    await Account.addJournal(dueCreditAccout.id, id)
+    await Account.addJournal(dueDebitAccout.id, id)
+  }
 
   return newJournal
 }
@@ -165,34 +169,6 @@ const deactivate = async ({ id }) => {
 }
 
 /* -------------------------------- UTILITIES ------------------------------- */
-
-const interCompanyJournalCreator = async ({
-  date,
-  company,
-  debit = deposit,
-  credit = due,
-  amount,
-  dueAccountCredit,
-  dueAccountDebit,
-}) => {
-  const creditAccount = await Account.fetch(credit)
-  const debitAccount = await Account.fetch(debit)
-
-  const { id } = await Journal.create({
-    date,
-    company,
-    creditAccount,
-    // credit_note   : '',
-    debitAccount,
-    // debit_note    : '',
-    description   : `From: ${dueAccountCredit.name}, to: ${dueAccountDebit.name}`,
-    amount,
-    // comment,
-  })
-
-  await Account.addJournal(credi, id)
-  await Account.addJournal(debit, id)
-}
 
 const assets = type => type === 'assets'
 const liabilities = type => type === 'liabilities'

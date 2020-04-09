@@ -13,7 +13,7 @@ const url = 'account'
 
 // CODE: FETCH
 
-function* handleFetch({ payload }) {
+function* handleFetch({ payload = {} }) {
   try {
     const { id, company, nonempty } = payload
 
@@ -35,7 +35,7 @@ function* handleFetch({ payload }) {
 
 // CODE: Create
 
-function* handleCreate({ payload }) {
+function* handleCreate({ payload = {} }) {
   try {
     const { company, name, path, type } = payload
 
@@ -57,7 +57,7 @@ function* handleCreate({ payload }) {
 
 // CODE: Modify
 
-function* handleModify({ payload }) {
+function* handleModify({ payload = {} }) {
   try {
     const { id, name } = payload
 
@@ -79,7 +79,7 @@ function* handleModify({ payload }) {
 
 // CODE: Activate
 
-function* handleActivate({ payload }) {
+function* handleActivate({ payload = {} }) {
   try {
     const { id } = payload
 
@@ -100,7 +100,7 @@ function* handleActivate({ payload }) {
 
 // CODE: Deactivate
 
-function* handleDeactivate({ payload }) {
+function* handleDeactivate({ payload = {} }) {
   try {
     const { id } = payload
 
@@ -121,7 +121,7 @@ function* handleDeactivate({ payload }) {
 
 // CODE: Remove
 
-function* handleRemove({ payload }) {
+function* handleRemove({ payload = {} }) {
   try {
     const { id } = payload
 

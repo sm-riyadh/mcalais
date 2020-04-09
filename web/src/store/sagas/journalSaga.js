@@ -33,7 +33,7 @@ function* handleFetch({ payload = {} }) {
 
 // CODE: Create
 
-function* handleCreate({ payload }) {
+function* handleCreate({ payload = {} }) {
   try {
     const { date, company, credit, credit_note, debit, debit_note, description, amount, comment } = payload
 
@@ -55,7 +55,7 @@ function* handleCreate({ payload }) {
 
 // CODE: Modify
 
-function* handleModify({ payload }) {
+function* handleModify({ payload = {} }) {
   try {
     const { id, date, credit_note, debit_note, description, comment } = payload
 
@@ -77,7 +77,7 @@ function* handleModify({ payload }) {
 
 // CODE: Activate
 
-function* handleActivate({ payload }) {
+function* handleActivate({ payload = {} }) {
   try {
     const { id } = payload
 
@@ -98,7 +98,7 @@ function* handleActivate({ payload }) {
 
 // CODE: Deactivate
 
-function* handleDeactivate({ payload }) {
+function* handleDeactivate({ payload = {} }) {
   try {
     const { id } = payload
 

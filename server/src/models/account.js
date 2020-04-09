@@ -31,23 +31,9 @@ const AccountSchema = new mongoose.Schema({
     },
   ],
   intercompany : {
-    to_company : {
-      type     : String,
-      trim     : true,
-      required : false,
-    },
-    deposit    : {
-      type     : Number,
-      min      : 100000,
-      max      : 999999,
-      required : false,
-    },
-    due        : {
-      type     : Number,
-      min      : 100000,
-      max      : 999999,
-      required : false,
-    },
+    to_company : mongoose.Schema.ObjectId,
+    deposit    : mongoose.Schema.ObjectId,
+    due        : mongoose.Schema.ObjectId,
   },
   isDisabled   : {
     type     : Boolean,
@@ -80,18 +66,16 @@ AccountSchema.methods.toJSON = function() {
 
 /* --------------------------------- METHODS -------------------------------- */
 
-// CODE: Check
-
-AccountSchema.statics.isInterCompany = id => Account.findById({ _id: id, intercompany: { $exists: true } })
-
 // CODE: Fetch
 
 AccountSchema.statics.fetchOne = id => Account.findById(id)
 
 AccountSchema.statics.fetch = (company, payload) => Account.find({ company, ...payload })
 
-AccountSchema.statics.fetchNonEmpty = (company, payload) =>
-  Account.find({ company, ...payload, transaction: { $exists: true, $ne: [] } })
+AccountSchema.statics.fetchNonEmpty = (id, payload) =>
+  Account.find({ _id: id, ...payload, transaction: { $exists: true, $ne: [] } })
+
+AccountSchema.statics.fetchInterCompany = id => Account.findOne({ _id: id, intercompany: { $exists: true } })
 
 // CODE: Create
 

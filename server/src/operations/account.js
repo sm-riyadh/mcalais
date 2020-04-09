@@ -17,6 +17,7 @@ const fetch = async ({ company, nonempty } = {}) => {
 }
 
 const fetchDetails = async ({ id }) => {
+  console.log('fetchDetails -> account', id)
   const account = await Account.fetchOne(id)
 
   return account

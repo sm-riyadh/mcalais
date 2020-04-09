@@ -78,6 +78,7 @@ CompanySchema.methods.toJSON = function() {
     name,
     balance,
     accountCount,
+
     isDisabled,
   }
 }
