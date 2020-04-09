@@ -1,28 +1,29 @@
 import { call, put, takeLatest } from 'redux-saga/effects'
-import { API } from './api/api'
+import Api from './api/api'
 
 import { JOURNAL } from '../index'
-import { account } from '../actions'
+import { journalAction } from '../actions'
 
-const { replace, addTop, addBottom, modify, remove } = account.save
-const { request, success, failed } = account.status
+const { replace, addTop, addBottom, modify, remove } = journalAction.save
+const { request, success, failed } = journalAction.status
 
-const url = 'company'
+const url = 'journal'
 
 // CODE: FETCH
 
-function* handleFetch({ payload }) {
+function* handleFetch({ payload = {} }) {
   try {
-    const { id, filters } = payload
+    const { id, company, type, size, page, start_date, end_date } = payload
 
-    const query = { id }
-    const params = { filters }
+    const params = [ id ]
+    const query = { company, type, size, page, start_date, end_date }
 
     yield put(request())
-    const { data, error } = yield call(API.fetch, [ url, { params, query } ])
+    const { data, error } = yield call(Api.fetch, [ url, { params, query } ])
 
     if (!error) {
-      yield put(replace(data))
+      // yield put(replace(data))
+      console.log('function*handleFetch -> data', data)
       yield put(success())
     } else throw error
   } catch (error) {
@@ -39,11 +40,12 @@ function* handleCreate({ payload }) {
     const body = { date, company, credit, credit_note, debit, debit_note, description, amount, comment }
 
     yield put(request())
-    const { data, error } = yield call(API.create, [ url, { body } ])
+    const { data, error } = yield call(Api.create, [ url, { body } ])
 
     if (!error) {
       // yield put(addTop(data))
-      yield put(addBottom(data))
+      // yield put(addBottom(data))
+      console.log('function*handleCreate -> data', data)
       yield put(success())
     } else throw error
   } catch (error) {
@@ -57,14 +59,15 @@ function* handleModify({ payload }) {
   try {
     const { id, date, credit_note, debit_note, description, comment } = payload
 
-    const params = { id }
+    const params = [ id ]
     const body = { date, credit_note, debit_note, description, comment }
 
     yield put(request())
-    const { data, error } = yield call(API.remove, [ url, { params, body } ])
+    const { data, error } = yield call(Api.modify, [ url, { params, body } ])
 
     if (!error) {
-      yield put(modify(data))
+      // yield put(modify(data))
+      console.log('function*handleModify -> data', data)
       yield put(success())
     } else throw error
   } catch (error) {
@@ -78,13 +81,14 @@ function* handleActivate({ payload }) {
   try {
     const { id } = payload
 
-    const params = { id }
+    const params = [ id ]
 
     yield put(request())
-    const { data, error } = yield call(API.activate, [ url, { params } ])
+    const { data, error } = yield call(Api.activate, [ url, { params } ])
 
     if (!error) {
-      yield put(modify(data))
+      // yield put(modify(data))
+      console.log('function*handleActivate -> data', data)
       yield put(success())
     } else throw error
   } catch (error) {
@@ -98,13 +102,14 @@ function* handleDeactivate({ payload }) {
   try {
     const { id } = payload
 
-    const params = { id }
+    const params = [ id ]
 
     yield put(request())
-    const { data, error } = yield call(API.deactivate, [ url, { params } ])
+    const { data, error } = yield call(Api.deactivate, [ url, { params } ])
 
     if (!error) {
-      yield put(modify(data))
+      // yield put(modify(data))
+      console.log('function*handleDeactivate -> data', data)
       yield put(success())
     } else throw error
   } catch (error) {
@@ -113,12 +118,11 @@ function* handleDeactivate({ payload }) {
 }
 
 function* watch() {
-  yield takeLatest(JOURNAL.SEND.FETCH._, handleFetch)
-  yield takeLatest(JOURNAL.SEND.CREATE._, handleCreate)
-  yield takeLatest(JOURNAL.SEND.MODIFY._, handleModify)
-  yield takeLatest(JOURNAL.SEND.ACTIVATE._, handleActivate)
-  yield takeLatest(JOURNAL.SEND.DEACTIVATE._, handleDeactivate)
-  yield takeLatest(JOURNAL.SEND.REMOVE, handleRemove)
+  yield takeLatest(JOURNAL.SEND.FETCH, handleFetch)
+  yield takeLatest(JOURNAL.SEND.CREATE, handleCreate)
+  yield takeLatest(JOURNAL.SEND.MODIFY, handleModify)
+  yield takeLatest(JOURNAL.SEND.ACTIVATE, handleActivate)
+  yield takeLatest(JOURNAL.SEND.DEACTIVATE, handleDeactivate)
 }
 
 export default watch

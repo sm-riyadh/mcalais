@@ -11,7 +11,7 @@ import {
 import { ActivityBar } from '../../component/layout'
 
 import { fetchAccount, createAccount, removeAccount } from '../../store/actions'
-import API from '../../store/sagas/api/tree'
+import Api from '../../store/sagas/api/tree'
 
 import AccountTableRows from './components/AccountTableRows'
 // import AccountManagerLegacy from './components/AccountManagerLegacy'
@@ -134,7 +134,7 @@ const TreeViewer = ({ branch, accountType, creationModal, removeAccount, removeF
 export class Account extends Component {
   async componentDidMount() {
     this.props.fetchAccount({ company: this.props.company })
-    const tree = await API.fetchTree({ company: this.props.company })
+    const tree = await Api.fetchTree({ company: this.props.company })
     tree && this.setState({ tree: tree.data })
   }
 
@@ -200,7 +200,7 @@ export class Account extends Component {
       tree[this.state.accountType] = selectedBranch
     }
 
-    this.setState({ tree, folder: '' }, () => API.sendTree({ company: this.props.company, tree }))
+    this.setState({ tree, folder: '' }, () => Api.sendTree({ company: this.props.company, tree }))
   }
   addAccount = ({ name }) => {
     let tree = { ...this.state.tree }
@@ -247,7 +247,7 @@ export class Account extends Component {
         name,
         path    : this.state.path,
       })
-      API.sendTree({ company: this.props.company, tree })
+      Api.sendTree({ company: this.props.company, tree })
     })
   }
   removeAccount = (accountType, { code }) => {
@@ -296,7 +296,7 @@ export class Account extends Component {
         company : this.props.company,
         code,
       })
-      await API.fetchTree({ company: this.props.company })
+      await Api.fetchTree({ company: this.props.company })
     })
   }
   removeFolder = (accountType, folderName, location) => {
@@ -322,7 +322,7 @@ export class Account extends Component {
     //   }
     // }
 
-    // this.setState({ tree }, async () => console.log(await API.sendTree({ company: this.props.company, tree })))
+    // this.setState({ tree }, async () => console.log(await Api.sendTree({ company: this.props.company, tree })))
   }
   creationModal = (type, accountType, location, path) => {
     this.setState({ accountType, location, path }, this.toggleModal(`modal_${type}`, true))

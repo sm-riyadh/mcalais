@@ -5,11 +5,11 @@ import Axios from './axios-instance'
 const fetch = async payload => {
   try {
     const url = payload[0]
-    const { params, query } = payload[1]
+    const { params = '', query } = payload[1]
 
     const { data } = await Axios({
-      method : 'get',
-      url    : `/${url}/${params}`,
+      method : 'GET',
+      url    : `/${url}/${params.join('/')}`,
       params : {
         ...query,
       },
@@ -29,7 +29,7 @@ const create = async payload => {
     const { body } = payload[1]
 
     const { data } = await Axios({
-      method : 'post',
+      method : 'POST',
       url    : `/${url}`,
       data   : {
         ...body,
@@ -47,11 +47,11 @@ const create = async payload => {
 const modify = async payload => {
   try {
     const url = payload[0]
-    const { params, body } = payload[1]
+    const { params = '', body } = payload[1]
 
     const { data } = await Axios({
-      method : 'patch',
-      url    : `/${url}${params}`,
+      method : 'PATCH',
+      url    : `/${url}/${params.join('/')}`,
       data   : {
         ...body,
       },
@@ -68,11 +68,11 @@ const modify = async payload => {
 const replace = async payload => {
   try {
     const url = payload[0]
-    const { params, body } = payload[1]
+    const { params = '', body } = payload[1]
 
     const { data } = await Axios({
-      method : 'put',
-      url    : `/${url}${params}`,
+      method : 'PUT',
+      url    : `/${url}/${params.join('/')}`,
       data   : {
         ...body,
       },
@@ -89,11 +89,11 @@ const replace = async payload => {
 const activate = async payload => {
   try {
     const url = payload[0]
-    const { params } = payload[1]
+    const { params = '' } = payload[1]
 
     const { data } = await Axios({
-      method : 'patch',
-      url    : `/${url}/${params}/activate`,
+      method : 'PATCH',
+      url    : `/${url}/${params.join('/')}/activate`,
     })
 
     return { data }
@@ -107,11 +107,11 @@ const activate = async payload => {
 const deactivate = async payload => {
   try {
     const url = payload[0]
-    const { params } = payload[1]
+    const { params = '' } = payload[1]
 
     const { data } = await Axios({
       method : 'patch',
-      url    : `/${url}/${params}/deactivate`,
+      url    : `/${url}/${params.join('/')}/deactivate`,
     })
 
     return { data }
@@ -125,11 +125,11 @@ const deactivate = async payload => {
 const remove = async payload => {
   try {
     const url = payload[0]
-    const { params } = payload[1]
+    const { params = '' } = payload[1]
 
     const { data } = await Axios({
-      method : 'delete',
-      url    : `/${url}/${params}`,
+      method : 'DELETE',
+      url    : `/${url}/${params.join('/')}`,
     })
 
     return { data }

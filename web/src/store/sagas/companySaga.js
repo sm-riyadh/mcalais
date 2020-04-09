@@ -1,11 +1,11 @@
 import { call, put, takeLatest } from 'redux-saga/effects'
-import { API } from './api/api'
+import Api from './api/api'
 
 import { COMPANY } from '../index'
-import { account } from '../actions'
+import { accountAction } from '../actions'
 
-const { replace, addTop, addBottom, modify, remove } = account.save
-const { request, success, failed } = account.status
+const { replace, addTop, addBottom, modify, remove } = accountAction.save
+const { request, success, failed } = accountAction.status
 
 const url = 'company'
 
@@ -17,13 +17,14 @@ function* handleFetch({ payload }) {
   try {
     const { id } = payload
 
-    const query = { id }
+    const params = [ id ]
 
     yield put(request())
-    const { data, error } = yield call(API.fetch, [ url, { query } ])
+    const { data, error } = yield call(Api.fetch, [ url, { params } ])
 
     if (!error) {
-      yield put(replace(data))
+      // yield put(replace(data))
+      console.log('function*handleFetch -> data', data)
       yield put(success())
     } else throw error
   } catch (error) {
@@ -40,11 +41,12 @@ function* handleCreate({ payload }) {
     const body = { name }
 
     yield put(request())
-    const { data, error } = yield call(API.create, [ url, { body } ])
+    const { data, error } = yield call(Api.create, [ url, { body } ])
 
     if (!error) {
       // yield put(addTop(data))
-      yield put(addBottom(data))
+      // yield put(addBottom(data))
+      console.log('function*handleCreate -> data', data)
       yield put(success())
     } else throw error
   } catch (error) {
@@ -58,14 +60,15 @@ function* handleModify({ payload }) {
   try {
     const { id, name } = payload
 
-    const params = { id }
+    const params = [ id ]
     const body = { name }
 
     yield put(request())
-    const { data, error } = yield call(API.remove, [ url, { params, body } ])
+    const { data, error } = yield call(Api.modify, [ url, { params, body } ])
 
     if (!error) {
-      yield put(modify(data))
+      // yield put(modify(data))
+      console.log('function*handleModify -> data', data)
       yield put(success())
     } else throw error
   } catch (error) {
@@ -79,13 +82,14 @@ function* handleActivate({ payload }) {
   try {
     const { id } = payload
 
-    const params = { id }
+    const params = [ id ]
 
     yield put(request())
-    const { data, error } = yield call(API.activate, [ url, { params } ])
+    const { data, error } = yield call(Api.activate, [ url, { params } ])
 
     if (!error) {
-      yield put(modify(data))
+      // yield put(modify(data))
+      console.log('function*handleActivate -> data', data)
       yield put(success())
     } else throw error
   } catch (error) {
@@ -99,13 +103,14 @@ function* handleDeactivate({ payload }) {
   try {
     const { id } = payload
 
-    const params = { id }
+    const params = [ id ]
 
     yield put(request())
-    const { data, error } = yield call(API.deactivate, [ url, { params } ])
+    const { data, error } = yield call(Api.deactivate, [ url, { params } ])
 
     if (!error) {
-      yield put(modify(data))
+      // yield put(modify(data))
+      console.log('function*handleDeactivate -> data', data)
       yield put(success())
     } else throw error
   } catch (error) {
@@ -119,13 +124,14 @@ function* handleRemove({ payload }) {
   try {
     const { id } = payload
 
-    const params = { id }
+    const params = [ id ]
 
     yield put(request())
-    const { data, error } = yield call(API.remove, [ url, { params } ])
+    const { data, error } = yield call(Api.remove, [ url, { params } ])
 
     if (!error) {
-      yield put(remove(data))
+      // yield put(remove(data))
+      console.log('function*handleRemove -> data', data)
       yield put(success())
     } else throw error
   } catch (error) {
@@ -136,11 +142,11 @@ function* handleRemove({ payload }) {
 /* --------------------------------- WATCHERS --------------------------------- */
 
 function* watch() {
-  yield takeLatest(COMPANY.SEND.FETCH._, handleFetch)
-  yield takeLatest(COMPANY.SEND.CREATE._, handleCreate)
-  yield takeLatest(COMPANY.SEND.MODIFY._, handleModify)
-  yield takeLatest(COMPANY.SEND.ACTIVATE._, handleActivate)
-  yield takeLatest(COMPANY.SEND.DEACTIVATE._, handleDeactivate)
+  yield takeLatest(COMPANY.SEND.FETCH, handleFetch)
+  yield takeLatest(COMPANY.SEND.CREATE, handleCreate)
+  yield takeLatest(COMPANY.SEND.MODIFY, handleModify)
+  yield takeLatest(COMPANY.SEND.ACTIVATE, handleActivate)
+  yield takeLatest(COMPANY.SEND.DEACTIVATE, handleDeactivate)
   yield takeLatest(COMPANY.SEND.REMOVE, handleRemove)
 }
 

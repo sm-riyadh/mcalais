@@ -1,5 +1,4 @@
-import { MAIN, JOURNAL, ACCOUNT, COMPANY } from './index'
-import { JOURNAL } from './index'
+import { JOURNAL, ACCOUNT, COMPANY } from './index'
 
 // const updateMain = (name, payload) => ({
 //   type    : MAIN.SET,
@@ -9,7 +8,7 @@ import { JOURNAL } from './index'
 
 // CODE: Journal
 
-const journal = {
+const journalAction = {
   send   : {
     fetch      : payload => ({
       type    : JOURNAL.SEND.FETCH,
@@ -29,10 +28,6 @@ const journal = {
     }),
     deactivate : payload => ({
       type    : JOURNAL.SEND.DEACTIVATE,
-      payload,
-    }),
-    remove     : payload => ({
-      type    : JOURNAL.SEND.REMOVE,
       payload,
     }),
   },
@@ -76,7 +71,7 @@ const journal = {
 
 // CODE: Account
 
-const account = {
+const accountAction = {
   send   : {
     fetch      : payload => ({
       type    : ACCOUNT.SEND.FETCH,
@@ -143,7 +138,7 @@ const account = {
 
 // CODE: Company
 
-const company = {
+const companyAction = {
   send   : {
     fetch      : payload => ({
       type    : COMPANY.SEND.FETCH,
@@ -208,4 +203,4 @@ const company = {
   },
 }
 
-export { journal, account, company }
+export { journalAction, accountAction, companyAction }
