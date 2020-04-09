@@ -8,10 +8,10 @@ const fetch = async ({ company, size, page, type, start_date, end_date } = {}) =
   // if (!Validator.isMongoId(company_id)) throw 'Wrong company ID'
   if (!company) throw 'Company is required'
 
-  if (size && !Validator.isNumeric(size)) throw 'Invalid date'
-  if (page && !Validator.isNumeric(page)) throw 'Invalid date'
-  if (start_date && !Validator.isISO8601(start_date)) throw 'Invalid starting date'
-  if (end_date && !Validator.isISO8601(end_date)) throw 'Invalid ending date'
+  if (size && !await Validator.isNumeric(size + '')) throw 'Invalid date'
+  if (page && !await Validator.isNumeric(page + '')) throw 'Invalid date'
+  if (start_date && !await Validator.isISO8601(start_date)) throw 'Invalid starting date'
+  if (end_date && !await Validator.isISO8601(end_date)) throw 'Invalid ending date'
 
   if (
     type &&
@@ -35,11 +35,20 @@ const create = async ({ date, company, credit, credit_note, debit, debit_note, d
   if (!company) throw 'Company is required'
 
   if (!Validator.isISO8601(date)) throw 'Invalid date'
-  if (!Validator.isNumeric(amount)) throw 'Invalid date'
-  if (!Validator.isAlphanumeric(credit_note)) throw 'Only letters and numbers are allowed for credit note'
-  if (!Validator.isAlphanumeric(debit_note)) throw 'Only letters and numbers are allowed for debit note'
-  if (!Validator.isAlphanumeric(description)) throw 'Only letters and numbers are allowed for description'
-  if (!Validator.isAlphanumeric(comment)) throw 'Only letters and numbers are allowed for comment'
+  if (!Validator.isNumeric(amount + '')) throw 'Invalid date'
+  if (!Validator.isNumeric(credit + '')) throw 'Invalid credit'
+  if (!Validator.isNumeric(debit + '')) throw 'Invalid debit'
+  if (!Validator.isAlphanumeric(credit_note.split(' ').join('')))
+    throw 'Only letters and numbers are allowed for credit note'
+  if (!Validator.isAlphanumeric(debit_note.split(' ').join('')))
+    throw 'Only letters and numbers are allowed for debit note'
+  if (!Validator.isAlphanumeric(description.split(' ').join('')))
+    throw 'Only letters and numbers are allowed for description'
+  if (!Validator.isAlphanumeric(comment.split(' ').join(''))) throw 'Only letters and numbers are allowed for comment'
+
+  // FIXIT: transform code into ids
+  if ((await Account.fetch(company, { code: credit })).length === 0) throw 'Invalid credit'
+  if ((await Account.fetch(company, { code: debit })).length === 0) throw 'Invalid debit'
 
   // NOTE: Checks transaction possiblity
 
@@ -86,10 +95,13 @@ const create = async ({ date, company, credit, credit_note, debit, debit_note, d
 const modify = async ({ id, date, credit_note, debit_note, description, comment } = {}) => {
   if (!Validator.isMongoId(id)) throw 'Wrong ID'
   if (!Validator.isISO8601(date)) throw 'Invalid date'
-  if (!Validator.isAlphanumeric(credit_note)) throw 'Only letters and numbers are allowed for credit note'
-  if (!Validator.isAlphanumeric(debit_note)) throw 'Only letters and numbers are allowed for debit note'
-  if (!Validator.isAlphanumeric(description)) throw 'Only letters and numbers are allowed for description'
-  if (!Validator.isAlphanumeric(comment)) throw 'Only letters and numbers are allowed for comment'
+  if (!Validator.isAlphanumeric(credit_note.split(' ').join('')))
+    throw 'Only letters and numbers are allowed for credit note'
+  if (!Validator.isAlphanumeric(debit_note.split(' ').join('')))
+    throw 'Only letters and numbers are allowed for debit note'
+  if (!Validator.isAlphanumeric(description.split(' ').join('')))
+    throw 'Only letters and numbers are allowed for description'
+  if (!Validator.isAlphanumeric(comment.split(' ').join(''))) throw 'Only letters and numbers are allowed for comment'
 }
 
 const activate = async ({ id } = {}) => {
@@ -100,10 +112,4 @@ const deactivate = async ({ id } = {}) => {
   if (!Validator.isMongoId(id)) throw 'Wrong ID'
 }
 
-// CODE: Remove
-
-const remove = async ({ id } = {}) => {
-  if (!Validator.isMongoId(id)) throw 'Wrong ID'
-}
-
-export default { fetch, fetchDetails, create, modify, activate, deactivate, remove }
+export default { fetch, fetchDetails, create, modify, activate, deactivate }

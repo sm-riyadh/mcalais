@@ -77,31 +77,17 @@ const modify = async ({ id, name }) => {
 }
 
 const activate = async ({ id }) => {
-  const activatedCompany = await Company.enable(id)
-
-  return activatedCompany
+  await Company.enable(id)
 }
 
 const deactivate = async ({ id }) => {
-  const deactivatedCompany = await Company.disable(id)
-
-  return deactivatedCompany
+  await Company.disable(id)
 }
 
 // CODE: Remove
 
 const remove = async ({ id }) => {
-  const { name } = Company.fetchOne(id)
-
-  if ((await Account.fetchNonEmpty(name)).length === 0) {
-    const removedCompany = await Company.remove(id)
-
-    return removedCompany
-  } else {
-    const deactivatedCompany = await deactivate({ id })
-
-    return deactivatedCompany
-  }
+  await Company.remove(id)
 }
 
 /* -------------------------------- Utilities ------------------------------- */

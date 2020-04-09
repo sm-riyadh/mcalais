@@ -111,12 +111,6 @@ CompanySchema.statics.modifyCount = (name, account) =>
 // CompanySchema.statics.modifyCount = (id, account) =>
 //   Company.findByIdAndUpdate(id, { $inc: { ['accountCount.' + account]: 1 } })
 
-CompanySchema.statics.disable = id =>
-  Company.findByIdAndUpdate(id, {
-    $set : {
-      isDisabled : true,
-    },
-  })
 CompanySchema.statics.enable = id =>
   Company.findByIdAndUpdate(id, {
     $set : {
@@ -124,6 +118,12 @@ CompanySchema.statics.enable = id =>
     },
   })
 
+CompanySchema.statics.disable = id =>
+  Company.findByIdAndUpdate(id, {
+    $set : {
+      isDisabled : true,
+    },
+  })
 // CODE: Remove
 
 CompanySchema.statics.remove = id => Company.findByIdAndRemove(id)

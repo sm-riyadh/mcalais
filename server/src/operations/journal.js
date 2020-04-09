@@ -75,8 +75,6 @@ const create = async ({ date, company, credit, credit_note, debit, debit_note, d
 
   const { id } = newJournal
 
-  // await Account.addJournal(company, id, { credit: creditAccount.code, debit: debitAccount.code, amount )
-
   // CAVEAT: Adds journal entry in account collection
   await Account.addJournal(company, creditAccount.code, id)
   await Account.addJournal(company, debitAccount.code, id)
@@ -137,7 +135,7 @@ const create = async ({ date, company, credit, credit_note, debit, debit_note, d
 // CODE: Modify
 
 const modify = async ({ id, date, credit_note, debit_note, description, comment } = {}) => {
-  const modifiedJournal = await Journal.modify(id, {
+  await Journal.modify(id, {
     date,
     credit_note,
     debit_note,
@@ -145,19 +143,17 @@ const modify = async ({ id, date, credit_note, debit_note, description, comment 
     comment,
   })
 
+  const modifiedJournal = await Journal.fetch(id)
+
   return modifiedJournal
 }
 
 const activate = async ({ id }) => {
-  const activatedJournal = await Journal.enable(id)
-
-  return activatedJournal
+  await Journal.enable(id)
 }
 
 const deactivate = async ({ id }) => {
-  const deactivatedJournal = await Journal.disable(id)
-
-  return deactivatedJournal
+  await Journal.disable(id)
 }
 
 /* -------------------------------- UTILITIES ------------------------------- */

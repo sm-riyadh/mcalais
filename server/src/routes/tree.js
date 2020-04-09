@@ -14,7 +14,7 @@ app.get(`/${url}`, async (req, res, next) => {
   try {
     const { company } = req.query
 
-    Validator.fetch({ company })
+    await Validator.fetch({ company })
 
     const data = await Ops.fetch({ company })
 
@@ -30,7 +30,7 @@ app.put(`/${url}`, async (req, res, next) => {
   try {
     const { company, tree } = req.body
 
-    Validator.put({ company, tree })
+    await Validator.put({ company, tree })
 
     const data = await Ops.put({ company, tree })
 

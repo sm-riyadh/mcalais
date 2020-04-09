@@ -154,13 +154,14 @@ JournalSchema.statics.modify = (id, payload) =>
     { upsert: true }
   )
 
-JournalSchema.statics.disable = id =>
+JournalSchema.statics.enable = id =>
   Journal.findByIdAndUpdate(id, {
     $set : {
-      isDisabled : true,
+      isDisabled : false,
     },
   })
-JournalSchema.statics.enable = id =>
+
+JournalSchema.statics.disable = id =>
   Journal.findByIdAndUpdate(id, {
     $set : {
       isDisabled : true,

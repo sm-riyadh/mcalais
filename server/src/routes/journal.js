@@ -15,7 +15,7 @@ app.get(`/${url}`, async (req, res, next) => {
   try {
     const { company, size, page, type, start_date, end_date } = req.query
 
-    Validator.fetch({ company, size, page, type, start_date, end_date })
+    await Validator.fetch({ company, size, page, type, start_date, end_date })
 
     const data = await Ops.fetch({ company, size, page, type, start_date, end_date })
 
@@ -29,7 +29,7 @@ app.get(`/${url}/:id`, async (req, res, next) => {
   try {
     const { id } = req.params
 
-    Validator.fetchDetails({ id })
+    await Validator.fetchDetails({ id })
 
     const data = await Ops.fetchDetails({ id })
 
@@ -44,7 +44,7 @@ app.post(`/${url}`, async (req, res, next) => {
   try {
     const { date, company, credit, credit_note, debit, debit_note, description, amount, comment } = req.body
 
-    Validator.create({ date, company, credit, credit_note, debit, debit_note, description, amount, comment })
+    await Validator.create({ date, company, credit, credit_note, debit, debit_note, description, amount, comment })
 
     const data = await Ops.create({
       date,
@@ -72,7 +72,7 @@ app.patch(`/${url}/:id`, async (req, res, next) => {
 
     const { date, credit_note, debit_note, description, comment } = req.body
 
-    Validator.modify({ id, date, credit_note, debit_note, description, comment })
+    await Validator.modify({ id, date, credit_note, debit_note, description, comment })
 
     const data = await Ops.modify({ id, date, credit_note, debit_note, description, comment })
 
@@ -86,7 +86,7 @@ app.patch(`/${url}/:id/activate`, async (req, res, next) => {
   try {
     const { id } = req.params
 
-    Validator.activate({ id })
+    await Validator.activate({ id })
 
     const data = await Ops.activate({ id })
 
@@ -100,7 +100,7 @@ app.patch(`/${url}/:id/deactivate`, async (req, res, next) => {
   try {
     const { id } = req.params
 
-    Validator.deactivate({ id })
+    await Validator.deactivate({ id })
 
     const data = await Ops.deactivate({ id })
 
@@ -109,17 +109,5 @@ app.patch(`/${url}/:id/deactivate`, async (req, res, next) => {
     return next(error)
   }
 })
-// CODE: Activation
 
-// app.delete(`/${url}`, async (req, res, next) => {
-//   try {
-//     Validator.state({ id, action })
-
-//     const data = await Ops.state({ id, action })
-
-//     return res.send(data)
-//   } catch (error) {
-//     return next(error)
-//   }
-// })
 export default app

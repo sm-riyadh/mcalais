@@ -1,5 +1,6 @@
 import './db/mongoose'
 import express from 'express'
+import cors from 'cors'
 import bodyparser from 'body-parser'
 
 import { host, port } from './config'
@@ -12,7 +13,18 @@ import tree from './routes/tree'
 
 const app = express()
 
+// Cors Config
+const whitelist = [ `http://${host}` ]
+const corsOptions = {
+  origin               : (origin, callback) => {
+    if (whitelist.indexOf(origin) !== -1 || !origin) callback(null, true)
+    else callback(new Error('Not allowed by CORS'))
+  },
+  optionsSuccessStatus : 200,
+}
+
 // Middlewares
+app.use(cors(corsOptions))
 app.use(bodyparser.json())
 
 app.use((req, res, next) => {

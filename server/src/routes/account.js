@@ -14,7 +14,7 @@ app.get(`/${url}`, async (req, res, next) => {
   try {
     const { company, nonempty } = req.query
 
-    Validator.fetch({ company, nonempty })
+    await Validator.fetch({ company, nonempty })
 
     const data = await Ops.fetch({ company, nonempty })
 
@@ -28,7 +28,7 @@ app.get(`/${url}/:id`, async (req, res, next) => {
   try {
     const { id } = req.params
 
-    Validator.fetchDetails({ id })
+    await Validator.fetchDetails({ id })
 
     const data = await Ops.fetchDetails({ id })
 
@@ -44,7 +44,7 @@ app.post(`/${url}`, async (req, res, next) => {
   try {
     const { company, type, name, path, intercompany } = req.body
 
-    Validator.create({ company, type, name, path, intercompany })
+    await Validator.create({ company, type, name, path, intercompany })
 
     const data = await Ops.create({ company, type, name, path, intercompany })
 
@@ -62,7 +62,7 @@ app.patch(`/${url}/:id`, async (req, res, next) => {
 
     const { name, path, intercompany } = req.body
 
-    Validator.modify({ id, name, path, intercompany })
+    await Validator.modify({ id, name, path, intercompany })
 
     const data = await Ops.modify({ id, name, path, intercompany })
 
@@ -76,7 +76,7 @@ app.patch(`/${url}/:id/activate`, async (req, res, next) => {
   try {
     const { id } = req.params
 
-    Validator.activate({ id })
+    await Validator.activate({ id })
 
     const data = await Ops.activate({ id })
 
@@ -90,7 +90,7 @@ app.patch(`/${url}/:id/deactivate`, async (req, res, next) => {
   try {
     const { id } = req.params
 
-    Validator.deactivate({ id })
+    await Validator.deactivate({ id })
 
     const data = await Ops.deactivate({ id })
 
@@ -106,7 +106,7 @@ app.delete(`/${url}/:id`, async (req, res, next) => {
   try {
     const { id } = req.params
 
-    Validator.remove({ id })
+    await Validator.remove({ id })
 
     const data = await Ops.remove({ id })
 

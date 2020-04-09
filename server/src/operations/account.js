@@ -42,37 +42,26 @@ const create = async ({ company, type, name, path, intercompany } = {}) => {
 // CODE: Modify
 
 const modify = async ({ id, name, path, intercompany } = {}) => {
-  const modifiedAccount = await Account.modify(id, { name, path, intercompany })
+  await Account.modify(id, { name, path, intercompany })
+  const modifiedAccount = await Account.fetchOne(id)
 
   return modifiedAccount
 }
 
 const activate = async ({ id }) => {
-  const activatedAccount = await Account.enable(id)
-
-  return activatedAccount
+  await Account.enable(id)
 }
 
 const deactivate = async ({ id }) => {
-  const deactivatedAccount = await Account.disable(id)
-
-  return deactivatedAccount
+  await Account.disable(id)
 }
 
 // CODE: Remove
 
 const remove = async ({ id }) => {
-  const { transaction } = await Account.fetchOne(id)
+  const removedAccount = await Account.remove(id)
 
-  if (transaction.length === 0) {
-    const removedAccount = await Account.remove(id)
-
-    return removedAccount
-  } else {
-    const deactivatedAccount = await deactivate(id)
-
-    return deactivatedAccount
-  }
+  return removedAccount
 }
 
 /* -------------------------------- Utilities ------------------------------- */
