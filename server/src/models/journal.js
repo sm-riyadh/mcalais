@@ -14,6 +14,10 @@ const JournalSchema = new mongoose.Schema({
     required : true,
   },
   debit       : {
+    id   : {
+      type     : mongoose.Schema.ObjectId,
+      required : true,
+    },
     code : {
       type     : Number,
       min      : 100001,
@@ -24,12 +28,16 @@ const JournalSchema = new mongoose.Schema({
       type     : String,
       trim     : true,
       required : true,
-    },
-    note : {
-      type : String,
     },
   },
+  debit_note  : {
+    type : String,
+  },
   credit      : {
+    id   : {
+      type     : mongoose.Schema.ObjectId,
+      required : true,
+    },
     code : {
       type     : Number,
       min      : 100001,
@@ -41,9 +49,9 @@ const JournalSchema = new mongoose.Schema({
       trim     : true,
       required : true,
     },
-    note : {
-      type : String,
-    },
+  },
+  credit_note : {
+    type : String,
   },
   amount      : {
     type     : Number,
@@ -127,15 +135,17 @@ JournalSchema.statics.create = (
     date,
     company,
     credit      : {
+      id   : credit.id,
       code : credit.code,
       name : credit.name,
-      note : credit_note,
     },
+    credit_note,
     debit       : {
+      id   : debit.id,
       code : debit.code,
       name : debit.name,
-      note : debit_note,
     },
+    debit_note,
     description,
     amount,
     comment,

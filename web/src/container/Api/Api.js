@@ -7,14 +7,14 @@ import { journalAction, accountAction, companyAction } from '../../store/actions
 export class Api extends Component {
   componentDidMount() {
     /* ------------------------------ NOTE: Journal ----------------------------- */
-    // this.props.fetch({
-    //   company    : '5e8f203e1a53001dec074c9a',
-    //   type       : 'journal',
-    //   size       : 12,
-    //   page       : 0,
-    //   start_date : subDays(new Date(), 100),
-    //   end_date   : new Date(),
-    // })
+    this.props.fetch({
+      company    : '5e8f203e1a53001dec074c9a',
+      type       : 'journal',
+      size       : 12,
+      page       : 0,
+      start_date : subDays(new Date(), 100),
+      end_date   : new Date(),
+    })
     // this.props.fetch({ id: '5e8cd40dcb2e822624229d60' })
     // this.props.create({
     //   date        : new Date(),
@@ -28,16 +28,15 @@ export class Api extends Component {
     //   comment     : 'Comment from web',
     // })
     // this.props.modify({
-    // id          : '5e8cd40dcb2e822624229d60',
-    // date        : new Date(),
-    // company     : 'HQ',
-    // credit_note : 'optional mod',
-    // debit_note  : 'optional mod',
-    // description : 'Description from web mod',
-    // comment     : 'Comment from web mod',
+    //   id          : '5e8ffa1d376afb203c1680ea',
+    //   date        : new Date(),
+    //   credit_note : '1',
+    //   debit_note  : '1',
+    //   description : '1',
+    //   comment     : '1',
     // })
-    // this.props.activate({ id: '5e8cd40dcb2e822624229d60' })
-    // this.props.deactivate({ id: '5e8cd40dcb2e822624229d60' })
+    // this.props.activate({ id: '5e8ffd801cace026280da23d' })
+    // this.props.deactivate({ id: '5e8ffa1d376afb203c1680ea' })
     /* ------------------------------ NOTE: Account ----------------------------- */
     // this.props.fetch({
     //   company : '5e8f203e1a53001dec074c9a',
@@ -75,7 +74,24 @@ export class Api extends Component {
   }
 
   render() {
-    return <Fragment>> api test</Fragment>
+    return (
+      <Fragment>
+        > api test
+        <button
+          onClick={() =>
+            this.props.modify({
+              id          : '5e8ffa1d376afb203c1680ea',
+              date        : new Date(),
+              credit_note : '8',
+              debit_note  : '8',
+              description : '8',
+              comment     : '8',
+            })}
+        >
+          o
+        </button>
+      </Fragment>
+    )
   }
 }
 

@@ -92,6 +92,10 @@ const deactivate = async ({ id }) => {
 // CODE: Remove
 
 const remove = async ({ id }) => {
+  const account = await Account.fetch({ company: id })
+
+  account.map(async ({ id }) => await Account.remove(id))
+
   await Company.remove(id)
 }
 

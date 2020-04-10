@@ -4,7 +4,7 @@ import Api from './api/api'
 import { JOURNAL } from '../index'
 import { journalAction } from '../actions'
 
-const { replace, addTop, addBottom, modify, remove } = journalAction.save
+const { replace, addTop, addBottom, modify, activate, deactivate } = journalAction.save
 const { request, success, failed } = journalAction.status
 
 const url = 'journal'
@@ -22,8 +22,7 @@ function* handleFetch({ payload = {} }) {
     const { data, error } = yield call(Api.fetch, [ url, { params, query } ])
 
     if (!error) {
-      // yield put(replace(data))
-      console.log('function*handleFetch -> data', data)
+      yield put(replace({ key: 'journal_list', data }))
       yield put(success())
     } else throw error
   } catch (error) {
@@ -43,9 +42,7 @@ function* handleCreate({ payload = {} }) {
     const { data, error } = yield call(Api.create, [ url, { body } ])
 
     if (!error) {
-      // yield put(addTop(data))
-      // yield put(addBottom(data))
-      console.log('function*handleCreate -> data', data)
+      yield put(addTop({ key: 'journal_list', data }))
       yield put(success())
     } else throw error
   } catch (error) {
@@ -66,11 +63,11 @@ function* handleModify({ payload = {} }) {
     const { data, error } = yield call(Api.modify, [ url, { params, body } ])
 
     if (!error) {
-      // yield put(modify(data))
-      console.log('function*handleModify -> data', data)
+      yield put(modify({ key: 'journal_list', id, data }))
       yield put(success())
     } else throw error
   } catch (error) {
+    console.log('function*handleModify -> error', error)
     yield put(failed(error.toString()))
   }
 }
@@ -87,8 +84,7 @@ function* handleActivate({ payload = {} }) {
     const { data, error } = yield call(Api.activate, [ url, { params } ])
 
     if (!error) {
-      // yield put(modify(data))
-      console.log('function*handleActivate -> data', data)
+      yield put(activate({ key: 'journal_list', data: { id } }))
       yield put(success())
     } else throw error
   } catch (error) {
@@ -108,8 +104,7 @@ function* handleDeactivate({ payload = {} }) {
     const { data, error } = yield call(Api.deactivate, [ url, { params } ])
 
     if (!error) {
-      // yield put(modify(data))
-      console.log('function*handleDeactivate -> data', data)
+      yield put(deactivate({ key: 'journal_list', data: { id } }))
       yield put(success())
     } else throw error
   } catch (error) {

@@ -32,23 +32,31 @@ const journalAction = {
     }),
   },
   save   : {
-    replace   : payload => ({
-      type    : JOURNAL.SAVE.FETCH,
+    replace    : payload => ({
+      type    : JOURNAL.SAVE.REPLACE,
       payload,
     }),
-    addTop    : payload => ({
+    addTop     : payload => ({
       type    : JOURNAL.SAVE.ADDTOP,
       payload,
     }),
-    addBottom : payload => ({
+    addBottom  : payload => ({
       type    : JOURNAL.SAVE.ADDBOTTOM,
       payload,
     }),
-    modify    : payload => ({
+    modify     : payload => ({
       type    : JOURNAL.SAVE.MODIFY,
       payload,
     }),
-    remove    : payload => ({
+    activate   : payload => ({
+      type    : JOURNAL.SAVE.ACTIVATE,
+      payload,
+    }),
+    deactivate : payload => ({
+      type    : JOURNAL.SAVE.DEACTIVATE,
+      payload,
+    }),
+    remove     : payload => ({
       type    : JOURNAL.SAVE.REMOVE,
       payload,
     }),
@@ -100,7 +108,7 @@ const accountAction = {
   },
   save   : {
     replace   : payload => ({
-      type    : ACCOUNT.SAVE.FETCH,
+      type    : ACCOUNT.SAVE.REPLACE,
       payload,
     }),
     addTop    : payload => ({
@@ -167,7 +175,7 @@ const companyAction = {
   },
   save   : {
     replace   : payload => ({
-      type    : COMPANY.SAVE.FETCH,
+      type    : COMPANY.SAVE.REPLACE,
       payload,
     }),
     addTop    : payload => ({
