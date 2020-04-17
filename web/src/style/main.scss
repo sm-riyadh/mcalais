@@ -108,3 +108,25 @@ p {
   font-family: inherit;
   font-size: inherit;
 }
+
+// company
+
+.company-card {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2rem;
+  border: 0.2rem solid #eee;
+  border-radius: 0.8rem;
+  margin: 0.6rem 0;
+
+  &:hover {
+    border-color: #ddd;
+  }
+}
+.company-title {
+  font-size: 1.8rem;
+  margin-bottom: 0.6rem;
+  font-weight: 500;
+}

@@ -1,4 +1,6 @@
 import moment from 'moment'
+import cloneDeep from 'lodash.clonedeep'
+
 import { JOURNAL } from '..'
 
 const initialState = {
@@ -36,13 +38,14 @@ const journal = (state = initialState, { type, payload }) => {
       return newState
     }
     case JOURNAL.SAVE.ADDBOTTOM: {
-      const newState = { ...state }
+      const newState = cloneDeep(state)
       newState[payload.key] = [ ...newState[payload.key], payload.data ]
 
       return newState
     }
     case JOURNAL.SAVE.MODIFY: {
-      const newState = { ...state }
+      const newState = cloneDeep(state)
+
       let toModify
       newState[payload.key].find((e, index) => e.id === payload.id && (toModify = index))
 
@@ -51,28 +54,32 @@ const journal = (state = initialState, { type, payload }) => {
       return newState
     }
     case JOURNAL.SAVE.ACTIVATE: {
-      const newState = { ...state }
+      const newState = cloneDeep(state)
+
       let toModify = newState[payload.key].filter(e => e.id === payload.data.id)[0]
       toModify.isDisabled = false
 
       return newState
     }
     case JOURNAL.SAVE.DEACTIVATE: {
-      const newState = { ...state }
+      const newState = cloneDeep(state)
+
       let toModify = newState[payload.key].filter(e => e.id === payload.data.id)[0]
       toModify.isDisabled = true
 
       return newState
     }
     case JOURNAL.STATUS.SUCCESS: {
-      const newState = { ...state }
+      const newState = cloneDeep(state)
+
       newState.status.request = false
       newState.status.success = true
 
       return newState
     }
     case JOURNAL.STATUS.REQUEST: {
-      const newState = { ...state }
+      const newState = cloneDeep(state)
+
       newState.status.success = false
       newState.status.failed = false
       newState.status.request = true
@@ -80,7 +87,8 @@ const journal = (state = initialState, { type, payload }) => {
       return newState
     }
     case JOURNAL.STATUS.FAILED: {
-      const newState = { ...state }
+      const newState = cloneDeep(state)
+
       newState.status.request = false
       newState.status.failed = true
       newState.status.message = payload

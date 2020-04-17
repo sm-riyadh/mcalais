@@ -24,11 +24,15 @@ function* handleFetch({ payload = {} }) {
     const { data, error } = yield call(Api.fetch, [ url, { params, query } ])
 
     if (!error) {
-      // yield put(replace(data))
-      console.log('function*handleFetch -> data', data)
+      if (nonempty) {
+        yield put(replace({ key: 'account_nonempty', data }))
+      } else {
+        yield put(replace({ key: 'account', data }))
+      }
       yield put(success())
     } else throw error
   } catch (error) {
+    console.log('function*handleFetch -> error', error)
     yield put(failed(error.toString()))
   }
 }

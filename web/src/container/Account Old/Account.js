@@ -5,136 +5,335 @@ import {
   // Modal,
   Container,
   Card,
-  // Text,
-  // Placeholder,
+  Text,
+  Placeholder,
 } from '../../component'
+import { ActivityBar } from '../../component/layout'
 
-const Children = ({ root, name, data, spacing = 0 }) =>
-  root[name]
-    ? root[name].map(item => (
-        <Fragment>
-          <tr>
-            <td>
-              <span>{'\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0'.repeat(spacing)}</span>
-              <span>{'\u00A0|\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0'}</span>
-              {data.find(e => e.id === item).name}
+import { accountAction } from '../../store/actions'
+import Api from '../../store/sagas/api/tree'
+
+import AccountTableRows from './components/AccountTableRows'
+// import AccountManagerLegacy from './components/AccountManagerLegacy'
+import AccountModal from './components/AccountModal'
+import FolderModal from './components/FolderModal'
+
+const TreeViewer = ({ branch, accountType, creationModal, removeAccount, removeFolder, nested = [], account }) =>
+  branch.map(({ type, location, path, name, children }, index) => {
+    const account = account.length != 0 && account.filter(e => e.name === name && e.type === accountType)[0]
+
+    return (
+      <Fragment key={index}>
+        <tr>
+          <td
+            style={
+              type === 'folder' ? (
+                {
+                  backgroundColor : '#f7f7f7',
+                }
+              ) : null
+            }
+          >
+            {nested.length != 0 && (
+              <span
+                style={{
+                  borderRight : '0.1rem solid #aaa',
+                  marginRight : '0.5rem',
+                  padding     : '0.8rem 0',
+                }}
+              >
+                {nested.map(n => (
+                  <span
+                    style={{
+                      borderLeft : '0.1rem solid #ddd',
+                      padding    : '0.8rem 0',
+                    }}
+                  >
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  </span>
+                ))}
+              </span>
+            )}
+            {type === 'folder' && <i className='material-icons p-right-1'>folder</i>}
+            {type === 'account' && <i className='material-icons p-right-1'>money</i>}
+            {name}
+          </td>
+          {type == 'account' && (
+            <td
+              style={{
+                paddingTop    : '0',
+                paddingBottom : '0',
+              }}
+              className='txtRight'
+            >
+              {account ? account.balance : '0'}
+              {account && (
+                <button className='btn btn-small btn-rounded grey' onClick={() => removeAccount(accountType, account)}>
+                  <i className='material-icons p-right-1'>{account.balance === 0 ? 'delete' : 'lock'}</i>
+                </button>
+              )}
             </td>
-            <td>0</td>
-          </tr>
-          <Children root={root} name={item} data={data} spacing={spacing++} />
-        </Fragment>
-      ))
-    : null
-
-const TreeViewer = ({ root, data }) =>
-  root.base.map(item => (
-    <Fragment>
-      <tr>
-        <td>{data.find(e => e.id === item).name}</td>
-        <td>
-          0
-          <button className='btn btn-small btn-rounded grey'>
-            <i className='material-icons p-right-1'>delete</i>
-          </button>
-        </td>
-      </tr>
-      <Children root={root} name={item} data={data} />
-    </Fragment>
-  ))
+          )}
+          {type == 'folder' && (
+            <td
+              style={
+                type === 'folder' ? (
+                  {
+                    backgroundColor : '#f7f7f7',
+                    paddingTop      : '0',
+                    paddingBottom   : '0',
+                  }
+                ) : (
+                  {
+                    paddingTop    : '0',
+                    paddingBottom : '0',
+                  }
+                )
+              }
+              className='txtRight'
+            >
+              <Fragment>
+                <button
+                  className='btn btn-small btn-rounded grey'
+                  onClick={() => creationModal('folder', accountType, location, path)}
+                >
+                  <i className='material-icons p-right-1'>create_new_folder</i>
+                </button>
+                &nbsp;
+                <button
+                  className='btn btn-small btn-rounded grey'
+                  onClick={() => creationModal('account', accountType, location, path)}
+                >
+                  <i className='material-icons p-right-1'>fiber_new</i>
+                </button>
+                <button
+                  className='btn btn-small btn-rounded grey'
+                  onClick={() => removeFolder(accountType, name, location)}
+                >
+                  <i className='material-icons p-right-1'>delete</i>
+                </button>
+              </Fragment>
+            </td>
+          )}
+        </tr>
+        {type == 'folder' && (
+          <TreeViewer
+            accountType={accountType}
+            branch={children}
+            creationModal={creationModal}
+            removeAccount={removeAccount}
+            removeFolder={removeFolder}
+            account={account}
+            nested={[ ...nested, null ]}
+          />
+        )}
+      </Fragment>
+    )
+  })
 
 export class Account extends Component {
-  componentDidMount() {}
+  async componentDidMount() {
+    const tree = await Api.fetchTree({ company: this.props.company })
+    tree && this.setState({ tree: tree.data })
+  }
 
   state = {
-    data   : {
-      assets : [
-        { id: '5e8f20411a53001dec074c9f', company: '5e8f203e1a53001dec074c9a', name: 'A', type: 'assets' },
-        { id: '5e8f203f1a53001dec074c9b', company: '5e8f203e1a53001dec074c9a', name: 'B', type: 'assets' },
-        { id: '5e8fa248355464231c4bffa1', company: '5e8f203e1a53001dec074c9a', name: 'C', type: 'assets' },
-        { id: '5e8f20411a53001dec074c93', company: '5e8f203e1a53001dec074c9a', name: 'D', type: 'assets' },
-        { id: '5e8f203f1a53001dec074c94', company: '5e8f203e1a53001dec074c9a', name: 'AA', type: 'assets' },
-        { id: '5e8fa248355464231c4bffa3', company: '5e8f203e1a53001dec074c9a', name: 'BA', type: 'assets' },
-        { id: '5e8f20411a53001dec074c9g', company: '5e8f203e1a53001dec074c9a', name: 'CA', type: 'assets' },
-        { id: '5e8f203f1a53001dec074c9y', company: '5e8f203e1a53001dec074c9a', name: 'CB', type: 'assets' },
-        { id: '5e8fa248355464231c4bffa8', company: '5e8f203e1a53001dec074c9a', name: 'CAA', type: 'assets' },
-        { id: '5e8fa248355464231c4bffa9', company: '5e8f203e1a53001dec074c9a', name: 'E', type: 'assets' },
-        { id: '5e8fa248355464231c4bfea9', company: '5e8f203e1a53001dec074c9a', name: 'F', type: 'assets' },
-      ],
+    modify_account : false,
+    filter         : '',
+    location       : '',
+    folder         : '',
+    account        : '',
+    path           : '',
+    accountType    : '',
+    modal_account  : false,
+    modal_folder   : false,
+    tree           : {
+      assets      : '',
+      liabilities : '',
+      equities    : '',
+      expenses    : '',
+      incomes     : '',
     },
-    assets : {
-      base                       : [
-        '5e8f20411a53001dec074c9f',
-        '5e8f203f1a53001dec074c9b',
-        '5e8fa248355464231c4bffa1',
-        '5e8f20411a53001dec074c93',
-      ],
-      '5e8f20411a53001dec074c9f' : [ '5e8f203f1a53001dec074c94' ],
-      '5e8f203f1a53001dec074c9b' : [ '5e8fa248355464231c4bffa3' ],
-      '5e8fa248355464231c4bffa1' : [ '5e8f20411a53001dec074c9g', '5e8f203f1a53001dec074c9y' ],
-      '5e8f20411a53001dec074c9g' : [ '5e8fa248355464231c4bffa8' ],
-    },
+  }
+  changeHandler = ({ target }) => {
+    const { name, value } = target
+    this.setState({ [name]: value })
+  }
+  toggleModal = (name, action) => this.setState({ [name]: action })
+
+  addFolder = () => {
+    let tree = { ...this.state.tree }
+    let selectedBranch = tree[this.state.accountType]
+
+    this.state.location.length !== 0 &&
+      this.state.location.map(
+        depth =>
+          selectedBranch.children
+            ? (selectedBranch = selectedBranch.children[depth])
+            : (selectedBranch = selectedBranch[depth])
+      )
+
+    if (this.state.location.length !== 0) {
+      selectedBranch.children = [
+        ...selectedBranch.children,
+        {
+          type     : 'folder',
+          path     : [ ...this.state.path, selectedBranch.name.toLowerCase() ],
+          location : [ ...this.state.location, selectedBranch.children.length ],
+          name     : this.state.folder,
+          children : [],
+        },
+      ]
+    } else {
+      selectedBranch = [
+        ...selectedBranch,
+        {
+          type     : 'folder',
+          path     : [ ...this.state.path ],
+          location : [ selectedBranch.length ],
+          name     : this.state.folder,
+          children : [],
+        },
+      ]
+
+      tree[this.state.accountType] = selectedBranch
+    }
+
+    this.setState({ tree, folder: '' }, () => Api.sendTree({ company: this.props.company, tree }))
+  }
+  addAccount = ({ name }) => {
+    let tree = { ...this.state.tree }
+    let selectedBranch = tree[this.state.accountType]
+
+    this.state.location.length !== 0 &&
+      this.state.location.map(
+        depth =>
+          selectedBranch.children
+            ? (selectedBranch = selectedBranch.children[depth])
+            : (selectedBranch = selectedBranch[depth])
+      )
+
+    if (this.state.location.length !== 0) {
+      selectedBranch.children = [
+        ...selectedBranch.children,
+        {
+          type     : 'account',
+          path     : [ ...this.state.path, selectedBranch.name.toLowerCase() ],
+          location : [ ...this.state.location, selectedBranch.children.length ],
+          name     : this.state.account,
+          children : [],
+        },
+      ]
+    } else {
+      selectedBranch = [
+        ...selectedBranch,
+        {
+          type     : 'account',
+          path     : [ ...this.state.path ],
+          location : [ selectedBranch.length ],
+          name     : this.state.account,
+          children : [],
+        },
+      ]
+
+      tree[this.state.accountType] = selectedBranch
+    }
+
+    this.setState({ tree, account: '' }, () => {
+      this.props.createAccount({
+        company : this.props.company,
+        type    : this.state.accountType,
+        name,
+        path    : this.state.path,
+      })
+      Api.sendTree({ company: this.props.company, tree })
+    })
+  }
+  removeAccount = (accountType, { code }) => {
+    let tree = { ...this.state.tree }
+    let selectedBranch = tree[accountType]
+
+    this.state.location.length !== 0 &&
+      this.state.location.map(
+        depth =>
+          selectedBranch.children
+            ? (selectedBranch = selectedBranch.children[depth])
+            : (selectedBranch = selectedBranch[depth])
+      )
+
+    const account = this.props.account[accountType] && this.props.account[accountType].filter(e => e.code === code)[0]
+    selectedBranch = selectedBranch.filter(({ type, name }) => type === 'account' && name !== account.name)
+
+    if (this.state.location.length !== 0) {
+      selectedBranch.children = [
+        ...selectedBranch.children,
+        {
+          type     : 'folder',
+          path     : [ ...this.state.path, selectedBranch.name.toLowerCase() ],
+          location : [ ...this.state.location, selectedBranch.children.length ],
+          name     : this.state.folder,
+          children : [],
+        },
+      ]
+    } else {
+      selectedBranch = [
+        ...selectedBranch,
+        {
+          type     : 'folder',
+          path     : [ ...this.state.path ],
+          location : [ selectedBranch.length ],
+          name     : this.state.folder,
+          children : [],
+        },
+      ]
+
+      tree[this.state.accountType] = selectedBranch
+    }
+
+    this.setState({ tree }, async () => {
+      this.props.removeAccount({
+        company : this.props.company,
+        code,
+      })
+      await Api.fetchTree({ company: this.props.company })
+    })
+  }
+  removeFolder = (accountType, folderName, location) => {
+    let tree = { ...this.state.tree }
+    let selectedBranch = tree[accountType]
+
+    const prevLocation = [ ...location ]
+
+    prevLocation.splice(prevLocation.length - 1, 1)
+
+    prevLocation.length !== 0 &&
+      prevLocation.map(depth => selectedBranch.children && (selectedBranch = selectedBranch[depth]))
+
+    let folder = selectedBranch.children.filter(({ type, name }) => type === 'folder' && name === folderName)[0]
+
+    console.log('removeFolder -> folder', folder)
+    // if (folder.children.length === 0) {
+    //   if (prevLocation.length !== 0) {
+    //     console.log(selectedBranch)
+    //     selectedBranch.children = selectedBranch.filter(({ type, name }) => type === 'folder' && name !== folderName)
+    //   } else {
+    //     selectedBranch.splice(location[0], 1)
+    //   }
+    // }
+
+    // this.setState({ tree }, async () => console.log(await Api.sendTree({ company: this.props.company, tree })))
+  }
+  creationModal = (type, accountType, location, path) => {
+    this.setState({ accountType, location, path }, this.toggleModal(`modal_${type}`, true))
   }
 
   render() {
     return (
       <Fragment>
-        {/* <Tree root={this.state.assets} data={this.state.data.assets} />
-        <button
-          onClick={() => {
-            const newState = { ...this.state }
-            newState.assets.base = [ ...newState.assets.base, '5e8fa248355464231c4bffa9' ]
-            newState.assets['5e8fa248355464231c4bffa1'] = [
-              ...newState.assets['5e8fa248355464231c4bffa1'],
-              '5e8fa248355464231c4bfea9',
-            ]
-            this.setState(newState)
-          }}
-        >
-          DO
-        </button> */}
-        <Container vertical className='scrollable p-hor-8 p-top-5'>
-          <Container className='flex-pos-between p-hor-4 p-bottom-4'>
-            <Card className='p-top-5' vertical noPad expand>
-              <Container className='card-header flex-pos-between p-vrt-4 p-hor-6'>
-                <b>Assets</b>
-                <span>
-                  <button
-                    className='btn btn-small btn-rounded grey'
-                    onClick={() => this.creationModal('folder', 'assets', [], [ 'assets' ])}
-                  >
-                    <i className='material-icons p-right-1'>create_new_folder</i>
-                  </button>
-                  &nbsp;
-                  <button
-                    className='btn btn-small btn-rounded grey'
-                    onClick={() => this.creationModal('account', 'assets', [], [ 'assets' ])}
-                  >
-                    <i className='material-icons p-right-1'>fiber_new</i>
-                  </button>
-                </span>
-              </Container>
-              <table className='table-card'>
-                <thead>
-                  <tr>
-                    <th>Name</th>
-                    <th className='txtRight'>Balance</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <TreeViewer accountType='assets' root={this.state.assets} data={this.state.data.assets} />
-                  <tr>
-                    <td className='txtRight' style={{ backgroundColor: '#eeeeee' }}>
-                      <b>Total</b>
-                    </td>
-                    <td className='txtRight' style={{ backgroundColor: '#eeeeee' }}>
-                      <span>৳</span> 0
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </Card>
-          </Container>
-          {/*     <select
+        {this.props.account && !this.props.status.failed ? (
+          <Container vertical className='scrollable p-hor-8 p-top-5'>
+            {/* <Container className='flex-pos-between p-hor-4 p-bottom-4'>
+              <select
                 name='filter'
                 className='btn btn-chip m-right-2'
                 onChange={this.changeHandler}
@@ -422,12 +621,41 @@ export class Account extends Component {
               name={this.state.folder}
               setName={name => this.setState({ folder: name })}
             /> */}
-        </Container>
+          </Container>
+        ) : this.props.status.request ? (
+          <Placeholder type='table' />
+        ) : (
+          <b style={{ padding: '10rem', color: '#dd3838' }}>{this.props.status.message}</b>
+        )}
+        <ActivityBar>
+          {this.props.status.success ? (
+            <Fragment>
+              <section>
+                <div className='widget-header'>
+                  <i className='material-icons p-right'>filter</i> Filter
+                </div>
+              </section>
+            </Fragment>
+          ) : this.props.status.request ? (
+            <Placeholder type='table' />
+          ) : (
+            <b style={{ padding: '10rem', color: '#dd3838' }}>{this.props.status.message}</b>
+          )}
+        </ActivityBar>
       </Fragment>
     )
   }
 }
-const mapStateToProps = state => ({})
-const mapDispatchToProps = dispatch => ({})
+
+const { fetch, create, modify } = accountAction.send
+
+const mapStateToProps = state => ({
+  company : state.main.company,
+  status  : state.account.status,
+  account : state.account.account,
+})
+const mapDispatchToProps = dispatch => ({
+  fetchAccount : payload => dispatch(fetch(payload)),
+})
 
 export default connect(mapStateToProps, mapDispatchToProps)(Account)

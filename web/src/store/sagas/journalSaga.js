@@ -22,7 +22,7 @@ function* handleFetch({ payload = {} }) {
     const { data, error } = yield call(Api.fetch, [ url, { params, query } ])
 
     if (!error) {
-      yield put(replace({ key: 'journal_list', data }))
+      yield put(replace({ key: 'journal', data }))
       yield put(success())
     } else throw error
   } catch (error) {
@@ -42,7 +42,7 @@ function* handleCreate({ payload = {} }) {
     const { data, error } = yield call(Api.create, [ url, { body } ])
 
     if (!error) {
-      yield put(addTop({ key: 'journal_list', data }))
+      yield put(addTop({ key: 'journal', data }))
       yield put(success())
     } else throw error
   } catch (error) {
@@ -63,7 +63,7 @@ function* handleModify({ payload = {} }) {
     const { data, error } = yield call(Api.modify, [ url, { params, body } ])
 
     if (!error) {
-      yield put(modify({ key: 'journal_list', id, data }))
+      yield put(modify({ key: 'journal', id, data }))
       yield put(success())
     } else throw error
   } catch (error) {
@@ -84,7 +84,7 @@ function* handleActivate({ payload = {} }) {
     const { data, error } = yield call(Api.activate, [ url, { params } ])
 
     if (!error) {
-      yield put(activate({ key: 'journal_list', data: { id } }))
+      yield put(activate({ key: 'journal', data: { id } }))
       yield put(success())
     } else throw error
   } catch (error) {
@@ -104,7 +104,7 @@ function* handleDeactivate({ payload = {} }) {
     const { data, error } = yield call(Api.deactivate, [ url, { params } ])
 
     if (!error) {
-      yield put(deactivate({ key: 'journal_list', data: { id } }))
+      yield put(deactivate({ key: 'journal', data: { id } }))
       yield put(success())
     } else throw error
   } catch (error) {

@@ -3,19 +3,20 @@ import { connect } from 'react-redux'
 
 import { ActivityBar } from '../../component/layout'
 import { Modal, Container, Card, Text, Placeholder } from '../../component'
-import { fetchCompany, sendCompany } from '../../store/actions'
+import { companyAction } from '../../store/actions'
 
-import CompanyEntry from './components/CompanyEntry'
+import CompanyEntry from './components/CompanyCreate'
+import CompanySettings from './components/CompanySettings'
 
-export class Journal extends Component {
+export class Company extends Component {
   componentDidMount() {
-    this.props.fetchCompany()
+    // this.props.fetchCompany()
   }
 
   state = {
     modal_journal_details : false,
 
-    modal_company_entry   : false,
+    modal_create          : false,
     journal_index         : '',
 
     page                  : 0,
@@ -28,102 +29,84 @@ export class Journal extends Component {
   render() {
     return (
       <Fragment>
-        {this.props.status.success ? (
-          <Fragment>
-            <Container vertical className='scrollable p-hor-8 p-top-5'>
-              <Container className='flex-pos-between p-hor-4 p-bottom-4'>
-                <div />
-                <button
-                  className='btn btn-chip primary'
+        <Container vertical className='scrollable p-hor-8 p-top-5'>
+          <Container className='flex-pos-between p-hor-4 p-bottom-4'>
+            <div />
+            <button
+              className='btn btn-chip primary'
+              onClick={() => {
+                this.toggleModal('modal_create', true)
+              }}
+            >
+              New Company &nbsp;&nbsp; +
+            </button>
+          </Container>
+          <Card className='p-top-5 p-5' vertical noPad expand>
+            <Container className='card-header flex-pos-between p-vrt-4 p-hor-6'>
+              <b>Companies</b>
+              <div>
+                <b className='m-right-3'>Total: {this.props.company.length}</b>
+                {/* <select
+                  className='btn btn-chip'
                   onClick={() => {
-                    this.toggleModal('modal_company_entry', true)
+                    this.toggleModal('modal_create', true)
                   }}
                 >
-                  New Company &nbsp;&nbsp; +
-                </button>
-              </Container>
-              <Card className='p-top-5' vertical noPad expand>
-                <Container className='card-header flex-pos-between p-vrt-4 p-hor-6'>
-                  <b>Companies</b>
-                </Container>
-                <Card className='p-top-5' vertical noPad expand>
-                  <table className='table-card'>
-                    <thead>
-                      <tr>
-                        <th rowSpan='2'>No</th>
-                        <th rowSpan='2'>Name</th>
-                        <th style={{ textAlign: 'center' }} colSpan='5'>
-                          Accounts (Balance)
-                        </th>
-                      </tr>
-                      <tr>
-                        <th>Assets</th>
-                        <th>Liabilities</th>
-                        <th>Equities</th>
-                        <th>Expenses</th>
-                        <th>Incomes</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {this.props.company.map(({ name, account_count, balance }, index) => (
-                        <tr key={index}>
-                          <td>{index + 1}</td>
-                          <td>{name}</td>
-                          {account_count &&
-                          balance && (
-                            <Fragment>
-                              <td>
-                                {account_count.assets} ({balance.assets})
-                              </td>
-                              <td>
-                                {account_count.liabilities} ({balance.liabilities}
-                                )
-                              </td>
-                              <td>
-                                {account_count.equities} ({balance.equities})
-                              </td>
-                              <td>
-                                {account_count.expenses} ({balance.expenses})
-                              </td>
-                              <td>
-                                {account_count.incomes} ({balance.incomes})
-                              </td>
-                            </Fragment>
-                          )}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </Card>
-              </Card>
+                  <option>A - Z</option>
+                </select> */}
+              </div>
             </Container>
-            <CompanyEntry
-              isModalOpen={this.state.modal_company_entry}
-              modalClose={() => this.toggleModal('modal_company_entry', false)}
-              sendCompany={this.props.sendCompany}
-              // account={this.props.account}
-              company={this.props.company}
-            />
-          </Fragment>
-        ) : this.props.status.request ? (
-          <Placeholder type='table' />
-        ) : (
-          <b style={{ padding: '10rem', color: '#dd3838' }}>{this.props.status.message}</b>
-        )}
-        <ActivityBar>
-          {this.props.status.success ? (
-            <Fragment>
-              <section>
-                <div className='widget-header'>
-                  <i className='material-icons p-right'>filter</i> Filter
+            {this.props.company.map(({ id, name, isDisabled, account_count, balance }, index) => (
+              <div
+                key={index}
+                className='company-card'
+                // Temp
+                style={isDisabled ? { backgroundColor: '#eee' } : {}}
+                style={id === this.props.settings.selectedCompany ? { borderColor: 'seagreen' } : {}}
+              >
+                <div key={index}>
+                  <p className='company-title'>{name}</p>
+                  <p>Description goes here...</p>
                 </div>
-              </section>
-            </Fragment>
-          ) : this.props.status.request ? (
-            <Placeholder type='table' />
-          ) : (
-            <b style={{ padding: '10rem', color: '#dd3838' }}>{this.props.status.message}</b>
+                <div key={index} className='company-buttons'>
+                  <button
+                    className='btn btn-chip black'
+                    onClick={() => this.setState({ selected_company: id, modal_settings: true })}
+                  >
+                    Settings
+                  </button>
+                </div>
+              </div>
+            ))}
+          </Card>
+          {this.state.selected_company && (
+            <CompanySettings
+              isModalOpen={this.state.modal_settings}
+              selectedCompany={this.props.company.find(e => e.id === this.state.selected_company)}
+              modalClose={() => this.toggleModal('modal_settings', false)}
+              modifyCompany={this.props.modifyCompany}
+              removeCompany={() => this.props.removeCompany({ id: this.state.selected_company })}
+              activateCompany={() => this.props.activateCompany({ id: this.state.selected_company })}
+              deactivateCompany={() => this.props.deactivateCompany({ id: this.state.selected_company })}
+            />
           )}
+          <CompanyEntry
+            isModalOpen={this.state.modal_create}
+            modalClose={() => this.toggleModal('modal_create', false)}
+            createCompany={this.props.createCompany}
+            // account={this.props.account}
+            company={this.props.company}
+          />
+        </Container>
+
+        <ActivityBar>
+          <Fragment>
+            <section>
+              <div className='widget-header'>
+                <i className='material-icons p-right'>filter</i> Filter
+              </div>
+            </section>
+          </Fragment>
         </ActivityBar>
       </Fragment>
     )
@@ -131,13 +114,16 @@ export class Journal extends Component {
 }
 
 const mapStateToProps = state => ({
-  current_company : state.main.company,
-  company         : state.company.company,
-  status          : state.company.status,
+  company  : state.company.company,
+  settings : state.settings,
+  status   : state.company.status,
 })
 const mapDispatchToProps = dispatch => ({
-  fetchCompany : () => dispatch(fetchCompany()),
-  sendCompany  : payload => dispatch(sendCompany(payload)),
+  createCompany     : payload => dispatch(companyAction.send.create(payload)),
+  modifyCompany     : payload => dispatch(companyAction.send.modify(payload)),
+  activateCompany   : payload => dispatch(companyAction.send.activate(payload)),
+  deactivateCompany : payload => dispatch(companyAction.send.deactivate(payload)),
+  removeCompany     : payload => dispatch(companyAction.send.remove(payload)),
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(Journal)
+export default connect(mapStateToProps, mapDispatchToProps)(Company)

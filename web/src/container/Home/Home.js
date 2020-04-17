@@ -2,25 +2,36 @@ import React, { Component, Fragment } from 'react'
 import { connect } from 'react-redux'
 import { Switch, Route } from 'react-router-dom'
 import KeyboardJS from 'keyboardjs'
+import { subDays } from 'date-fns'
 
-import { fetchAccountNonempty, sendJournal, fetchAccount, updateJournal } from '../../store/actions'
+import { journalAction, accountAction, companyAction, settingsAction } from '../../store/actions'
 import { SideBar } from '../../component'
 import { NavBar } from '../../component/layout'
 
 import JournalEntry from '../Global/JournalEntry'
 
-import Header from '../Header/Header'
+// import Header from '../Header/Header'
 import Journal from '../Journal/Journal'
 import Account from '../Account/Account'
 import Company from '../Company/Company'
-import TestGround from '../TestGround/TestGround'
+// import TestGround from '../TestGround/TestGround'
 
 // import container from '../../component/container/container'
 
 export class Home extends Component {
   componentDidMount() {
-    this.props.fetchAccount({ company: this.props.company })
-    this.props.fetchAccountNonempty({ company: this.props.company })
+    this.props.fetchJournal({
+      company    : '5e8f203e1a53001dec074c9a',
+      type       : 'journal',
+      size       : 12,
+      page       : 0,
+      start_date : subDays(new Date(), 100),
+      end_date   : new Date(),
+    })
+    this.props.fetchAccount({ company: '5e8f203e1a53001dec074c9a' })
+    this.props.fetchAccount({ company: '5e8f203e1a53001dec074c9a', nonempty: true })
+    this.props.fetchCompany()
+    this.props.fetchSettings()
 
     KeyboardJS.bind(
       'ctrl + enter',
@@ -64,7 +75,7 @@ export class Home extends Component {
   render() {
     return (
       <Fragment>
-        <Header />
+        {/* <Header /> */}
         <main>
           <SideBar collapsed={this.props.collapsed}>
             <section className='navbar'>
@@ -95,8 +106,9 @@ export class Home extends Component {
               key={this.props.company}
             />
             <Route path='/account' component={Account} key={this.props.company} />
+            {/* <Route path='/account' component={Account} key={this.props.company} /> */}
             <Route path='/company' component={Company} key={this.props.company} />
-            <Route path='/test' component={TestGround} key={this.props.company} />
+            {/* <Route path='/test' component={TestGround} key={this.props.company} /> */}
           </Switch>
           <JournalEntry
             isModalOpen={this.state.modal_journal_entry}
@@ -118,16 +130,19 @@ export class Home extends Component {
 }
 
 const mapStateToProps = state => ({
-  sidebar_collapse : state.main.sidebar_collapse,
-  account          : state.account.account,
+  sidebar_collapse : true,
+  // state.main.sidebar_collapse,
+  // account          : state.account.account,
   journal          : state.journal,
-  company          : state.main.company,
+  // company          : state.main.company,
 })
 const mapDispatchToProps = dispatch => ({
-  updateJournal        : payload => dispatch(updateJournal(payload)),
-  fetchAccount         : payload => dispatch(fetchAccount(payload)),
-  fetchAccountNonempty : payload => dispatch(fetchAccountNonempty(payload)),
-  sendJournal          : payload => dispatch(sendJournal(payload)),
+  fetchJournal  : payload => dispatch(journalAction.send.fetch(payload)),
+  fetchAccount  : payload => dispatch(accountAction.send.fetch(payload)),
+  fetchCompany  : payload => dispatch(companyAction.send.fetch(payload)),
+  fetchSettings : payload => dispatch(settingsAction.send.fetch(payload)),
+  // fetchAccountNonempty : payload => dispatch(fetchAccountNonempty(payload)),
+  // sendJournal          : payload => dispatch(sendJournal(payload)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home)

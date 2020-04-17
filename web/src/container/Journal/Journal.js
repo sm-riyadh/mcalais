@@ -18,13 +18,13 @@ import JournalDetailModal from './components/JournalDetailModal'
 
 export class Journal extends Component {
   componentDidMount() {
-    this.props.fetchAccount({ company: this.props.company })
-    this.props.fetchAccountNonempty({ company: this.props.company })
-    this.props.fetchJournal({
-      company    : this.props.company,
-      start_date : moment().subtract(24, 'hours').toDate(),
-      end_date   : moment().toDate(),
-    })
+    // this.props.fetchAccount({ company: this.props.company })
+    // this.props.fetchAccountNonempty({ company: this.props.company })
+    // this.props.fetchJournal({
+    //   company    : this.props.company,
+    //   start_date : moment().subtract(24, 'hours').toDate(),
+    //   end_date   : moment().toDate(),
+    // })
   }
 
   state = {
@@ -157,7 +157,7 @@ export class Journal extends Component {
   render() {
     return (
       <Fragment>
-        {this.props.journal && !this.props.status.failed ? (
+        {this.props.journal_list && !this.props.status.failed ? (
           <Container vertical className='scrollable p-hor-8 p-top-2'>
             <Card className='p-top-5' vertical noPad expand>
               <Container className='card-header flex-pos-between p-hor-6'>
@@ -173,7 +173,13 @@ export class Journal extends Component {
                   />
                   <select name='filter_account' className='btn btn-chip grey m-hor' onChange={this.onChangeHandler}>
                     <option value=''>All Accounts</option>
-                    {this.props.account_list.map(account => <option value={account.code}>{account.name}</option>)}
+                    {this.props.account_list_nonexist ? (
+                      this.props.account_list_nonexist.map(account => (
+                        <option value={account.code}>{account.name}</option>
+                      ))
+                    ) : (
+                      'loading...'
+                    )}
                   </select>
                 </Container>
               </Container>
@@ -194,7 +200,7 @@ export class Journal extends Component {
                   </thead>
                   <tbody>
                     <JournalTableRows
-                      data={this.props.journal}
+                      data={this.props.journal_list}
                       modalOpen={() => this.toggleModal('modal_journal_details', true)}
                       setJournalIndex={this.setJournalIndex}
                       filterAccount={this.state.filter_account}
@@ -203,7 +209,7 @@ export class Journal extends Component {
                   </tbody>
                 </table>
               </div>
-              {/* <button onClick={this.appendMore}>Show more</button> */}
+              <button onClick={this.appendMore}>Show more</button>
             </Card>
           </Container>
         ) : !this.props.status.failed ? (
@@ -212,7 +218,7 @@ export class Journal extends Component {
           <b style={{ padding: '10rem', color: '#dd3838' }}>{this.props.status.message}</b>
         )}
         <ActivityBar>
-          {this.props.journal && !this.props.status.failed ? (
+          {this.props.journal_list && !this.props.status.failed ? (
             <Fragment>
               <section>
                 <div className='widget m-bottom-5'>
@@ -412,19 +418,20 @@ export class Journal extends Component {
   }
 }
 const mapStateToProps = state => ({
-  company        : state.main.company,
-  journal        : state.journal.journal,
-  status         : state.journal.status,
-  account        : state.account.account,
-  account_list   : state.account.account_list,
-  account_status : state.account.status,
+  journal_list          : state.journal.journal_list,
+  // company        : state.main.company,
+  // journal        : state.journal.journal,
+  status                : state.journal.status,
+  // account        : state.account.account,
+  account_list_nonexist : state.account.account_list_nonexist,
+  // account_status : state.account.status,
 })
 const mapDispatchToProps = dispatch => ({
-  fetchAccount         : payload => dispatch(fetchAccount(payload)),
-  fetchAccountNonempty : payload => dispatch(fetchAccountNonempty(payload)),
-  fetchJournal         : payload => dispatch(fetchJournal(payload)),
-  fetchJournalMore     : payload => dispatch(fetchJournalMore(payload)),
-  sendJournal          : payload => dispatch(sendJournal(payload)),
+  // fetchAccount         : payload => dispatch(fetchAccount(payload)),
+  // fetchAccountNonempty : payload => dispatch(fetchAccountNonempty(payload)),
+  // fetchJournal         : payload => dispatch(fetchJournal(payload)),
+  // fetchJournalMore     : payload => dispatch(fetchJournalMore(payload)),
+  // sendJournal          : payload => dispatch(sendJournal(payload)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Journal)

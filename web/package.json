@@ -8,6 +8,7 @@
     "dateformat": "^3.0.3",
     "indian-number-format": "^1.0.4",
     "keyboardjs": "^2.5.1",
+    "lodash.clonedeep": "^4.5.0",
     "material-design-icons": "^3.0.1",
     "moment": "^2.24.0",
     "node-sass": "^4.13.1",
