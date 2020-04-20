@@ -3,20 +3,8 @@ import cloneDeep from 'lodash.clonedeep'
 import { ACCOUNT } from '..'
 
 const initialState = {
-  account_nonexist : {
-    assets      : '',
-    liabilities : '',
-    equities    : '',
-    expenses    : '',
-    incomes     : '',
-  },
-  account          : {
-    assets      : '',
-    liabilities : '',
-    equities    : '',
-    expenses    : '',
-    incomes     : '',
-  },
+  account_nonexist : [],
+  account          : [],
   balance          : {
     assets      : '',
     liabilities : '',
@@ -55,9 +43,9 @@ const account = (state = initialState, { type, payload }) => {
       const newState = cloneDeep(state)
 
       let toModify
-      newState[payload.key].find((e, index) => e.id === payload.id && (toModify = index))
+      newState[payload.key].find((e, index) => e.id === payload.data.id && (toModify = index))
 
-      newState[payload.key][toModify] = payload.data
+      newState[payload.key][toModify].name = payload.data.name
 
       return newState
     }

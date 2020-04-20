@@ -4,7 +4,7 @@ import Api from './api/api'
 import { ACCOUNT } from '../index'
 import { accountAction } from '../actions'
 
-const { replace, addTop, addBottom, modify, remove } = accountAction.save
+const { replace, addTop, addBottom, modify, activate, deactivate, remove } = accountAction.save
 const { request, success, failed } = accountAction.status
 
 const url = 'account'
@@ -32,7 +32,6 @@ function* handleFetch({ payload = {} }) {
       yield put(success())
     } else throw error
   } catch (error) {
-    console.log('function*handleFetch -> error', error)
     yield put(failed(error.toString()))
   }
 }
@@ -49,9 +48,7 @@ function* handleCreate({ payload = {} }) {
     const { data, error } = yield call(Api.create, [ url, { body } ])
 
     if (!error) {
-      // yield put(addTop(data))
-      // yield put(addBottom(data))
-      console.log('function*handleFetch -> data', data)
+      yield put(addTop({ key: 'account', data }))
       yield put(success())
     } else throw error
   } catch (error) {
@@ -72,8 +69,7 @@ function* handleModify({ payload = {} }) {
     const { data, error } = yield call(Api.modify, [ url, { params, body } ])
 
     if (!error) {
-      // yield put(modify(data))
-      console.log('function*handleFetch -> data', data)
+      yield put(modify({ key: 'account', data: { id, name } }))
       yield put(success())
     } else throw error
   } catch (error) {
@@ -93,8 +89,7 @@ function* handleActivate({ payload = {} }) {
     const { data, error } = yield call(Api.activate, [ url, { params } ])
 
     if (!error) {
-      // yield put(modify(data))
-      console.log('function*handleFetch -> data', data)
+      yield put(activate({ key: 'account', data: { id } }))
       yield put(success())
     } else throw error
   } catch (error) {
@@ -114,8 +109,7 @@ function* handleDeactivate({ payload = {} }) {
     const { data, error } = yield call(Api.deactivate, [ url, { params } ])
 
     if (!error) {
-      // yield put(modify(data))
-      console.log('function*handleFetch -> data', data)
+      yield put(deactivate({ key: 'account', data: { id } }))
       yield put(success())
     } else throw error
   } catch (error) {
@@ -135,8 +129,7 @@ function* handleRemove({ payload = {} }) {
     const { data, error } = yield call(Api.remove, [ url, { params } ])
 
     if (!error) {
-      // yield put(remove(data))
-      console.log('function*handleFetch -> data', data)
+      yield put(remove({ key: 'account', data: { id } }))
       yield put(success())
     } else throw error
   } catch (error) {

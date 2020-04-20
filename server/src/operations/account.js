@@ -9,11 +9,11 @@ const fetch = async ({ company, nonempty } = {}) => {
   if (nonempty) account = await Account.fetchNonEmpty(company)
   else account = await Account.fetch(company)
 
-  const { balance } = await Company.fetchOne(company)
+  // const { balance } = await Company.fetchOne(company)
 
-  const sortedAccount = { balance, ...accountSorter(account) }
+  // const sortedAccount = { balance, ...accountSorter(account) }
 
-  return sortedAccount
+  return account
 }
 
 const fetchDetails = async ({ id }) => {

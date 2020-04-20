@@ -29,9 +29,9 @@ export class Home extends Component {
       end_date   : new Date(),
     })
     this.props.fetchAccount({ company: '5e8f203e1a53001dec074c9a' })
-    this.props.fetchAccount({ company: '5e8f203e1a53001dec074c9a', nonempty: true })
+    // this.props.fetchAccount({ company: '5e8f203e1a53001dec074c9a', nonempty: true })
     this.props.fetchCompany()
-    this.props.fetchSettings()
+    // this.props.fetchSettings()
 
     KeyboardJS.bind(
       'ctrl + enter',
