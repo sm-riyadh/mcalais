@@ -4,7 +4,7 @@
   "private": true,
   "main": ".eslintrc.json",
   "dependencies": {
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "dateformat": "^3.0.3",
     "indian-number-format": "^1.0.4",
     "keyboardjs": "^2.5.1",
